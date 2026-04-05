@@ -51,7 +51,7 @@ export default function Navbar() {
 
                 {/* Desktop Navigation - Separated 3D Buttons */}
                 <div className="hidden md:flex items-center gap-4">
-                    <Link href="/" className="px-6 py-2.5 rounded-xl bg-[#ef4444] text-white font-bold text-sm shadow-[0_6px_0_#991b1b] hover:shadow-[0_3px_0_#991b1b] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-[#ef4444]">
+                    <Link href="/" className="px-6 py-2.5 rounded-xl bg-[#3b82f6] text-white font-bold text-sm shadow-[0_6px_0_#1d4ed8] hover:shadow-[0_3px_0_#1d4ed8] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-[#3b82f6]">
                         <HomeIcon className="w-4 h-4" /> Home
                     </Link>
                     <Link href="/apps" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">

@@ -46,15 +46,17 @@ export default function Home() {
       setLoading(true);
 
       // Fetch Categories
-      const { data: cats } = await supabase.from("categories").select("*").order("created_at", { ascending: true });
+      const { data: cats, error: catError } = await supabase.from("categories").select("*").order("created_at", { ascending: true });
+      if (catError) console.error("❌ Categories fetch error:", catError.message);
       if (cats) setCategories(cats);
 
       // Fetch Products (with packages)
-      const { data: prods } = await supabase
+      const { data: prods, error: prodError } = await supabase
         .from("products")
         .select("*, packages(*)")
         .order("created_at", { ascending: false });
 
+      if (prodError) console.error("❌ Products fetch error:", prodError.message);
       if (prods) setProducts(prods);
 
       setLoading(false);
