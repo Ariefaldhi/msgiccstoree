@@ -6,6 +6,8 @@ import { Loader2, RefreshCw, CheckCircle2, Clock, XCircle, ShoppingBag, Plus, Ed
 
 interface Order {
     id: string;
+    user_id?: string;
+    email?: string;
     wa_number: string;
     customer_name: string;
     product_name: string;
@@ -27,7 +29,7 @@ export default function AdminOrders() {
     const [editingOrder, setEditingOrder] = useState<Order | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderForm, setOrderForm] = useState({
-        customer_name: "", wa_number: "", product_id: "", package_id: "", status: "Pesanan Selesai"
+        customer_name: "", wa_number: "", product_id: "", package_id: "", status: "Pesanan Selesai", created_at: ""
     });
 
     const supabase = createClient();
@@ -89,7 +91,7 @@ export default function AdminOrders() {
         const rawPrice = parseInt(selectedPackage.price.replace(/\D/g, "")) || 0;
         const profitRaw = rawPrice - selectedPackage.cost_price;
 
-        const payload = {
+        const payload: any = {
             customer_name: orderForm.customer_name,
             wa_number: orderForm.wa_number,
             package_id: selectedPackage.id,
@@ -98,8 +100,14 @@ export default function AdminOrders() {
             sell_price: rawPrice,
             cost_price: selectedPackage.cost_price,
             profit: profitRaw,
-            status: orderForm.status
+            status: orderForm.status,
+            created_at: new Date(orderForm.created_at).toISOString()
         };
+
+        if (editingOrder) {
+            payload.user_id = editingOrder.user_id;
+            payload.email = editingOrder.email;
+        }
 
         if (editingOrder) {
             const { error } = await supabase.from("orders").update(payload).eq("id", editingOrder.id);
@@ -141,11 +149,19 @@ export default function AdminOrders() {
                 wa_number: order.wa_number,
                 product_id: prodId,
                 package_id: pkgId,
-                status: order.status
+                status: order.status,
+                created_at: new Date(order.created_at).toISOString().slice(0, 16)
             });
         } else {
             setEditingOrder(null);
-            setOrderForm({ customer_name: "", wa_number: "", product_id: "", package_id: "", status: "Pesanan Selesai" });
+            setOrderForm({ 
+                customer_name: "", 
+                wa_number: "", 
+                product_id: "", 
+                package_id: "", 
+                status: "Pesanan Selesai",
+                created_at: new Date().toISOString().slice(0, 16)
+            });
         }
         setIsModalOpen(true);
     };
@@ -241,9 +257,10 @@ export default function AdminOrders() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex flex-col">
+                                            <div className="flex flex-col text-[10px]">
                                                 <span className="text-sm font-bold text-slate-900">{order.customer_name}</span>
-                                                <span className="text-xs font-medium text-slate-500 mt-0.5 whitespace-nowrap">{order.wa_number}</span>
+                                                <span className="font-medium text-slate-500 mt-0.5 whitespace-nowrap leading-tight">{order.wa_number}</span>
+                                                {order.email && <span className="text-blue-500 font-bold truncate lowercase max-w-[150px]">{order.email}</span>}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -323,6 +340,12 @@ export default function AdminOrders() {
                                     </select>
                                 </div>
                             )}
+                            
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal & Waktu Pesanan</label>
+                                <input required type="datetime-local" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                    value={orderForm.created_at} onChange={e => setOrderForm({...orderForm, created_at: e.target.value})} />
+                            </div>
 
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>

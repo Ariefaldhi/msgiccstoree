@@ -2,6 +2,7 @@ import { X, CheckCircle2, ChevronLeft, ArrowRight, ShieldCheck, Loader2 } from "
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 interface Package {
     id: string;
@@ -40,6 +41,7 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
     const [customerName, setCustomerName] = useState("");
     const [waNumber, setWaNumber] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [user, setUser] = useState<any>(null);
     const supabase = createClient();
 
     const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
@@ -50,12 +52,23 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
             setStep("selection");
             setSelectedPackage(null);
             setAgreed(false);
-            setCustomerName("");
-            setWaNumber("");
             setIsSubmitting(false);
             fetchSalesCounts();
+            checkUser();
         }
     }, [isOpen, product?.id]);
+
+    const checkUser = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+        if (user) {
+            setCustomerName(user.user_metadata?.full_name || user.email?.split('@')[0] || "");
+            setWaNumber(user.email || ""); // Using email as a placeholder for WA if logged in
+        } else {
+            setCustomerName("");
+            setWaNumber("");
+        }
+    };
 
     const fetchSalesCounts = async () => {
         if (!product) return;
@@ -100,6 +113,8 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
         const { error } = await supabase.from("orders").insert([{
             wa_number: waNumber,
             customer_name: customerName,
+            email: user?.email || null,
+            user_id: user?.id || null,
             product_name: product.title,
             package_name: selectedPackage.name,
             sell_price: sellPriceRaw,
@@ -356,28 +371,48 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
 
                             {/* Customer Form */}
                             <div className="space-y-4 px-1">
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nama Pemesan</label>
-                                    <input 
-                                        type="text" 
-                                        required 
-                                        placeholder="Masukkan nama Anda" 
-                                        value={customerName}
-                                        onChange={(e) => setCustomerName(e.target.value)}
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nomor WhatsApp</label>
-                                    <input 
-                                        type="text" 
-                                        required 
-                                        placeholder="Contoh: 0812xxxx" 
-                                        value={waNumber}
-                                        onChange={(e) => setWaNumber(e.target.value.replace(/\D/g, ''))}
-                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                    />
-                                </div>
+                                {user ? (
+                                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                                            <span className="text-white font-black text-lg uppercase">{customerName.charAt(0)}</span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-0.5">Sudah Login</p>
+                                            <p className="text-sm font-black text-slate-900 truncate">{customerName}</p>
+                                            <p className="text-[11px] font-bold text-slate-500 truncate">{user.email}</p>
+                                        </div>
+                                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                                            <ShieldCheck className="w-5 h-5 text-blue-600" />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center justify-between px-1">
+                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Detail Pemesan</label>
+                                            <Link href="/register" className="text-[10px] font-black text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-tighter transition-all">
+                                                Daftar agar otomatis
+                                            </Link>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <input 
+                                                type="text" 
+                                                required 
+                                                placeholder="Nama Pelanggan" 
+                                                value={customerName}
+                                                onChange={(e) => setCustomerName(e.target.value)}
+                                                className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                            />
+                                            <input 
+                                                type="text" 
+                                                required 
+                                                placeholder="Nomor WhatsApp" 
+                                                value={waNumber}
+                                                onChange={(e) => setWaNumber(e.target.value.replace(/\D/g, ''))}
+                                                className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                            />
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
 
