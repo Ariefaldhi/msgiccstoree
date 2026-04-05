@@ -9,12 +9,17 @@ interface FlashSaleItem {
     discount_percent: number;
     label: string;
     end_time: string;
-    product: {
+    package: {
         id: string;
-        title: string;
+        name: string;
         price: string;
-        image_url?: string;
-        packages?: any[];
+        product: {
+            id: string;
+            category_id: string;
+            title: string;
+            image_url?: string;
+            packages?: any[];
+        };
     };
 }
 
@@ -57,7 +62,7 @@ function FlashCard({ item, onOpen }: { item: FlashSaleItem; onOpen: () => void }
     const { h, m, s, expired } = useCountdown(item.end_time);
 
     // Calculate discounted price from raw number in price string
-    const rawPrice = parseInt(item.product.price.replace(/\D/g, ""), 10) || 0;
+    const rawPrice = parseInt(item.package.price.replace(/\D/g, ""), 10) || 0;
     const discounted = Math.round(rawPrice * (1 - item.discount_percent / 100));
     const discountedFormatted = `Rp ${discounted.toLocaleString("id-ID")}`;
 
@@ -75,19 +80,20 @@ function FlashCard({ item, onOpen }: { item: FlashSaleItem; onOpen: () => void }
 
             {/* Product Image */}
             <div className="w-full h-28 rounded-xl overflow-hidden bg-slate-100 mb-3 flex items-center justify-center">
-                {item.product.image_url ? (
-                    <img src={item.product.image_url} alt={item.product.title} className="w-full h-full object-cover" />
+                {item.package.product.image_url ? (
+                    <img src={item.package.product.image_url} alt={item.package.product.title} className="w-full h-full object-cover" />
                 ) : (
-                    <span className="text-4xl font-black text-slate-300">{item.product.title.charAt(0)}</span>
+                    <span className="text-4xl font-black text-slate-300">{item.package.product.title.charAt(0)}</span>
                 )}
             </div>
 
             {/* Title */}
-            <h3 className="font-black text-sm text-slate-900 truncate mb-1">{item.product.title}</h3>
+            <h3 className="font-black text-sm text-slate-900 truncate mb-1">{item.package.product.title}</h3>
+            <p className="text-xs text-slate-500 font-bold mb-1 truncate">{item.package.name}</p>
 
             {/* Price */}
             <div className="mb-3">
-                <p className="text-[10px] text-slate-400 line-through">{item.product.price}</p>
+                <p className="text-[10px] text-slate-400 line-through">{item.package.price}</p>
                 <p className="text-base font-black text-[#ff2d55]">{discountedFormatted}</p>
             </div>
 
@@ -113,7 +119,7 @@ export default function FlashSale({ onOpenProduct }: FlashSaleProps) {
             const now = new Date().toISOString();
             const { data } = await supabase
                 .from("flash_sales")
-                .select("*, product:products(id, title, price, image_url, packages(*))")
+                .select("*, package:packages(id, name, price, product:products(id, category_id, title, image_url, packages(*)))")
                 .eq("is_active", true)
                 .gte("end_time", now)
                 .order("created_at", { ascending: false });
@@ -154,7 +160,7 @@ export default function FlashSale({ onOpenProduct }: FlashSaleProps) {
                         <FlashCard
                             key={item.id}
                             item={item}
-                            onOpen={() => onOpenProduct({ ...item.product, discount_percent: item.discount_percent })}
+                            onOpen={() => onOpenProduct(item.package.product)}
                         />
                     ))}
                 </div>
