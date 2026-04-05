@@ -211,7 +211,7 @@ export default function AdminProducts() {
     const openPackageModal = (product: Product) => {
         setEditingPackage(null);
         setSelectedProduct(product);
-        setPackageForm({ name: "", price: "", cost_price: "0", duration: "", type: "", features: [] });
+        setPackageForm({ name: "", price: "", cost_price: "0", duration: "", type: "", is_available: true, features: [] });
         setIsPackageModalOpen(true);
     };
 
