@@ -1,65 +1,157 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import CategoryFilter from "@/components/CategoryFilter";
+import ProductCard from "@/components/ProductCard";
+import Footer from "@/components/Footer";
+import ProductModal from "@/components/ProductModal";
+import { createClient } from "@/lib/supabase/client";
+import { Loader2 } from "lucide-react";
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string;
+}
+
+interface Product {
+  id: string;
+  category_id: string;
+  title: string;
+  price: string;
+  tag?: string;
+  tagColor?: "yellow" | "red" | "blue" | "purple";
+  image_url?: string;
+  packages?: any[];
+}
 
 export default function Home() {
+  const [activeCategory, setActiveCategory] = useState("Semua");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Data State
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+
+      // Fetch Categories
+      const { data: cats } = await supabase.from("categories").select("*").order("created_at", { ascending: true });
+      if (cats) setCategories(cats);
+
+      // Fetch Products (with packages)
+      const { data: prods } = await supabase
+        .from("products")
+        .select("*, packages(*)")
+        .order("created_at", { ascending: false });
+
+      if (prods) setProducts(prods);
+
+      setLoading(false);
+    }
+
+    fetchData();
+  }, []);
+
+  // Prepare categories for Filter Component
+  // REMOVED: Manually prepended "Semua" to avoid duplication with CategoryFilter's internal button
+  const filterCategories = categories.map(c => ({
+    name: c.name,
+    slug: c.slug,
+    icon: c.icon
+  }));
+
+  // Filter Products
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory = activeCategory === "Semua" ||
+      categories.find(c => c.id === product.category_id)?.name === activeCategory;
+
+    const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="min-h-screen bg-white">
+      <Navbar />
+
+      <Hero />
+
+      <section id="products" className="container mx-auto px-4 py-8 -mt-10 relative z-20">
+        <CategoryFilter
+          categories={filterCategories}
+          activeCategory={activeCategory}
+          onSelectCategory={setActiveCategory}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        {/* Search Input - Mobile/Desktop */}
+        <div className="mb-10 max-w-md mx-auto">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white border border-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-bold text-sm text-slate-800 placeholder:text-gray-400 shadow-sm"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
         </div>
-      </main>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-8 pb-20">
+            {filteredProducts.map((product) => (
+              <div key={product.id} onClick={() => handleProductClick(product)} className="cursor-pointer">
+                <ProductCard
+                  title={product.title}
+                  price={product.price}
+                  image={product.image_url}
+                  tag={product.tag}
+                  tagColor={product.tagColor}
+                  href="#" // Prevent navigation, handle with onClick
+                />
+              </div>
+            ))}
+            {filteredProducts.length === 0 && (
+              <div className="col-span-full text-center py-20">
+                <p className="text-gray-400 font-bold text-lg">Tidak ada produk ditemukan.</p>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+
+      <Footer />
+
+      <ProductModal
+        product={selectedProduct ? {
+          ...selectedProduct,
+          category: categories.find(c => c.id === selectedProduct.category_id)?.name || "Unknown",
+          // Correct mapping for packages if needed, here we assume it matches enough or cast it
+          packages: selectedProduct.packages
+        } : null}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

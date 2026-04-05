@@ -1,0 +1,522 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { Plus, Trash2, Loader2, Save, X, Edit, Package as PackageIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+import ImageCropper from "@/components/admin/ImageCropper";
+
+// Types matching DB schema
+interface Category {
+    id: string;
+    name: string;
+}
+
+interface Product {
+    id: string;
+    category_id: string;
+    title: string;
+    price: string;
+    tag: string;
+    tag_color: "yellow" | "red" | "blue" | "purple";
+    image_url?: string;
+    packages?: Package[];
+}
+
+interface Package {
+    id: string;
+    product_id: string;
+    name: string;
+    price: string;
+    duration: string;
+    type: string;
+    features?: string[];
+}
+
+export default function AdminProducts() {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Modal States
+    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+    const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+    // Forms
+    const [productForm, setProductForm] = useState({
+        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: ""
+    });
+    const [packageForm, setPackageForm] = useState<{
+        name: string; price: string; duration: string; type: string; features: string[];
+    }>({
+        name: "", price: "", duration: "", type: "", features: []
+    });
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const supabase = createClient();
+    const router = useRouter();
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        setLoading(true);
+
+        // Fetch Categories for dropdown
+        const { data: cats } = await supabase.from("categories").select("*");
+        if (cats) setCategories(cats);
+
+        // Fetch Products with Packages
+        const { data: prods, error } = await supabase
+            .from("products")
+            .select("*, packages(*)")
+            .order("created_at", { ascending: false });
+
+        if (prods) setProducts(prods);
+        setLoading(false);
+    };
+
+    // Image State
+    const [imageFile, setImageFile] = useState<Blob | null>(null);
+    const [showCropper, setShowCropper] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    // --- PRODUCT HANDLERS ---
+
+    const handleCreateProduct = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        // Auto-fix price format if just number
+        let formattedPrice = productForm.price;
+        if (!productForm.price.startsWith("Rp")) {
+            formattedPrice = `Rp ${Number(productForm.price.replace(/\D/g, '')).toLocaleString('id-ID')}`;
+        }
+
+        let imageUrl = productForm.image_url;
+
+        // Upload Image if exists
+        if (imageFile) {
+            const fileName = `${Date.now()}-${productForm.title.replace(/\s+/g, '-').toLowerCase()}.jpg`;
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('products')
+                .upload(fileName, imageFile, {
+                    contentType: 'image/jpeg'
+                });
+
+            if (uploadError) {
+                alert("Image upload failed: " + uploadError.message + "\nMake sure you created a public bucket named 'products'.");
+                setIsSubmitting(false);
+                return;
+            }
+
+            if (uploadData) {
+                // Get Public URL
+                const { data: { publicUrl } } = supabase.storage.from('products').getPublicUrl(fileName);
+                imageUrl = publicUrl;
+            }
+        }
+
+        const { data, error } = await supabase.from("products").insert([{
+            ...productForm,
+            price: formattedPrice,
+            image_url: imageUrl
+        }]).select();
+
+        if (!error && data) {
+            setProducts([data[0], ...products]);
+            setIsProductModalOpen(false);
+            setProductForm({ category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "" });
+            setImageFile(null);
+            setImagePreview(null);
+            router.refresh();
+        } else {
+            alert("Error: " + error?.message);
+        }
+        setIsSubmitting(false);
+    };
+
+    const handleDeleteProduct = async (id: string) => {
+        if (!confirm("Delete product? This will delete all its packages too.")) return;
+        const { error } = await supabase.from("products").delete().eq("id", id);
+        if (!error) {
+            setProducts(products.filter(p => p.id !== id));
+            router.refresh();
+        }
+    };
+
+    // --- PACKAGE HANDLERS ---
+
+    const openPackageModal = (product: Product) => {
+        setSelectedProduct(product);
+        setIsPackageModalOpen(true);
+    };
+
+    const handleCreatePackage = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedProduct) return;
+        setIsSubmitting(true);
+
+        // Auto-fix price
+        let formattedPrice = packageForm.price;
+        if (!packageForm.price.startsWith("Rp")) {
+            formattedPrice = `Rp ${Number(packageForm.price.replace(/\D/g, '')).toLocaleString('id-ID')}`;
+        }
+
+        const { data, error } = await supabase.from("packages").insert([{
+            ...packageForm,
+            price: formattedPrice,
+            product_id: selectedProduct.id,
+            features: packageForm.features
+        }]).select();
+
+        if (!error && data) {
+            // Update local state nested packages
+            setProducts(products.map(p => {
+                if (p.id === selectedProduct.id) {
+                    return { ...p, packages: [...(p.packages || []), data[0]] };
+                }
+                return p;
+            }));
+            setIsPackageModalOpen(false);
+            setPackageForm({ name: "", price: "", duration: "", type: "", features: [] });
+        } else {
+            alert("Error: " + error?.message);
+        }
+        setIsSubmitting(false);
+    };
+
+    const handleDeletePackage = async (packageId: string, productId: string) => {
+        if (!confirm("Delete this package?")) return;
+        const { error } = await supabase.from("packages").delete().eq("id", packageId);
+        if (!error) {
+            setProducts(products.map(p => {
+                if (p.id === productId) {
+                    return { ...p, packages: p.packages?.filter(pkg => pkg.id !== packageId) };
+                }
+                return p;
+            }));
+        }
+    };
+
+
+    return (
+        <div className="space-y-8">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Products</h1>
+                    <p className="text-slate-500 mt-1">Manage products and their packages.</p>
+                </div>
+                <button
+                    onClick={() => setIsProductModalOpen(true)}
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-900/20 transition-all"
+                >
+                    <Plus className="w-5 h-5" />
+                    Add Product
+                </button>
+            </div>
+
+            {loading ? (
+                <div className="flex justify-center h-64"><Loader2 className="w-8 h-8 text-blue-600 animate-spin" /></div>
+            ) : (
+                <div className="space-y-6">
+                    {products.map((product) => (
+                        <div key={product.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                            {/* Product Header */}
+                            <div className="p-6 flex items-start justify-between border-b border-slate-50 bg-slate-50/50">
+                                <div className="flex gap-4">
+                                    <div className="w-16 h-16 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-3xl font-black text-slate-900 overflow-hidden relative">
+                                        {product.image_url ? (
+                                            <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                                        ) : (
+                                            product.title.charAt(0)
+                                        )}
+                                    </div>
+                                    <div>
+                                        <div className="flex gap-2 mb-1">
+                                            {product.tag && (
+                                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md text-white bg-${product.tag_color === 'yellow' ? 'yellow-500' : product.tag_color === 'red' ? 'red-500' : 'blue-500'}`}>
+                                                    {product.tag}
+                                                </span>
+                                            )}
+                                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-200 text-slate-600">
+                                                {categories.find(c => c.id === product.category_id)?.name || "Unknown Category"}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-xl font-black text-slate-900">{product.title}</h3>
+                                        <p className="text-blue-600 font-bold">{product.price}</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => openPackageModal(product)}
+                                        className="text-xs font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1"
+                                    >
+                                        <Plus className="w-3 h-3" /> Add Package
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteProduct(product.id)}
+                                        className="p-2 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    >
+                                        <Trash2 className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Packages List */}
+                            <div className="p-4 bg-white">
+                                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pl-2">Packages Available</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {product.packages?.map(pkg => (
+                                        <div key={pkg.id} className="border border-slate-100 rounded-xl p-3 flex justify-between items-center bg-slate-50/30 hover:bg-slate-50 transition-colors">
+                                            <div>
+                                                <p className="font-bold text-sm text-slate-900">{pkg.name}</p>
+                                                <p className="text-xs text-blue-600 font-bold">{pkg.price} <span className="text-slate-400 font-normal">• {pkg.duration}</span></p>
+                                                <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wide">{pkg.type}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDeletePackage(pkg.id, product.id)}
+                                                className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {(!product.packages || product.packages.length === 0) && (
+                                        <div className="col-span-full text-center py-4 text-xs text-slate-400 italic">
+                                            No packages added yet.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+
+                    {products.length === 0 && (
+                        <div className="text-center py-12 text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                            No products. Add your first product to start selling.
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* --- MODALS --- */}
+
+            {/* Add Product Modal */}
+            {isProductModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-black text-slate-900">New Product</h2>
+                            <button onClick={() => setIsProductModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleCreateProduct} className="space-y-4">
+                            <div>
+                                <label className="label-admin">Product Logo</label>
+                                <div className="flex items-center gap-4">
+                                    {imagePreview ? (
+                                        <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 group">
+                                            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => { setImageFile(null); setImagePreview(null); }}
+                                                className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white"
+                                            >
+                                                <X className="w-6 h-6" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCropper(true)}
+                                            className="w-20 h-20 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 hover:border-blue-500 hover:text-blue-500 transition-all bg-slate-50"
+                                        >
+                                            <Plus className="w-6 h-6" />
+                                        </button>
+                                    )}
+                                    <div className="text-xs text-slate-400">
+                                        <p>Upload clean product logo.</p>
+                                        <p>Square ratio recommended.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="label-admin">Category</label>
+                                <select
+                                    required
+                                    className="input-admin"
+                                    value={productForm.category_id}
+                                    onChange={e => setProductForm({ ...productForm, category_id: e.target.value })}
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="label-admin">Product Title</label>
+                                <input required type="text" className="input-admin" placeholder="e.g. Netflix Premium"
+                                    value={productForm.title} onChange={e => setProductForm({ ...productForm, title: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="label-admin">Starting Price</label>
+                                <input required type="text" className="input-admin" placeholder="e.g. 25000"
+                                    value={productForm.price} onChange={e => setProductForm({ ...productForm, price: e.target.value })} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="label-admin">Tag (Optional)</label>
+                                    <input type="text" className="input-admin" placeholder="e.g. PROMO"
+                                        value={productForm.tag} onChange={e => setProductForm({ ...productForm, tag: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="label-admin">Tag Color</label>
+                                    <select className="input-admin" value={productForm.tag_color} onChange={e => setProductForm({ ...productForm, tag_color: e.target.value as any })}>
+                                        <option value="yellow">Yellow</option>
+                                        <option value="red">Red</option>
+                                        <option value="blue">Blue</option>
+                                        <option value="purple">Purple</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" disabled={isSubmitting} className="btn-admin-submit mt-4">
+                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Product"}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Add Package Modal */}
+            {isPackageModalOpen && selectedProduct && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-xl font-black text-slate-900">Add Package</h2>
+                                <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">For {selectedProduct.title}</p>
+                            </div>
+                            <button onClick={() => setIsPackageModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleCreatePackage} className="space-y-4">
+                            <div>
+                                <label className="label-admin">Package Name</label>
+                                <input required type="text" className="input-admin" placeholder="e.g. 1 Bulan Sharing"
+                                    value={packageForm.name} onChange={e => setPackageForm({ ...packageForm, name: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="label-admin">Price</label>
+                                <input required type="text" className="input-admin" placeholder="e.g. 29000"
+                                    value={packageForm.price} onChange={e => setPackageForm({ ...packageForm, price: e.target.value })} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="label-admin">Duration</label>
+                                    <input required type="text" className="input-admin" placeholder="e.g. 30 Hari"
+                                        value={packageForm.duration} onChange={e => setPackageForm({ ...packageForm, duration: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="label-admin">Type</label>
+                                    <input required type="text" className="input-admin" placeholder="e.g. PRIVAT"
+                                        value={packageForm.type} onChange={e => setPackageForm({ ...packageForm, type: e.target.value })} />
+                                </div>
+                            </div>
+
+                            {/* Features Input */}
+                            <div>
+                                <label className="label-admin">Features (Unlimited)</label>
+                                <div className="flex gap-2 mb-2">
+                                    <input
+                                        type="text"
+                                        className="input-admin"
+                                        placeholder="Add a feature (e.g. Garansi 7 Hari)"
+                                        id="feature-input"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                const val = e.currentTarget.value.trim();
+                                                if (val) {
+                                                    setPackageForm(prev => ({ ...prev, features: [...prev.features, val] }));
+                                                    e.currentTarget.value = "";
+                                                }
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const input = document.getElementById('feature-input') as HTMLInputElement;
+                                            const val = input.value.trim();
+                                            if (val) {
+                                                setPackageForm(prev => ({ ...prev, features: [...prev.features, val] }));
+                                                input.value = "";
+                                            }
+                                        }}
+                                        className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 rounded-xl font-bold transition-colors"
+                                    >
+                                        <Plus className="w-5 h-5" />
+                                    </button>
+                                </div>
+                                <div className="space-y-2">
+                                    {packageForm.features.map((feat, idx) => (
+                                        <div key={idx} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                                            <span className="text-xs font-bold text-slate-700">{feat}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setPackageForm(prev => ({ ...prev, features: prev.features.filter((_, i) => i !== idx) }))}
+                                                className="text-slate-400 hover:text-red-500 transition-colors"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {packageForm.features.length === 0 && (
+                                        <p className="text-xs text-slate-400 italic">No features added. Press Enter to add.</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <button type="submit" disabled={isSubmitting} className="btn-admin-submit mt-4">
+                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Add Package"}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            <style jsx>{`
+        .label-admin {
+            @apply block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2;
+        }
+        .input-admin {
+            @apply w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all;
+        }
+        .btn-admin-submit {
+            @apply w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2;
+        }
+      `}</style>
+
+            {showCropper && (
+                <ImageCropper
+                    onCropComplete={(blob) => {
+                        setImageFile(blob);
+                        setImagePreview(URL.createObjectURL(blob));
+                        setShowCropper(false);
+                    }}
+                    onCancel={() => setShowCropper(false)}
+                />
+            )}
+        </div>
+    );
+}
