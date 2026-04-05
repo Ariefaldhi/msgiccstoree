@@ -51,7 +51,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
         if (!selectedPackage || !agreed) return;
 
         const message = `Halo Admin, saya mau order paket ini:%0A%0A*${product.title}*%0A📦 ${selectedPackage.name}%0A💰 ${selectedPackage.price}%0A⏳ ${selectedPackage.duration}%0A%0A_Mohon diproses ya kak!_`;
-        window.open(`https://wa.me/628123456789?text=${message}`, "_blank");
+        window.open(`https://wa.me/6285720892082?text=${message}`, "_blank");
     };
 
     return (
