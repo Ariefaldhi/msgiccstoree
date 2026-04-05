@@ -45,10 +45,10 @@ function useCountdown(endTime: string) {
 function CountdownUnit({ value, label }: { value: number; label: string }) {
     return (
         <div className="flex flex-col items-center">
-            <div className="bg-[#ff2d55] text-white font-black text-xl w-10 h-10 rounded-lg flex items-center justify-center shadow-lg">
+            <div className="bg-[#3b82f6] text-white font-black text-xs w-6 h-6 rounded-md flex items-center justify-center shadow-lg">
                 {String(value).padStart(2, "0")}
             </div>
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1">{label}</span>
+            <span className="text-[7px] font-bold text-slate-400 uppercase tracking-wider mt-1">{label}</span>
         </div>
     );
 }
@@ -69,7 +69,7 @@ function FlashCard({ item, onOpen }: { item: FlashSaleItem; onOpen: () => void }
             className="group relative bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden"
         >
             {/* Discount Badge */}
-            <div className="absolute top-3 right-3 bg-[#ff2d55] text-white text-[10px] font-black px-2 py-1 rounded-lg shadow">
+            <div className="absolute top-3 right-3 bg-[#3b82f6] text-white text-[10px] font-black px-2 py-1 rounded-lg shadow">
                 -{item.discount_percent}%
             </div>
 
@@ -94,9 +94,9 @@ function FlashCard({ item, onOpen }: { item: FlashSaleItem; onOpen: () => void }
             {/* Countdown */}
             <div className="flex items-center gap-1.5">
                 <CountdownUnit value={h} label="Jam" />
-                <span className="text-slate-400 font-black text-lg pb-4">:</span>
+                <span className="text-slate-400 font-black text-xs pb-3">:</span>
                 <CountdownUnit value={m} label="Menit" />
-                <span className="text-slate-400 font-black text-lg pb-4">:</span>
+                <span className="text-slate-400 font-black text-xs pb-3">:</span>
                 <CountdownUnit value={s} label="Detik" />
             </div>
         </div>
@@ -127,19 +127,19 @@ export default function FlashSale({ onOpenProduct }: FlashSaleProps) {
 
     return (
         <section className="container mx-auto px-4 pb-4">
-            <div className="bg-gradient-to-br from-[#1a0a14] to-[#0d0d0d] rounded-[2rem] p-6 md:p-8 border border-[#ff2d55]/20 shadow-2xl relative overflow-hidden">
+            <div className="bg-gradient-to-br from-[#0f172a] to-[#020617] rounded-[2rem] p-6 md:p-8 border border-[#3b82f6]/20 shadow-2xl relative overflow-hidden">
                 {/* Background glow */}
-                <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#ff2d55]/10 blur-[80px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#3b82f6]/10 blur-[80px] rounded-full pointer-events-none" />
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 relative z-10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#ff2d55] flex items-center justify-center shadow-lg shadow-red-500/30">
+                        <div className="w-10 h-10 rounded-xl bg-[#3b82f6] flex items-center justify-center shadow-lg shadow-blue-500/30">
                             <Zap className="w-5 h-5 text-white fill-white" />
                         </div>
                         <div>
                             <h2 className="text-xl font-black text-white tracking-tight">FLASH SALE</h2>
-                            <p className="text-[10px] font-bold text-[#ff2d55] uppercase tracking-widest">Penawaran Terbatas!</p>
+                            <p className="text-[10px] font-bold text-[#3b82f6] uppercase tracking-widest">Penawaran Terbatas!</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold">
@@ -154,7 +154,7 @@ export default function FlashSale({ onOpenProduct }: FlashSaleProps) {
                         <FlashCard
                             key={item.id}
                             item={item}
-                            onOpen={() => onOpenProduct(item.product)}
+                            onOpen={() => onOpenProduct({ ...item.product, discount_percent: item.discount_percent })}
                         />
                     ))}
                 </div>
