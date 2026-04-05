@@ -42,10 +42,15 @@ export default function AdminProducts() {
     // Modal States
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
     // Forms
     const [productForm, setProductForm] = useState({
+        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: ""
+    });
+    const [editForm, setEditForm] = useState({
         category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: ""
     });
     const [packageForm, setPackageForm] = useState<{
@@ -147,6 +152,50 @@ export default function AdminProducts() {
             setProducts(products.filter(p => p.id !== id));
             router.refresh();
         }
+    };
+
+    // --- EDIT PRODUCT HANDLERS ---
+
+    const openEditModal = (product: Product) => {
+        setEditingProduct(product);
+        setEditForm({
+            category_id: product.category_id,
+            title: product.title,
+            price: product.price,
+            tag: product.tag || "",
+            tag_color: product.tag_color || "yellow",
+            image_url: product.image_url || "",
+        });
+        setIsEditModalOpen(true);
+    };
+
+    const handleUpdateProduct = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingProduct) return;
+        setIsSubmitting(true);
+
+        let formattedPrice = editForm.price;
+        if (!editForm.price.startsWith("Rp")) {
+            formattedPrice = `Rp ${Number(editForm.price.replace(/\D/g, '')).toLocaleString('id-ID')}`;
+        }
+
+        const { error } = await supabase
+            .from("products")
+            .update({ ...editForm, price: formattedPrice })
+            .eq("id", editingProduct.id);
+
+        if (!error) {
+            setProducts(products.map(p =>
+                p.id === editingProduct.id
+                    ? { ...p, ...editForm, price: formattedPrice }
+                    : p
+            ));
+            setIsEditModalOpen(false);
+            setEditingProduct(null);
+        } else {
+            alert("Error: " + error.message);
+        }
+        setIsSubmitting(false);
     };
 
     // --- PACKAGE HANDLERS ---
@@ -257,6 +306,13 @@ export default function AdminProducts() {
                                         className="text-xs font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1"
                                     >
                                         <Plus className="w-3 h-3" /> Add Package
+                                    </button>
+                                    <button
+                                        onClick={() => openEditModal(product)}
+                                        className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Edit Product"
+                                    >
+                                        <Edit className="w-5 h-5" />
                                     </button>
                                     <button
                                         onClick={() => handleDeleteProduct(product.id)}
@@ -389,6 +445,76 @@ export default function AdminProducts() {
 
                             <button type="submit" disabled={isSubmitting} className="btn-admin-submit mt-4">
                                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Product"}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Product Modal */}
+            {isEditModalOpen && editingProduct && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-xl font-black text-slate-900">Edit Product</h2>
+                                <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">{editingProduct.title}</p>
+                            </div>
+                            <button onClick={() => setIsEditModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleUpdateProduct} className="space-y-4">
+                            <div>
+                                <label className="label-admin">Category</label>
+                                <select
+                                    required
+                                    className="input-admin"
+                                    value={editForm.category_id}
+                                    onChange={e => setEditForm({ ...editForm, category_id: e.target.value })}
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="label-admin">Product Title</label>
+                                <input required type="text" className="input-admin" placeholder="e.g. Netflix Premium"
+                                    value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="label-admin">Starting Price</label>
+                                <input required type="text" className="input-admin" placeholder="e.g. 25000 atau Rp 25.000"
+                                    value={editForm.price} onChange={e => setEditForm({ ...editForm, price: e.target.value })} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="label-admin">Tag (Optional)</label>
+                                    <input type="text" className="input-admin" placeholder="e.g. PROMO"
+                                        value={editForm.tag} onChange={e => setEditForm({ ...editForm, tag: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="label-admin">Tag Color</label>
+                                    <select className="input-admin" value={editForm.tag_color} onChange={e => setEditForm({ ...editForm, tag_color: e.target.value as any })}>
+                                        <option value="yellow">Yellow</option>
+                                        <option value="red">Red</option>
+                                        <option value="blue">Blue</option>
+                                        <option value="purple">Purple</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="label-admin">Image URL (Optional)</label>
+                                <input type="text" className="input-admin" placeholder="https://..."
+                                    value={editForm.image_url} onChange={e => setEditForm({ ...editForm, image_url: e.target.value })} />
+                                {editForm.image_url && (
+                                    <img src={editForm.image_url} className="mt-2 w-16 h-16 rounded-xl object-cover border border-slate-200" alt="preview" />
+                                )}
+                            </div>
+
+                            <button type="submit" disabled={isSubmitting} className="btn-admin-submit mt-4">
+                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-4 h-4" /> Save Changes</>}
                             </button>
                         </form>
                     </div>
