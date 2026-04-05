@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, Tags, Settings, LogOut, ShoppingBag } from "lucide-react";
+import { LayoutDashboard, Package, Tags, Settings, LogOut, ShoppingBag, Zap } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -24,6 +24,7 @@ export default function AdminLayout({
         { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
         { name: "Categories", href: "/admin/categories", icon: Tags },
         { name: "Products", href: "/admin/products", icon: Package },
+        { name: "Flash Sale", href: "/admin/flashsale", icon: Zap },
         { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
         { name: "Settings", href: "/admin/settings", icon: Settings },
     ];

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
+import FlashSale from "@/components/FlashSale";
 import CategoryFilter from "@/components/CategoryFilter";
 import ProductCard from "@/components/ProductCard";
 import Footer from "@/components/Footer";
@@ -92,9 +92,12 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      <Hero />
+      {/* Flash Sale - replaces Hero, auto-hides if no active sales */}
+      <div className="pt-28">
+        <FlashSale onOpenProduct={(p) => { setSelectedProduct(p); setIsModalOpen(true); }} />
+      </div>
 
-      <section id="products" className="container mx-auto px-4 py-8 -mt-10 relative z-20">
+      <section id="products" className="container mx-auto px-4 py-8 relative z-20">
         <CategoryFilter
           categories={filterCategories}
           activeCategory={activeCategory}
