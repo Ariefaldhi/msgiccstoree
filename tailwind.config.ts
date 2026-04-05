@@ -14,7 +14,17 @@ const config: Config = {
                     red: '#ff4b1f',
                     darkblue: '#1e3a8a', // Was orange
                     dark: '#161616',
-                    blue: '#1e293b',
+                },
+                blue: {
+                    50: 'var(--theme-50)',
+                    100: 'var(--theme-100)',
+                    200: 'var(--theme-200)',
+                    300: 'var(--theme-300)',
+                    400: 'var(--theme-400)',
+                    500: 'var(--theme-500)',
+                    600: 'var(--theme-600)',
+                    700: 'var(--theme-700)',
+                    900: 'var(--theme-900)',
                 },
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',

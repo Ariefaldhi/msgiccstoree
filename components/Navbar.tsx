@@ -7,7 +7,7 @@ import AuthButton from "./AuthButton";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-export default function Navbar() {
+export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeName?: string, logoUrl?: string }) {
     const [isScrolled, setIsScrolled] = useState(false);
     const pathname = usePathname();
 
@@ -35,13 +35,19 @@ export default function Navbar() {
             <div className="container mx-auto flex items-center gap-6 px-4 py-3">
                 {/* Logo Section */}
                 <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-[#18181b] flex items-center justify-center text-white relative overflow-hidden shrink-0 shadow-md">
-                        <span className="font-bold text-xl italic select-none">M</span>
-                        <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
-                    </div>
+                    {logoUrl ? (
+                        <div className="w-11 h-11 rounded-full overflow-hidden shrink-0 shadow-md">
+                            <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                        </div>
+                    ) : (
+                        <div className="w-11 h-11 rounded-full bg-[#18181b] flex items-center justify-center text-white relative overflow-hidden shrink-0 shadow-md">
+                            <span className="font-bold text-xl italic select-none">{storeName.charAt(0).toUpperCase()}</span>
+                            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
+                        </div>
+                    )}
                     <div className="flex flex-col justify-center">
-                        <span className="text-2xl font-black tracking-tight text-[#09090b] leading-none">
-                            MSGICC STORE
+                        <span className="text-2xl font-black tracking-tight text-[#09090b] leading-none uppercase">
+                            {storeName}
                         </span>
                         <span className="text-[0.65rem] font-bold tracking-[0.2em] text-gray-400 uppercase leading-none mt-1">
                             MARKETPLACE V2.3
@@ -51,7 +57,7 @@ export default function Navbar() {
 
                 {/* Desktop Navigation - Separated 3D Buttons */}
                 <div className="hidden md:flex items-center gap-4">
-                    <Link href="/" className="px-6 py-2.5 rounded-xl bg-[#3b82f6] text-white font-bold text-sm shadow-[0_6px_0_#1d4ed8] hover:shadow-[0_3px_0_#1d4ed8] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-[#3b82f6]">
+                    <Link href="/" className="px-6 py-2.5 rounded-xl bg-blue-500 text-white font-bold text-sm shadow-[0_6px_0_theme(colors.blue.700)] hover:shadow-[0_3px_0_theme(colors.blue.700)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-blue-500">
                         <HomeIcon className="w-4 h-4" /> Home
                     </Link>
                     <Link href="/apps" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">

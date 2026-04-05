@@ -10,7 +10,7 @@ export default function Footer() {
                             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#18181b] text-white font-bold shadow-lg shadow-gray-200/20 italic text-xl">
                                 M
                             </div>
-                            <span className="text-xl font-bold">MSGICC<span className="text-red-500">STORE</span></span>
+                            <span className="text-xl font-bold">MSGICC<span className="text-blue-500">STORE</span></span>
                         </div>
                         <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
                             Platform top-up game dan aplikasi premium termurah, tercepat, dan terpercaya di Indonesia.
@@ -20,18 +20,18 @@ export default function Footer() {
                     <div>
                         <h4 className="font-bold mb-4 text-foreground">Menu</h4>
                         <ul className="space-y-2 text-sm text-muted-foreground">
-                            <li><Link href="/" className="hover:text-red-500 transition-colors">Home</Link></li>
-                            <li><Link href="/apps" className="hover:text-red-500 transition-colors">Apps</Link></li>
-                            <li><Link href="/sosmed" className="hover:text-red-500 transition-colors">Sosmed</Link></li>
+                            <li><Link href="/" className="hover:text-blue-500 transition-colors">Home</Link></li>
+                            <li><Link href="/apps" className="hover:text-blue-500 transition-colors">Apps</Link></li>
+                            <li><Link href="/sosmed" className="hover:text-blue-500 transition-colors">Sosmed</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-bold mb-4 text-foreground">Legal</h4>
                         <ul className="space-y-2 text-sm text-muted-foreground">
-                            <li><Link href="/privacy" className="hover:text-red-500 transition-colors">Privacy Policy</Link></li>
-                            <li><Link href="/terms" className="hover:text-red-500 transition-colors">Terms of Service</Link></li>
-                            <li><Link href="/contact" className="hover:text-red-500 transition-colors">Contact Us</Link></li>
+                            <li><Link href="/privacy" className="hover:text-blue-500 transition-colors">Privacy Policy</Link></li>
+                            <li><Link href="/terms" className="hover:text-blue-500 transition-colors">Terms of Service</Link></li>
+                            <li><Link href="/contact" className="hover:text-blue-500 transition-colors">Contact Us</Link></li>
                         </ul>
                     </div>
                 </div>

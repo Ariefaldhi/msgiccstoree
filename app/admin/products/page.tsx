@@ -21,6 +21,7 @@ interface Product {
     tag: string;
     tag_color: "yellow" | "red" | "blue" | "purple";
     image_url?: string;
+    terms_conditions?: string;
     packages?: Package[];
 }
 
@@ -46,16 +47,17 @@ export default function AdminProducts() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [editingPackage, setEditingPackage] = useState<Package | null>(null);
 
     // Forms
     const [productForm, setProductForm] = useState({
-        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: ""
+        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", terms_conditions: ""
     });
     const [editForm, setEditForm] = useState<{
         category_id: string; title: string; price: string;
-        tag: string; tag_color: "yellow" | "red" | "blue" | "purple"; image_url: string;
+        tag: string; tag_color: "yellow" | "red" | "blue" | "purple"; image_url: string; terms_conditions: string;
     }>({
-        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: ""
+        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", terms_conditions: ""
     });
     const [packageForm, setPackageForm] = useState<{
         name: string; price: string; cost_price: string; duration: string; type: string; features: string[];
@@ -139,7 +141,7 @@ export default function AdminProducts() {
         if (!error && data) {
             setProducts([data[0], ...products]);
             setIsProductModalOpen(false);
-            setProductForm({ category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "" });
+            setProductForm({ category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", terms_conditions: "" });
             setImageFile(null);
             setImagePreview(null);
             router.refresh();
@@ -169,6 +171,7 @@ export default function AdminProducts() {
             tag: product.tag || "",
             tag_color: product.tag_color || "yellow",
             image_url: product.image_url || "",
+            terms_conditions: product.terms_conditions || "",
         });
         setIsEditModalOpen(true);
     };
@@ -205,7 +208,23 @@ export default function AdminProducts() {
     // --- PACKAGE HANDLERS ---
 
     const openPackageModal = (product: Product) => {
+        setEditingPackage(null);
         setSelectedProduct(product);
+        setPackageForm({ name: "", price: "", cost_price: "0", duration: "", type: "", features: [] });
+        setIsPackageModalOpen(true);
+    };
+
+    const openEditPackageModal = (product: Product, pkg: Package) => {
+        setEditingPackage(pkg);
+        setSelectedProduct(product);
+        setPackageForm({ 
+            name: pkg.name, 
+            price: pkg.price, 
+            cost_price: pkg.cost_price.toString(), 
+            duration: pkg.duration, 
+            type: pkg.type, 
+            features: pkg.features || [] 
+        });
         setIsPackageModalOpen(true);
     };
 
@@ -220,26 +239,46 @@ export default function AdminProducts() {
             formattedPrice = `Rp ${Number(packageForm.price.replace(/\D/g, '')).toLocaleString('id-ID')}`;
         }
 
-        const { data, error } = await supabase.from("packages").insert([{
+        const payload = {
             ...packageForm,
             price: formattedPrice,
             cost_price: parseInt(packageForm.cost_price.replace(/\D/g, '')) || 0,
             product_id: selectedProduct.id,
             features: packageForm.features
-        }]).select();
+        };
 
-        if (!error && data) {
-            // Update local state nested packages
-            setProducts(products.map(p => {
-                if (p.id === selectedProduct.id) {
-                    return { ...p, packages: [...(p.packages || []), data[0]] };
-                }
-                return p;
-            }));
-            setIsPackageModalOpen(false);
-            setPackageForm({ name: "", price: "", cost_price: "0", duration: "", type: "", features: [] });
+        if (editingPackage) {
+            const { error } = await supabase.from("packages").update(payload).eq("id", editingPackage.id);
+            if (!error) {
+                setProducts(products.map(p => {
+                    if (p.id === selectedProduct.id) {
+                        return { 
+                            ...p, 
+                            packages: (p.packages || []).map(pkg => pkg.id === editingPackage.id ? { ...pkg, ...payload } : pkg) 
+                        };
+                    }
+                    return p;
+                }));
+                setIsPackageModalOpen(false);
+                setEditingPackage(null);
+            } else {
+                alert("Error: " + error.message);
+            }
         } else {
-            alert("Error: " + error?.message);
+            const { data, error } = await supabase.from("packages").insert([payload]).select();
+
+            if (!error && data) {
+                setProducts(products.map(p => {
+                    if (p.id === selectedProduct.id) {
+                        return { ...p, packages: [...(p.packages || []), data[0]] };
+                    }
+                    return p;
+                }));
+                setIsPackageModalOpen(false);
+                setPackageForm({ name: "", price: "", cost_price: "0", duration: "", type: "", features: [] });
+            } else {
+                alert("Error: " + error?.message);
+            }
         }
         setIsSubmitting(false);
     };
@@ -339,12 +378,20 @@ export default function AdminProducts() {
                                                 <p className="text-xs text-blue-600 font-bold">{pkg.price} <span className="text-slate-400 font-normal">• {pkg.duration}</span></p>
                                                 <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wide">{pkg.type}</p>
                                             </div>
-                                            <button
-                                                onClick={() => handleDeletePackage(pkg.id, product.id)}
-                                                className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                            >
-                                                <X className="w-4 h-4" />
-                                            </button>
+                                            <div className="flex flex-col gap-1">
+                                                <button
+                                                    onClick={() => openEditPackageModal(product, pkg)}
+                                                    className="p-1.5 text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeletePackage(pkg.id, product.id)}
+                                                    className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                     {(!product.packages || product.packages.length === 0) && (
@@ -407,6 +454,12 @@ export default function AdminProducts() {
                                         <p>Square ratio recommended.</p>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="label-admin">Terms & Conditions (Optional)</label>
+                                <textarea className="input-admin min-h-[100px]" placeholder="Syarat dan ketentuan untuk produk ini..."
+                                    value={productForm.terms_conditions} onChange={e => setProductForm({ ...productForm, terms_conditions: e.target.value })}></textarea>
                             </div>
 
                             <div>
@@ -517,6 +570,11 @@ export default function AdminProducts() {
                                     <img src={editForm.image_url} className="mt-2 w-16 h-16 rounded-xl object-cover border border-slate-200" alt="preview" />
                                 )}
                             </div>
+                            <div>
+                                <label className="label-admin">Terms & Conditions (Optional)</label>
+                                <textarea className="input-admin min-h-[100px]" placeholder="Syarat dan ketentuan untuk produk ini..."
+                                    value={editForm.terms_conditions} onChange={e => setEditForm({ ...editForm, terms_conditions: e.target.value })}></textarea>
+                            </div>
 
                             <button type="submit" disabled={isSubmitting} className="btn-admin-submit mt-4">
                                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-4 h-4" /> Save Changes</>}
@@ -532,7 +590,7 @@ export default function AdminProducts() {
                     <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h2 className="text-xl font-black text-slate-900">Add Package</h2>
+                                <h2 className="text-xl font-black text-slate-900">{editingPackage ? "Edit Package" : "Add Package"}</h2>
                                 <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">For {selectedProduct.title}</p>
                             </div>
                             <button onClick={() => setIsPackageModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
@@ -626,7 +684,7 @@ export default function AdminProducts() {
                             </div>
 
                             <button type="submit" disabled={isSubmitting} className="btn-admin-submit mt-4">
-                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Add Package"}
+                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : editingPackage ? "Save Package" : "Add Package"}
                             </button>
                         </form>
                     </div>

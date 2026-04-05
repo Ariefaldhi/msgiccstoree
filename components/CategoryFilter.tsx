@@ -30,7 +30,7 @@ export default function CategoryFilter({ categories, activeCategory, onSelectCat
                         className={cn(
                             "px-5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all duration-200 border flex items-center gap-2",
                             activeCategory === "Semua"
-                                ? "bg-[#3b82f6] text-white border-blue-500 shadow-md shadow-blue-500/20"
+                                ? "bg-blue-500 text-white border-blue-500 shadow-md shadow-blue-500/20"
                                 : "bg-white text-gray-500 border-gray-100 shadow-sm hover:translate-y-[-2px] hover:shadow-md"
                         )}
                     >
@@ -46,7 +46,7 @@ export default function CategoryFilter({ categories, activeCategory, onSelectCat
                             className={cn(
                                 "px-5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all duration-200 border flex items-center gap-2",
                                 activeCategory === cat.name
-                                    ? "bg-[#3b82f6] text-white border-blue-500 shadow-md shadow-blue-500/20"
+                                    ? "bg-blue-500 text-white border-blue-500 shadow-md shadow-blue-500/20"
                                     : "bg-white text-gray-500 border-gray-100 shadow-sm hover:translate-y-[-2px] hover:shadow-md"
                             )}
                         >

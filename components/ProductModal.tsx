@@ -14,12 +14,14 @@ interface Package {
 }
 
 interface Product {
+    id: string;
     title: string;
     price: string;
     category: string;
     tag?: string;
     tagColor?: "yellow" | "red" | "blue" | "purple";
     image_url?: string;
+    terms_conditions?: string;
     packages?: Package[];
 }
 
@@ -39,6 +41,8 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
     const [isSubmitting, setIsSubmitting] = useState(false);
     const supabase = createClient();
 
+    const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
+
     // Reset state when modal opens/closes
     useEffect(() => {
         if (isOpen) {
@@ -48,8 +52,26 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
             setCustomerName("");
             setWaNumber("");
             setIsSubmitting(false);
+            fetchSalesCounts();
         }
-    }, [isOpen]);
+    }, [isOpen, product?.id]);
+
+    const fetchSalesCounts = async () => {
+        if (!product) return;
+        const { data, error } = await supabase
+            .from("orders")
+            .select("package_name, status")
+            .eq("product_name", product.title)
+            .eq("status", "Pesanan Selesai");
+        
+        if (data) {
+            const counts: Record<string, number> = {};
+            data.forEach(order => {
+                counts[order.package_name] = (counts[order.package_name] || 0) + 1;
+            });
+            setSalesCounts(counts);
+        }
+    };
 
     if (!isOpen || !product) return null;
 
@@ -204,17 +226,34 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
                                             </button>
                                         </div>
 
-                                        {/* Price */}
-                                        <div className="text-2xl font-black text-blue-600 flex items-center gap-3 flex-wrap">
-                                            {flashSales?.find(fs => fs.package_id === pkg.id) ? (
-                                                <>
-                                                    <span>Rp {Math.round((parseInt(pkg.price.replace(/\D/g, "")) || 0) * (1 - (flashSales.find(fs => fs.package_id === pkg.id)?.discount_percent || 0) / 100)).toLocaleString("id-ID")}</span>
-                                                    <span className="text-xs font-bold text-slate-400 line-through">{pkg.price}</span>
-                                                    <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-md">-{flashSales.find(fs => fs.package_id === pkg.id)?.discount_percent}%</span>
-                                                </>
-                                            ) : (
-                                                <span>{pkg.price}</span>
-                                            )}
+                                        {/* Price & Sales Count */}
+                                        <div className="flex justify-between items-end">
+                                            <div className="text-2xl font-black text-blue-600 flex items-center gap-3 flex-wrap">
+                                                {(() => {
+                                                    const fs = flashSales?.find(f => f.package_id === pkg.id);
+                                                    const rawPrice = parseInt(pkg.price.replace(/\D/g, "")) || 0;
+                                                    
+                                                    // Check if flash sale is still valid (limit check)
+                                                    // We'd need to fetch orders for THIS flash sale specifically if we want exact max_orders logic
+                                                    // but for now let's show the discounted price if fs exists.
+                                                    
+                                                    if (fs) {
+                                                        const discounted = Math.round(rawPrice * (1 - fs.discount_percent / 100));
+                                                        return (
+                                                            <>
+                                                                <span>Rp {discounted.toLocaleString("id-ID")}</span>
+                                                                <span className="text-xs font-bold text-slate-400 line-through">{pkg.price}</span>
+                                                                <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-md">-{fs.discount_percent}%</span>
+                                                            </>
+                                                        );
+                                                    }
+                                                    return <span>{pkg.price}</span>;
+                                                })()}
+                                            </div>
+                                            <div className="text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100 flex items-center gap-1.5">
+                                                <ShieldCheck className="w-3 h-3 text-blue-400" />
+                                                Terjual {salesCounts[pkg.name] || 0}
+                                            </div>
                                         </div>
 
                                         {/* Features List (Reference Style) */}
@@ -338,9 +377,9 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
                                 </div>
                                 <div className="flex-1">
                                     <span className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Setuju dengan Syarat & Ketentuan</span>
-                                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                                        Pesanan akan diproses melalui WhatsApp. Pastikan nomor WhatsApp Anda aktif.
-                                    </p>
+                                    <div className="mt-2 text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed max-h-32 overflow-y-auto custom-scrollbar italic font-medium whitespace-pre-wrap">
+                                        {product.terms_conditions || "Pesanan akan diproses melalui WhatsApp. Pastikan nomor WhatsApp Anda aktif dan data yang dimasukkan sudah benar."}
+                                    </div>
                                 </div>
                             </label>
 

@@ -9,6 +9,7 @@ interface FlashSaleItem {
     discount_percent: number;
     label: string;
     end_time: string;
+    max_orders: number;
     package: {
         id: string;
         name: string;
@@ -50,7 +51,7 @@ function useCountdown(endTime: string) {
 function CountdownUnit({ value, label }: { value: number; label: string }) {
     return (
         <div className="flex flex-col items-center">
-            <div className="bg-[#3b82f6] text-white font-black text-xs w-6 h-6 rounded-md flex items-center justify-center shadow-lg">
+            <div className="bg-blue-500 text-white font-black text-xs w-6 h-6 rounded-md flex items-center justify-center shadow-lg">
                 {String(value).padStart(2, "0")}
             </div>
             <span className="text-[7px] font-bold text-slate-400 uppercase tracking-wider mt-1">{label}</span>
@@ -74,7 +75,7 @@ function FlashCard({ item, onOpen }: { item: FlashSaleItem; onOpen: () => void }
             className="group relative bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden"
         >
             {/* Discount Badge */}
-            <div className="absolute top-3 right-3 bg-[#3b82f6] text-white text-[10px] font-black px-2 py-1 rounded-lg shadow">
+            <div className="absolute top-3 right-3 bg-blue-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow">
                 -{item.discount_percent}%
             </div>
 
@@ -116,14 +117,37 @@ export default function FlashSale({ onOpenProduct }: FlashSaleProps) {
 
     useEffect(() => {
         async function fetch() {
+            setLoading(true);
             const now = new Date().toISOString();
-            const { data } = await supabase
+            const { data: sales } = await supabase
                 .from("flash_sales")
                 .select("*, package:packages(id, name, price, product:products(id, category_id, title, image_url, packages(*)))")
                 .eq("is_active", true)
                 .gte("end_time", now)
                 .order("created_at", { ascending: false });
-            if (data) setItems(data as any);
+
+            if (sales) {
+                // Fetch completed orders count for these packages to check max_orders
+                const packageIds = sales.map(s => s.package_id);
+                const { data: orders } = await supabase
+                    .from("orders")
+                    .select("package_name, product_name")
+                    .eq("status", "Pesanan Selesai");
+
+                const validSales = sales.filter(sale => {
+                    if (sale.max_orders === 0) return true;
+                    
+                    // Count orders that match this package and product
+                    const count = orders?.filter(o => 
+                        o.package_name === sale.package.name && 
+                        o.product_name === sale.package.product.title
+                    ).length || 0;
+
+                    return count < sale.max_orders;
+                });
+
+                setItems(validSales as any);
+            }
             setLoading(false);
         }
         fetch();
@@ -133,19 +157,19 @@ export default function FlashSale({ onOpenProduct }: FlashSaleProps) {
 
     return (
         <section className="container mx-auto px-4 pb-4">
-            <div className="bg-gradient-to-br from-[#0f172a] to-[#020617] rounded-[2rem] p-6 md:p-8 border border-[#3b82f6]/20 shadow-2xl relative overflow-hidden">
+            <div className="bg-gradient-to-br from-[#0f172a] to-[#020617] rounded-[2rem] p-6 md:p-8 border border-blue-500/20 shadow-2xl relative overflow-hidden">
                 {/* Background glow */}
-                <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#3b82f6]/10 blur-[80px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 left-1/4 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 relative z-10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#3b82f6] flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
                             <Zap className="w-5 h-5 text-white fill-white" />
                         </div>
                         <div>
                             <h2 className="text-xl font-black text-white tracking-tight">FLASH SALE</h2>
-                            <p className="text-[10px] font-bold text-[#3b82f6] uppercase tracking-widest">Penawaran Terbatas!</p>
+                            <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Penawaran Terbatas!</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold">

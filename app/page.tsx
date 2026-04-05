@@ -64,11 +64,28 @@ export default function Home() {
       const now = new Date().toISOString();
       const { data: sales, error: saleError } = await supabase
         .from("flash_sales")
-        .select("package_id, discount_percent")
+        .select("package_id, discount_percent, max_orders, package:packages(name, product:products(title))")
         .eq("is_active", true)
         .gte("end_time", now);
       
-      if (sales) setActiveFlashSales(sales);
+      if (sales) {
+        // Fetch completed orders to check limits for global application
+        const { data: orders } = await supabase
+          .from("orders")
+          .select("package_name, product_name")
+          .eq("status", "Pesanan Selesai");
+
+        const validSales = sales.filter(sale => {
+          if (sale.max_orders === 0) return true;
+          const count = orders?.filter(o => 
+            o.package_name === (sale.package as any).name && 
+            o.product_name === (sale.package as any).product.title
+          ).length || 0;
+          return count < sale.max_orders;
+        });
+
+        setActiveFlashSales(validSales);
+      }
 
       setLoading(false);
     }

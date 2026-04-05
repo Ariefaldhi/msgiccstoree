@@ -20,6 +20,7 @@ interface FlashSaleRow {
     label: string;
     end_time: string;
     is_active: boolean;
+    max_orders: number;
     package: Package;
 }
 
@@ -35,6 +36,7 @@ export default function AdminFlashSale() {
         discount_percent: "20",
         label: "FLASH SALE",
         duration_hours: "24",
+        max_orders: "0",
     });
 
     const supabase = createClient();
@@ -66,11 +68,12 @@ export default function AdminFlashSale() {
             label: form.label,
             end_time: endTime,
             is_active: true,
+            max_orders: parseInt(form.max_orders) || 0,
         }]);
 
         if (!error) {
             setIsModalOpen(false);
-            setForm({ package_id: "", discount_percent: "20", label: "FLASH SALE", duration_hours: "24" });
+            setForm({ package_id: "", discount_percent: "20", label: "FLASH SALE", duration_hours: "24", max_orders: "0" });
             fetchData();
         } else {
             alert("Error: " + error.message);
@@ -200,10 +203,17 @@ export default function AdminFlashSale() {
                                         value={form.duration_hours} onChange={e => setForm({ ...form, duration_hours: e.target.value })} />
                                 </div>
                             </div>
-                            <div>
-                                <label className="label-admin">Label Badge</label>
-                                <input type="text" className="input-admin" placeholder="e.g. FLASH SALE"
-                                    value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="label-admin">Label Badge</label>
+                                    <input type="text" className="input-admin" placeholder="e.g. FLASH SALE"
+                                        value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="label-admin">Batas Transaksi</label>
+                                    <input type="number" min="0" className="input-admin" placeholder="0 = tanpa batas"
+                                        value={form.max_orders} onChange={e => setForm({ ...form, max_orders: e.target.value })} />
+                                </div>
                             </div>
                             <button type="submit" disabled={isSubmitting} className="w-full bg-[#ff2d55] hover:bg-red-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-red-900/20 flex items-center justify-center gap-2">
                                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Zap className="w-4 h-4" /> Aktifkan Flash Sale</>}

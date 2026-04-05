@@ -16,6 +16,7 @@ export default function AdminCategories() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editCategory, setEditCategory] = useState<Category | null>(null);
     const [formData, setFormData] = useState({ name: "", slug: "", icon: "" });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,18 +54,42 @@ export default function AdminCategories() {
         e.preventDefault();
         setIsSubmitting(true);
 
-        const { data, error } = await supabase.from("categories").insert([formData]).select();
+        if (editCategory) {
+            const { data, error } = await supabase
+                .from("categories")
+                .update(formData)
+                .eq("id", editCategory.id)
+                .select();
 
-        if (!error && data) {
-            setCategories([...categories, data[0]]);
-            setIsModalOpen(false);
-            setFormData({ name: "", slug: "", icon: "" });
-            router.refresh();
+            if (!error && data) {
+                setCategories(categories.map(c => c.id === editCategory.id ? data[0] : c));
+                setIsModalOpen(false);
+                setFormData({ name: "", slug: "", icon: "" });
+                setEditCategory(null);
+                router.refresh();
+            } else {
+                alert("Error updating category: " + (error?.message || "Unknown error"));
+            }
         } else {
-            alert("Error saving category: " + (error?.message || "Unknown error"));
+            const { data, error } = await supabase.from("categories").insert([formData]).select();
+
+            if (!error && data) {
+                setCategories([...categories, data[0]]);
+                setIsModalOpen(false);
+                setFormData({ name: "", slug: "", icon: "" });
+                router.refresh();
+            } else {
+                alert("Error saving category: " + (error?.message || "Unknown error"));
+            }
         }
 
         setIsSubmitting(false);
+    };
+
+    const openEdit = (cat: Category) => {
+        setEditCategory(cat);
+        setFormData({ name: cat.name, slug: cat.slug, icon: cat.icon });
+        setIsModalOpen(true);
     };
 
     return (
@@ -75,7 +100,11 @@ export default function AdminCategories() {
                     <p className="text-slate-500 mt-1">Manage product categories.</p>
                 </div>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => {
+                        setEditCategory(null);
+                        setFormData({ name: "", slug: "", icon: "" });
+                        setIsModalOpen(true);
+                    }}
                     className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-900/20 transition-all"
                 >
                     <Plus className="w-5 h-5" />
@@ -100,13 +129,22 @@ export default function AdminCategories() {
                                     <code className="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-md">/{cat.slug}</code>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => handleDelete(cat.id)}
-                                className="p-2 rounded-xl bg-red-50 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-100"
-                                title="Delete"
-                            >
-                                <Trash2 className="w-5 h-5" />
-                            </button>
+                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                <button
+                                    onClick={() => openEdit(cat)}
+                                    className="p-2 rounded-xl bg-blue-50 text-blue-500 hover:bg-blue-100"
+                                    title="Edit"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(cat.id)}
+                                    className="p-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100"
+                                    title="Delete"
+                                >
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            </div>
                         </div>
                     ))}
                     {categories.length === 0 && (
@@ -122,7 +160,7 @@ export default function AdminCategories() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
                     <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-black text-slate-900">New Category</h2>
+                            <h2 className="text-xl font-black text-slate-900">{editCategory ? "Edit Category" : "New Category"}</h2>
                             <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full transition-colors">
                                 <X className="w-6 h-6" />
                             </button>
