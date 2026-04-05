@@ -33,6 +33,7 @@ interface Package {
     cost_price: number;
     duration: string;
     type: string;
+    is_available: boolean;
     features?: string[];
 }
 
@@ -60,9 +61,9 @@ export default function AdminProducts() {
         category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", terms_conditions: ""
     });
     const [packageForm, setPackageForm] = useState<{
-        name: string; price: string; cost_price: string; duration: string; type: string; features: string[];
+        name: string; price: string; cost_price: string; duration: string; type: string; is_available: boolean; features: string[];
     }>({
-        name: "", price: "", cost_price: "0", duration: "", type: "", features: []
+        name: "", price: "", cost_price: "0", duration: "", type: "", is_available: true, features: []
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -223,6 +224,7 @@ export default function AdminProducts() {
             cost_price: pkg.cost_price.toString(), 
             duration: pkg.duration, 
             type: pkg.type, 
+            is_available: pkg.is_available ?? true,
             features: pkg.features || [] 
         });
         setIsPackageModalOpen(true);
@@ -275,7 +277,7 @@ export default function AdminProducts() {
                     return p;
                 }));
                 setIsPackageModalOpen(false);
-                setPackageForm({ name: "", price: "", cost_price: "0", duration: "", type: "", features: [] });
+                setPackageForm({ name: "", price: "", cost_price: "0", duration: "", type: "", is_available: true, features: [] });
             } else {
                 alert("Error: " + error?.message);
             }
@@ -378,7 +380,30 @@ export default function AdminProducts() {
                                                 <p className="text-xs text-blue-600 font-bold">{pkg.price} <span className="text-slate-400 font-normal">• {pkg.duration}</span></p>
                                                 <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wide">{pkg.type}</p>
                                             </div>
-                                            <div className="flex flex-col gap-1">
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex flex-col items-center gap-1 mr-2">
+                                                    <label className="relative inline-flex items-center cursor-pointer scale-75">
+                                                        <input type="checkbox" className="sr-only peer" checked={pkg.is_available ?? true} 
+                                                            onChange={async (e) => {
+                                                                const newVal = e.target.checked;
+                                                                const { error } = await supabase.from("packages").update({ is_available: newVal }).eq("id", pkg.id);
+                                                                if (!error) {
+                                                                    setProducts(products.map(p => {
+                                                                        if (p.id === product.id) {
+                                                                            return { ...p, packages: (p.packages || []).map(p_pkg => p_pkg.id === pkg.id ? { ...p_pkg, is_available: newVal } : p_pkg) };
+                                                                        }
+                                                                        return p;
+                                                                    }));
+                                                                }
+                                                            }}
+                                                        />
+                                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                                    </label>
+                                                    <span className={`text-[8px] font-bold uppercase tracking-tighter ${pkg.is_available ?? true ? 'text-blue-600' : 'text-slate-400'}`}>
+                                                        {pkg.is_available ?? true ? 'ON' : 'OFF'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex flex-col gap-1">
                                                 <button
                                                     onClick={() => openEditPackageModal(product, pkg)}
                                                     className="p-1.5 text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
@@ -393,7 +418,8 @@ export default function AdminProducts() {
                                                 </button>
                                             </div>
                                         </div>
-                                    ))}
+                                    </div>
+                                ))}
                                     {(!product.packages || product.packages.length === 0) && (
                                         <div className="col-span-full text-center py-4 text-xs text-slate-400 italic">
                                             No packages added yet.
@@ -627,6 +653,14 @@ export default function AdminProducts() {
                                     <input required type="text" className="input-admin" placeholder="e.g. PRIVAT"
                                         value={packageForm.type} onChange={e => setPackageForm({ ...packageForm, type: e.target.value })} />
                                 </div>
+                            </div>
+                            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" className="sr-only peer" checked={packageForm.is_available} 
+                                        onChange={e => setPackageForm({ ...packageForm, is_available: e.target.checked })} />
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                                <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Package Available</span>
                             </div>
 
                             {/* Features Input */}

@@ -10,6 +10,7 @@ interface Package {
     cost_price: number;
     duration: string;
     type: string;
+    is_available?: boolean;
     features?: string[];
 }
 
@@ -210,8 +211,20 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
                             {product.packages?.map((pkg, idx) => (
                                 <div
                                     key={idx}
-                                    className="group border border-slate-100 rounded-[2rem] p-5 bg-white shadow-sm hover:shadow-lg hover:border-blue-200 transition-all"
+                                    className={cn(
+                                        "group border rounded-[2rem] p-5 bg-white shadow-sm transition-all relative overflow-hidden",
+                                        (pkg.is_available === false) 
+                                            ? "opacity-60 grayscale-[0.5] border-slate-200 cursor-not-allowed" 
+                                            : "hover:shadow-lg hover:border-blue-200 border-slate-100"
+                                    )}
                                 >
+                                    {pkg.is_available === false && (
+                                        <div className="absolute top-4 right-20 z-20">
+                                            <span className="bg-slate-800 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-xl">
+                                                STOK HABIS
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="flex flex-col gap-4">
 
                                         {/* Header */}
@@ -219,10 +232,16 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
                                             <h4 className="font-bold text-base text-slate-900 w-2/3">{product.title} {pkg.name}</h4>
                                             {/* Order Button in Reference Style */}
                                             <button
-                                                onClick={() => handleSelectPackage(pkg)}
-                                                className="bg-[#0f172a] text-white px-5 py-2 rounded-xl text-xs font-bold shadow-lg hover:bg-[#1e293b] active:scale-95 transition-all"
+                                                onClick={() => pkg.is_available !== false && handleSelectPackage(pkg)}
+                                                disabled={pkg.is_available === false}
+                                                className={cn(
+                                                    "px-5 py-2 rounded-xl text-xs font-bold shadow-lg active:scale-95 transition-all text-white",
+                                                    pkg.is_available === false 
+                                                        ? "bg-slate-400 cursor-not-allowed shadow-none" 
+                                                        : "bg-[#0f172a] hover:bg-[#1e293b]"
+                                                )}
                                             >
-                                                ORDER
+                                                {pkg.is_available === false ? "TUTUP" : "ORDER"}
                                             </button>
                                         </div>
 
