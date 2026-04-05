@@ -4,11 +4,14 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, Trash2, Loader2, X, Zap } from "lucide-react";
 
-interface Product {
+interface Package {
     id: string;
-    title: string;
+    name: string;
     price: string;
-    image_url?: string;
+    product: {
+        title: string;
+        image_url?: string;
+    };
 }
 
 interface FlashSaleRow {
@@ -17,18 +20,18 @@ interface FlashSaleRow {
     label: string;
     end_time: string;
     is_active: boolean;
-    product: Product;
+    package: Package;
 }
 
 export default function AdminFlashSale() {
+    const [packages, setPackages] = useState<Package[]>([]);
     const [flashSales, setFlashSales] = useState<FlashSaleRow[]>([]);
-    const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [form, setForm] = useState({
-        product_id: "",
+        package_id: "",
         discount_percent: "20",
         label: "FLASH SALE",
         duration_hours: "24",
@@ -40,12 +43,12 @@ export default function AdminFlashSale() {
 
     async function fetchData() {
         setLoading(true);
-        const { data: prods } = await supabase.from("products").select("id, title, price, image_url").order("title");
-        if (prods) setProducts(prods);
+        const { data: pkgs } = await supabase.from("packages").select("id, name, price, product:products(title, image_url)");
+        if (pkgs) setPackages(pkgs as any);
 
         const { data: sales } = await supabase
             .from("flash_sales")
-            .select("*, product:products(id, title, price, image_url)")
+            .select("*, package:packages(name, price, product:products(title, image_url))")
             .order("created_at", { ascending: false });
         if (sales) setFlashSales(sales as any);
         setLoading(false);
@@ -58,7 +61,7 @@ export default function AdminFlashSale() {
         const endTime = new Date(Date.now() + parseFloat(form.duration_hours) * 3600000).toISOString();
 
         const { error } = await supabase.from("flash_sales").insert([{
-            product_id: form.product_id,
+            package_id: form.package_id,
             discount_percent: parseInt(form.discount_percent),
             label: form.label,
             end_time: endTime,
@@ -67,7 +70,7 @@ export default function AdminFlashSale() {
 
         if (!error) {
             setIsModalOpen(false);
-            setForm({ product_id: "", discount_percent: "20", label: "FLASH SALE", duration_hours: "24" });
+            setForm({ package_id: "", discount_percent: "20", label: "FLASH SALE", duration_hours: "24" });
             fetchData();
         } else {
             alert("Error: " + error.message);
@@ -121,24 +124,24 @@ export default function AdminFlashSale() {
             ) : (
                 <div className="space-y-3">
                     {flashSales.map(item => {
-                        const rawPrice = parseInt(item.product.price.replace(/\D/g, ""), 10) || 0;
+                        const rawPrice = parseInt(item.package.price.replace(/\D/g, ""), 10) || 0;
                         const discounted = Math.round(rawPrice * (1 - item.discount_percent / 100));
                         return (
                             <div key={item.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4">
                                 {/* Product Image */}
                                 <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center">
-                                    {item.product.image_url
-                                        ? <img src={item.product.image_url} className="w-full h-full object-cover" alt="" />
-                                        : <span className="text-xl font-black text-slate-300">{item.product.title.charAt(0)}</span>
+                                    {item.package.product.image_url
+                                        ? <img src={item.package.product.image_url} className="w-full h-full object-cover" alt="" />
+                                        : <span className="text-xl font-black text-slate-300">{item.package.product.title.charAt(0)}</span>
                                     }
                                 </div>
 
                                 {/* Info */}
                                 <div className="flex-1 min-w-0">
-                                    <p className="font-black text-slate-900 truncate">{item.product.title}</p>
+                                    <p className="font-black text-slate-900 truncate">{item.package.product.title} - {item.package.name}</p>
                                     <div className="flex items-center gap-3 mt-1 flex-wrap">
                                         <span className="text-xs bg-red-50 text-[#ff2d55] font-bold px-2 py-0.5 rounded-lg">-{item.discount_percent}%</span>
-                                        <span className="text-xs text-slate-400 line-through">{item.product.price}</span>
+                                        <span className="text-xs text-slate-400 line-through">{item.package.price}</span>
                                         <span className="text-xs font-black text-[#ff2d55]">Rp {discounted.toLocaleString("id-ID")}</span>
                                     </div>
                                     <p className="text-[10px] text-slate-400 mt-1 font-bold">⏱ Sisa: {timeLeft(item.end_time)}</p>
@@ -179,10 +182,10 @@ export default function AdminFlashSale() {
                         </div>
                         <form onSubmit={handleCreate} className="space-y-4">
                             <div>
-                                <label className="label-admin">Produk</label>
-                                <select required className="input-admin" value={form.product_id} onChange={e => setForm({ ...form, product_id: e.target.value })}>
-                                    <option value="">Pilih Produk</option>
-                                    {products.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+                                <label className="label-admin">Paket</label>
+                                <select required className="input-admin" value={form.package_id} onChange={e => setForm({ ...form, package_id: e.target.value })}>
+                                    <option value="">Pilih Paket</option>
+                                    {packages.map(p => <option key={p.id} value={p.id}>{p.product.title} - {p.name}</option>)}
                                 </select>
                             </div>
                             <div className="grid grid-cols-2 gap-4">

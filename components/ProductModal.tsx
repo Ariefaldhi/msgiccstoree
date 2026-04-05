@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 interface Package {
+    id: string;
     name: string;
     price: string;
     duration: string;
@@ -18,16 +19,16 @@ interface Product {
     tagColor?: "yellow" | "red" | "blue" | "purple";
     image_url?: string;
     packages?: Package[];
-    discount_percent?: number;
 }
 
 interface ProductModalProps {
     product: Product | null;
+    flashSales?: any[];
     isOpen: boolean;
     onClose: () => void;
 }
 
-export default function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
+export default function ProductModal({ product, flashSales, isOpen, onClose }: ProductModalProps) {
     const [step, setStep] = useState<"selection" | "payment">("selection");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [agreed, setAgreed] = useState(false);
@@ -51,8 +52,11 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
     const handleOrder = () => {
         if (!selectedPackage || !agreed) return;
 
-        const finalPriceDisplay = product.discount_percent
-            ? `Rp ${Math.round((parseInt(selectedPackage.price.replace(/\D/g, "")) || 0) * (1 - product.discount_percent / 100)).toLocaleString("id-ID")}`
+        const flashSaleInfo = flashSales?.find(fs => fs.package_id === selectedPackage.id);
+        const discount_percent = flashSaleInfo ? flashSaleInfo.discount_percent : null;
+
+        const finalPriceDisplay = discount_percent
+            ? `Rp ${Math.round((parseInt(selectedPackage.price.replace(/\D/g, "")) || 0) * (1 - discount_percent / 100)).toLocaleString("id-ID")}`
             : selectedPackage.price;
 
         const message = `Halo Admin, saya mau order paket ini:%0A%0A*${product.title}*%0A📦 ${selectedPackage.name}%0A💰 ${finalPriceDisplay}%0A⏳ ${selectedPackage.duration}%0A%0A_Mohon diproses ya kak!_`;
@@ -167,11 +171,11 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
 
                                         {/* Price */}
                                         <div className="text-2xl font-black text-blue-600 flex items-center gap-3 flex-wrap">
-                                            {product.discount_percent ? (
+                                            {flashSales?.find(fs => fs.package_id === pkg.id) ? (
                                                 <>
-                                                    <span>Rp {Math.round((parseInt(pkg.price.replace(/\D/g, "")) || 0) * (1 - product.discount_percent / 100)).toLocaleString("id-ID")}</span>
+                                                    <span>Rp {Math.round((parseInt(pkg.price.replace(/\D/g, "")) || 0) * (1 - (flashSales.find(fs => fs.package_id === pkg.id)?.discount_percent || 0) / 100)).toLocaleString("id-ID")}</span>
                                                     <span className="text-xs font-bold text-slate-400 line-through">{pkg.price}</span>
-                                                    <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-md">-{product.discount_percent}%</span>
+                                                    <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-md">-{flashSales.find(fs => fs.package_id === pkg.id)?.discount_percent}%</span>
                                                 </>
                                             ) : (
                                                 <span>{pkg.price}</span>
@@ -224,9 +228,9 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                             <div className="border border-blue-100 rounded-[2rem] p-6 bg-blue-50/30">
                                 <h4 className="font-bold text-lg text-slate-900 mb-1">{selectedPackage?.name}</h4>
                                 <div className="text-3xl font-black text-blue-600 mb-4 flex items-center gap-3 flex-wrap">
-                                    {product.discount_percent && selectedPackage ? (
+                                    {selectedPackage && flashSales?.find(fs => fs.package_id === selectedPackage.id) ? (
                                         <>
-                                            <span>Rp {Math.round((parseInt(selectedPackage.price.replace(/\D/g, "")) || 0) * (1 - product.discount_percent / 100)).toLocaleString("id-ID")}</span>
+                                            <span>Rp {Math.round((parseInt(selectedPackage.price.replace(/\D/g, "")) || 0) * (1 - (flashSales.find(fs => fs.package_id === selectedPackage.id)?.discount_percent || 0) / 100)).toLocaleString("id-ID")}</span>
                                             <span className="text-sm font-bold text-slate-400 line-through">{selectedPackage.price}</span>
                                         </>
                                     ) : (

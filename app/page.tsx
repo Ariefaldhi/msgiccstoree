@@ -37,6 +37,7 @@ export default function Home() {
   // Data State
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [activeFlashSales, setActiveFlashSales] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const supabase = createClient();
@@ -58,6 +59,16 @@ export default function Home() {
 
       if (prodError) console.error("❌ Products fetch error:", prodError.message);
       if (prods) setProducts(prods);
+
+      // Fetch Active Flash Sales mapping
+      const now = new Date().toISOString();
+      const { data: sales, error: saleError } = await supabase
+        .from("flash_sales")
+        .select("package_id, discount_percent")
+        .eq("is_active", true)
+        .gte("end_time", now);
+      
+      if (sales) setActiveFlashSales(sales);
 
       setLoading(false);
     }
@@ -151,9 +162,9 @@ export default function Home() {
         product={selectedProduct ? {
           ...selectedProduct,
           category: categories.find(c => c.id === selectedProduct.category_id)?.name || "Unknown",
-          // Correct mapping for packages if needed, here we assume it matches enough or cast it
           packages: selectedProduct.packages
         } : null}
+        flashSales={activeFlashSales}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
