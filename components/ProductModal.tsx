@@ -1,11 +1,13 @@
-import { X, CheckCircle2, ChevronLeft, ArrowRight, ShieldCheck } from "lucide-react";
+import { X, CheckCircle2, ChevronLeft, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 interface Package {
     id: string;
     name: string;
     price: string;
+    cost_price: number;
     duration: string;
     type: string;
     features?: string[];
@@ -32,6 +34,10 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
     const [step, setStep] = useState<"selection" | "payment">("selection");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [agreed, setAgreed] = useState(false);
+    const [customerName, setCustomerName] = useState("");
+    const [waNumber, setWaNumber] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const supabase = createClient();
 
     // Reset state when modal opens/closes
     useEffect(() => {
@@ -39,6 +45,9 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
             setStep("selection");
             setSelectedPackage(null);
             setAgreed(false);
+            setCustomerName("");
+            setWaNumber("");
+            setIsSubmitting(false);
         }
     }, [isOpen]);
 
@@ -49,18 +58,44 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
         setStep("payment");
     };
 
-    const handleOrder = () => {
-        if (!selectedPackage || !agreed) return;
+    const handleOrder = async () => {
+        if (!selectedPackage || !agreed || !customerName || !waNumber) return;
+
+        setIsSubmitting(true);
 
         const flashSaleInfo = flashSales?.find(fs => fs.package_id === selectedPackage.id);
         const discount_percent = flashSaleInfo ? flashSaleInfo.discount_percent : null;
 
-        const finalPriceDisplay = discount_percent
-            ? `Rp ${Math.round((parseInt(selectedPackage.price.replace(/\D/g, "")) || 0) * (1 - discount_percent / 100)).toLocaleString("id-ID")}`
-            : selectedPackage.price;
+        const rawPrice = parseInt(selectedPackage.price.replace(/\D/g, "")) || 0;
+        const sellPriceRaw = discount_percent ? Math.round(rawPrice * (1 - discount_percent / 100)) : rawPrice;
+        const costPriceRaw = selectedPackage.cost_price || 0;
+        const profitRaw = sellPriceRaw - costPriceRaw;
 
-        const message = `Halo Admin, saya mau order paket ini:%0A%0A*${product.title}*%0A📦 ${selectedPackage.name}%0A💰 ${finalPriceDisplay}%0A⏳ ${selectedPackage.duration}%0A%0A_Mohon diproses ya kak!_`;
+        const finalPriceDisplay = `Rp ${sellPriceRaw.toLocaleString("id-ID")}`;
+
+        // Simpan ke database
+        const { error } = await supabase.from("orders").insert([{
+            wa_number: waNumber,
+            customer_name: customerName,
+            product_name: product.title,
+            package_name: selectedPackage.name,
+            sell_price: sellPriceRaw,
+            cost_price: costPriceRaw,
+            profit: profitRaw,
+            status: "Menunggu Konfirmasi"
+        }]);
+
+        setIsSubmitting(false);
+
+        if (error) {
+            alert("Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.");
+            return;
+        }
+
+        const message = `Halo Admin, saya mau order paket ini:%0A%0A*${product.title}*%0A📦 ${selectedPackage.name}%0A💰 ${finalPriceDisplay}%0A⏳ ${selectedPackage.duration}%0A👤 Nama: ${customerName}%0A📱 WA: ${waNumber}%0A%0A_Mohon diproses ya kak!_`;
         window.open(`https://wa.me/6285720892082?text=${message}`, "_blank");
+        
+        onClose();
     };
 
     return (
@@ -261,6 +296,33 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
                                 </div>
                             </div>
 
+                            {/* Customer Form */}
+                            <div className="space-y-4 px-1">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nama Pemesan</label>
+                                    <input 
+                                        type="text" 
+                                        required 
+                                        placeholder="Masukkan nama Anda" 
+                                        value={customerName}
+                                        onChange={(e) => setCustomerName(e.target.value)}
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nomor WhatsApp</label>
+                                    <input 
+                                        type="text" 
+                                        required 
+                                        placeholder="Contoh: 0812xxxx" 
+                                        value={waNumber}
+                                        onChange={(e) => setWaNumber(e.target.value.replace(/\D/g, ''))}
+                                        className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    />
+                                </div>
+                            </div>
+
+
                             {/* Terms Checkbox */}
                             <label className="flex items-start gap-4 cursor-pointer group p-4 rounded-2xl border border-slate-100 hover:border-blue-200 transition-all bg-white shadow-sm">
                                 <div className="relative flex items-center mt-0.5">
@@ -285,16 +347,22 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
                             {/* Order Button */}
                             <button
                                 onClick={handleOrder}
-                                disabled={!agreed}
+                                disabled={!agreed || !customerName || !waNumber || isSubmitting}
                                 className={cn(
                                     "w-full py-4 rounded-2xl text-sm font-bold shadow-xl transition-all flex items-center justify-center gap-3",
-                                    agreed
+                                    (agreed && customerName && waNumber && !isSubmitting)
                                         ? "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-300 hover:-translate-y-1 active:scale-95 cursor-pointer"
                                         : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
                                 )}
                             >
-                                <span>KONFIRMASI VIA WHATSAPP</span>
-                                <ArrowRight className="w-5 h-5" />
+                                {isSubmitting ? (
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : (
+                                    <>
+                                        <span>KONFIRMASI VIA WHATSAPP</span>
+                                        <ArrowRight className="w-5 h-5" />
+                                    </>
+                                )}
                             </button>
                         </div>
                     )}

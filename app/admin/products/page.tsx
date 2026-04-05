@@ -29,6 +29,7 @@ interface Package {
     product_id: string;
     name: string;
     price: string;
+    cost_price: number;
     duration: string;
     type: string;
     features?: string[];
@@ -57,9 +58,9 @@ export default function AdminProducts() {
         category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: ""
     });
     const [packageForm, setPackageForm] = useState<{
-        name: string; price: string; duration: string; type: string; features: string[];
+        name: string; price: string; cost_price: string; duration: string; type: string; features: string[];
     }>({
-        name: "", price: "", duration: "", type: "", features: []
+        name: "", price: "", cost_price: "0", duration: "", type: "", features: []
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -222,6 +223,7 @@ export default function AdminProducts() {
         const { data, error } = await supabase.from("packages").insert([{
             ...packageForm,
             price: formattedPrice,
+            cost_price: parseInt(packageForm.cost_price.replace(/\D/g, '')) || 0,
             product_id: selectedProduct.id,
             features: packageForm.features
         }]).select();
@@ -235,7 +237,7 @@ export default function AdminProducts() {
                 return p;
             }));
             setIsPackageModalOpen(false);
-            setPackageForm({ name: "", price: "", duration: "", type: "", features: [] });
+            setPackageForm({ name: "", price: "", cost_price: "0", duration: "", type: "", features: [] });
         } else {
             alert("Error: " + error?.message);
         }
@@ -544,10 +546,17 @@ export default function AdminProducts() {
                                 <input required type="text" className="input-admin" placeholder="e.g. 1 Bulan Sharing"
                                     value={packageForm.name} onChange={e => setPackageForm({ ...packageForm, name: e.target.value })} />
                             </div>
-                            <div>
-                                <label className="label-admin">Price</label>
-                                <input required type="text" className="input-admin" placeholder="e.g. 29000"
-                                    value={packageForm.price} onChange={e => setPackageForm({ ...packageForm, price: e.target.value })} />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="label-admin">Sell Price</label>
+                                    <input required type="text" className="input-admin" placeholder="e.g. 29000"
+                                        value={packageForm.price} onChange={e => setPackageForm({ ...packageForm, price: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="label-admin">Cost Price (Modal)</label>
+                                    <input required type="text" className="input-admin" placeholder="e.g. 25000"
+                                        value={packageForm.cost_price} onChange={e => setPackageForm({ ...packageForm, cost_price: e.target.value })} />
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
