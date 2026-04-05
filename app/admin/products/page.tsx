@@ -50,7 +50,10 @@ export default function AdminProducts() {
     const [productForm, setProductForm] = useState({
         category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: ""
     });
-    const [editForm, setEditForm] = useState({
+    const [editForm, setEditForm] = useState<{
+        category_id: string; title: string; price: string;
+        tag: string; tag_color: "yellow" | "red" | "blue" | "purple"; image_url: string;
+    }>({
         category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: ""
     });
     const [packageForm, setPackageForm] = useState<{
