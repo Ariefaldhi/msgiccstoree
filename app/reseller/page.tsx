@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard";
-import Footer from "@/components/Footer";
 import ProductModal from "@/components/ProductModal";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Store, ArrowRight, CheckCircle2 } from "lucide-react";
@@ -63,14 +61,11 @@ export default function ResellerPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="flex items-center justify-center pt-32 pb-20">
+      <div className="min-h-screen bg-white pt-32 pb-20">
+        <div className="flex items-center justify-center">
           <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
         </div>
       </div>
-    );
   }
 
   const isAdmin = profile?.role === 'admin';
@@ -83,9 +78,8 @@ export default function ResellerPage() {
     const waLink = `https://wa.me/${adminPhone}?text=${encodeURIComponent(waText)}`;
 
     return (
-      <div className="min-h-screen bg-white flex flex-col">
-        <Navbar />
-        <main className="flex-1 container mx-auto px-4 pt-32 pb-20 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex flex-col pt-32 pb-20">
+        <main className="flex-1 container mx-auto px-4 flex items-center justify-center">
           <div className="max-w-2xl w-full bg-white border border-slate-100 rounded-[2rem] p-8 md:p-12 shadow-2xl text-center relative overflow-hidden">
              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
              
@@ -129,7 +123,6 @@ export default function ResellerPage() {
              </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -146,9 +139,8 @@ export default function ResellerPage() {
 
   // Reseller Connected View
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <Navbar />
-      <main className="flex-1 container mx-auto px-4 pt-32 pb-20">
+    <div className="min-h-screen bg-slate-50 flex flex-col pt-32 pb-20">
+      <main className="flex-1 container mx-auto px-4">
         
         <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-200">
            <div>
@@ -179,7 +171,6 @@ export default function ResellerPage() {
         </div>
 
       </main>
-      <Footer />
 
       <ProductModal
         product={selectedProduct ? { ...selectedProduct, category: 'Reseller', packages: selectedProduct.packages } : null}

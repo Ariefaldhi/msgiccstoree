@@ -61,13 +61,13 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
         <nav className={`fixed top-0 left-0 right-0 z-[999] transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-xl border-b border-gray-100 py-4' : 'bg-transparent py-6'} `}>
             <div className="container mx-auto flex items-center gap-6 px-4 py-3">
                 {/* Logo Section */}
-                <div className="flex items-center gap-3">
+                <Link href="/" className="flex items-center gap-3">
                     {logoUrl ? (
-                        <div className="w-11 h-11 rounded-full overflow-hidden shrink-0 shadow-md">
+                        <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 shadow-md">
                             <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
                         </div>
                     ) : (
-                        <div className="w-11 h-11 rounded-full bg-[#18181b] flex items-center justify-center text-white relative overflow-hidden shrink-0 shadow-md">
+                        <div className="w-11 h-11 rounded-xl bg-[#18181b] flex items-center justify-center text-white relative overflow-hidden shrink-0 shadow-md">
                             <span className="font-bold text-xl italic select-none">{storeName.charAt(0).toUpperCase()}</span>
                             <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
                         </div>
@@ -80,7 +80,7 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                             MARKETPLACE V2.3
                         </span>
                     </div>
-                </div>
+                </Link>
 
                 {/* Mobile Menu Toggle */}
                 <button 

@@ -3,6 +3,7 @@ import { Poppins, Inter } from "next/font/google"; // Import standard next fonts
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import AffiliateTracker from "@/components/AffiliateTracker";
 import { Suspense } from "react";
@@ -23,7 +24,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "JawirStore - Digital Revolution",
+  title: "MsgiccStore - Digital Revolution",
   description: "Platform top-up aplikasi premium #1 di Indonesia",
 };
 
@@ -48,6 +49,7 @@ export default async function RootLayout({
         <main className="pt-24 pb-10 min-h-screen bg-white">
           {children}
         </main>
+        <Footer storeName={settings?.store_name} logoUrl={settings?.logo_url} />
       </body>
     </html>
   );

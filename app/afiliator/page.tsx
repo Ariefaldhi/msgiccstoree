@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Megaphone, ArrowRight, Wallet, History, Users, Copy, Check, MessageCircle } from "lucide-react";
 import Link from "next/link";
@@ -51,9 +49,8 @@ export default function AfiliatorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="flex items-center justify-center pt-32 pb-20">
+      <div className="min-h-screen bg-white pt-32 pb-20">
+        <div className="flex items-center justify-center">
           <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
         </div>
       </div>
@@ -69,9 +66,8 @@ export default function AfiliatorPage() {
     const waLink = `https://wa.me/${adminPhone}?text=${encodeURIComponent(waText)}`;
 
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col">
-        <Navbar />
-        <main className="flex-1 container mx-auto px-4 pt-32 pb-20 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex flex-col pt-32 pb-20">
+        <main className="flex-1 container mx-auto px-4 flex items-center justify-center">
           <div className="max-w-3xl w-full bg-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden border border-slate-100">
              {/* Decorative Background */}
              <div className="absolute top-[-50%] right-[-10%] w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -114,7 +110,6 @@ export default function AfiliatorPage() {
              </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -136,9 +131,8 @@ Tujuan (BCA/DANA/dll): `;
   const wdLink = `https://wa.me/${adminPhone}?text=${encodeURIComponent(wdText)}`;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <Navbar />
-      <main className="flex-1 container mx-auto px-4 pt-32 pb-20 max-w-5xl">
+    <div className="min-h-screen bg-slate-100 flex flex-col pt-32 pb-20">
+      <main className="flex-1 container mx-auto px-4 max-w-7xl">
         
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-6 border-b border-slate-200">
            <div>
@@ -240,7 +234,6 @@ Tujuan (BCA/DANA/dll): `;
         </div>
 
       </main>
-      <Footer />
     </div>
   );
 }

@@ -83,7 +83,7 @@ export default function AdminSettings() {
                             </label>
                             <input 
                                 required type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                placeholder="e.g. JawirStore" 
+                                placeholder="e.g. MsgiccStore" 
                                 value={settings.store_name} 
                                 onChange={e => setSettings({...settings, store_name: e.target.value})} 
                             />

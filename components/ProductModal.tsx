@@ -259,7 +259,20 @@ export default function ProductModal({ product, flashSales, isOpen, onClose, isR
 
                     {step === "selection" ? (
                         <div className="space-y-4">
-                            {product.packages?.map((pkg, idx) => (
+                            {[...(product.packages || [])]
+                                .sort((a, b) => {
+                                    // 1. Availability first
+                                    const aAvail = a.is_available !== false;
+                                    const bAvail = b.is_available !== false;
+                                    if (aAvail && !bAvail) return -1;
+                                    if (!aAvail && bAvail) return 1;
+                                    
+                                    // 2. Price (Lowest first)
+                                    const aPrice = isResellerContext && a.reseller_price ? a.reseller_price : parseInt(a.price.replace(/\D/g, "")) || 0;
+                                    const bPrice = isResellerContext && b.reseller_price ? b.reseller_price : parseInt(b.price.replace(/\D/g, "")) || 0;
+                                    return aPrice - bPrice;
+                                })
+                                .map((pkg, idx) => (
                                 <div
                                     key={idx}
                                     className={cn(

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import FlashSale from "@/components/FlashSale";
 import CategoryFilter from "@/components/CategoryFilter";
 import ProductCard from "@/components/ProductCard";
-import Footer from "@/components/Footer";
 import ProductModal from "@/components/ProductModal";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2 } from "lucide-react";
@@ -169,8 +168,6 @@ export default function Home() {
           </div>
         )}
       </section>
-
-      <Footer />
 
       <ProductModal
         product={selectedProduct ? {

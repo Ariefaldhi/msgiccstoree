@@ -376,7 +376,17 @@ export default function AdminProducts() {
                             <div className="p-4 bg-white">
                                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pl-2">Packages Available</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    {product.packages?.map(pkg => (
+                                    {[...(product.packages || [])]
+                                        .sort((a, b) => {
+                                            const aAvail = a.is_available !== false;
+                                            const bAvail = b.is_available !== false;
+                                            if (aAvail && !bAvail) return -1;
+                                            if (!aAvail && bAvail) return 1;
+                                            const aPrice = parseInt(a.price.replace(/\D/g, "")) || 0;
+                                            const bPrice = parseInt(b.price.replace(/\D/g, "")) || 0;
+                                            return aPrice - bPrice;
+                                        })
+                                        .map(pkg => (
                                         <div key={pkg.id} className="border border-slate-100 rounded-xl p-3 flex justify-between items-center bg-slate-50/30 hover:bg-slate-50 transition-colors">
                                             <div>
                                                 <p className="font-bold text-sm text-slate-900">{pkg.name}</p>
