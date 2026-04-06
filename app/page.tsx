@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
 import FlashSale from "@/components/FlashSale";
 import CategoryFilter from "@/components/CategoryFilter";
 import ProductCard from "@/components/ProductCard";
@@ -118,8 +117,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
-
       {/* Flash Sale - replaces Hero, auto-hides if no active sales */}
       <div className="pt-28">
         <FlashSale onOpenProduct={(p) => { setSelectedProduct(p); setIsModalOpen(true); }} />

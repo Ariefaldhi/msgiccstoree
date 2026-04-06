@@ -35,6 +35,7 @@ interface Package {
     type: string;
     is_available: boolean;
     features?: string[];
+    reseller_price?: number;
 }
 
 export default function AdminProducts() {
@@ -61,9 +62,9 @@ export default function AdminProducts() {
         category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", terms_conditions: ""
     });
     const [packageForm, setPackageForm] = useState<{
-        name: string; price: string; cost_price: string; duration: string; type: string; is_available: boolean; features: string[];
+        name: string; price: string; cost_price: string; reseller_price: string; duration: string; type: string; is_available: boolean; features: string[];
     }>({
-        name: "", price: "", cost_price: "0", duration: "", type: "", is_available: true, features: []
+        name: "", price: "", cost_price: "0", reseller_price: "0", duration: "", type: "", is_available: true, features: []
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -211,7 +212,7 @@ export default function AdminProducts() {
     const openPackageModal = (product: Product) => {
         setEditingPackage(null);
         setSelectedProduct(product);
-        setPackageForm({ name: "", price: "", cost_price: "0", duration: "", type: "", is_available: true, features: [] });
+        setPackageForm({ name: "", price: "", cost_price: "0", reseller_price: "0", duration: "", type: "", is_available: true, features: [] });
         setIsPackageModalOpen(true);
     };
 
@@ -222,6 +223,7 @@ export default function AdminProducts() {
             name: pkg.name, 
             price: pkg.price, 
             cost_price: pkg.cost_price.toString(), 
+            reseller_price: pkg.reseller_price?.toString() || "0",
             duration: pkg.duration, 
             type: pkg.type, 
             is_available: pkg.is_available ?? true,
@@ -245,6 +247,7 @@ export default function AdminProducts() {
             ...packageForm,
             price: formattedPrice,
             cost_price: parseInt(packageForm.cost_price.replace(/\D/g, '')) || 0,
+            reseller_price: parseInt(packageForm.reseller_price.replace(/\D/g, '')) || 0,
             product_id: selectedProduct.id,
             features: packageForm.features
         };
@@ -277,7 +280,7 @@ export default function AdminProducts() {
                     return p;
                 }));
                 setIsPackageModalOpen(false);
-                setPackageForm({ name: "", price: "", cost_price: "0", duration: "", type: "", is_available: true, features: [] });
+                setPackageForm({ name: "", price: "", cost_price: "0", reseller_price: "0", duration: "", type: "", is_available: true, features: [] });
             } else {
                 alert("Error: " + error?.message);
             }
@@ -641,6 +644,11 @@ export default function AdminProducts() {
                                     <input required type="text" className="input-admin" placeholder="e.g. 25000"
                                         value={packageForm.cost_price} onChange={e => setPackageForm({ ...packageForm, cost_price: e.target.value })} />
                                 </div>
+                            </div>
+                            <div>
+                                <label className="label-admin">Reseller Price</label>
+                                <input required type="text" className="input-admin" placeholder="e.g. 27000"
+                                    value={packageForm.reseller_price} onChange={e => setPackageForm({ ...packageForm, reseller_price: e.target.value })} />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>

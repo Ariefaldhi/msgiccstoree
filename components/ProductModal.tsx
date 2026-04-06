@@ -13,6 +13,7 @@ interface Package {
     type: string;
     is_available?: boolean;
     features?: string[];
+    reseller_price?: number;
 }
 
 interface Product {
@@ -32,9 +33,10 @@ interface ProductModalProps {
     flashSales?: any[];
     isOpen: boolean;
     onClose: () => void;
+    isResellerContext?: boolean;
 }
 
-export default function ProductModal({ product, flashSales, isOpen, onClose }: ProductModalProps) {
+export default function ProductModal({ product, flashSales, isOpen, onClose, isResellerContext = false }: ProductModalProps) {
     const [step, setStep] = useState<"selection" | "payment">("selection");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [agreed, setAgreed] = useState(false);
@@ -42,9 +44,11 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
     const [waNumber, setWaNumber] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [user, setUser] = useState<any>(null);
+    const [adminPhone, setAdminPhone] = useState("6285720892082");
     const supabase = createClient();
 
     const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
+
 
     // Reset state when modal opens/closes
     useEffect(() => {
@@ -55,6 +59,10 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
             setIsSubmitting(false);
             fetchSalesCounts();
             checkUser();
+            // Fetch admin WhatsApp number
+            supabase.from("store_settings").select("whatsapp_number").eq("id", 1).single().then(({ data }) => {
+                if (data?.whatsapp_number) setAdminPhone(data.whatsapp_number);
+            });
         }
     }, [isOpen, product?.id]);
 
@@ -99,15 +107,40 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
 
         setIsSubmitting(true);
 
-        const flashSaleInfo = flashSales?.find(fs => fs.package_id === selectedPackage.id);
+        const flashSaleInfo = !isResellerContext && flashSales?.find(fs => fs.package_id === selectedPackage.id);
         const discount_percent = flashSaleInfo ? flashSaleInfo.discount_percent : null;
 
         const rawPrice = parseInt(selectedPackage.price.replace(/\D/g, "")) || 0;
-        const sellPriceRaw = discount_percent ? Math.round(rawPrice * (1 - discount_percent / 100)) : rawPrice;
+        
+        let sellPriceRaw = rawPrice;
+        if (isResellerContext && selectedPackage.reseller_price) {
+           sellPriceRaw = selectedPackage.reseller_price;
+        } else if (discount_percent) {
+           sellPriceRaw = Math.round(rawPrice * (1 - discount_percent / 100));
+        }
+
         const costPriceRaw = selectedPackage.cost_price || 0;
-        const profitRaw = sellPriceRaw - costPriceRaw;
+        let profitRaw = sellPriceRaw - costPriceRaw;
+        if (profitRaw < 0) profitRaw = 0; // Prevent negative profit
 
         const finalPriceDisplay = `Rp ${sellPriceRaw.toLocaleString("id-ID")}`;
+
+        // Affiliate Tracking Logic
+        let affiliator_id = null;
+        let commission = 0;
+        let affiliate_code_used = null;
+
+        const refCode = localStorage.getItem("msgicc_affiliate_ref");
+        if (refCode) {
+            const { data: affl } = await supabase.from("profiles").select("id").eq("affiliate_code", refCode).single();
+            if (affl) {
+                const { data: st } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
+                affiliator_id = affl.id;
+                affiliate_code_used = refCode;
+                const percent = st?.affiliate_commission_percent || 5;
+                commission = Math.floor(profitRaw * (percent / 100));
+            }
+        }
 
         // Simpan ke database
         const { error } = await supabase.from("orders").insert([{
@@ -120,6 +153,9 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
             sell_price: sellPriceRaw,
             cost_price: costPriceRaw,
             profit: profitRaw,
+            affiliator_id: affiliator_id,
+            commission: commission,
+            affiliate_code_used: affiliate_code_used,
             status: "Menunggu Konfirmasi"
         }]);
 
@@ -131,7 +167,7 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
         }
 
         const message = `Halo Admin, saya mau order paket ini:%0A%0A*${product.title}*%0A📦 ${selectedPackage.name}%0A💰 ${finalPriceDisplay}%0A⏳ ${selectedPackage.duration}%0A👤 Nama: ${customerName}%0A📱 WA: ${waNumber}%0A%0A_Mohon diproses ya kak!_`;
-        window.open(`https://wa.me/6285720892082?text=${message}`, "_blank");
+        window.open(`https://wa.me/${adminPhone}?text=${message}`, "_blank");
         
         onClose();
     };
@@ -264,12 +300,17 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
                                         <div className="flex justify-between items-end">
                                             <div className="text-2xl font-black text-blue-600 flex items-center gap-3 flex-wrap">
                                                 {(() => {
-                                                    const fs = flashSales?.find(f => f.package_id === pkg.id);
+                                                    const fs = !isResellerContext && flashSales?.find(f => f.package_id === pkg.id);
                                                     const rawPrice = parseInt(pkg.price.replace(/\D/g, "")) || 0;
                                                     
-                                                    // Check if flash sale is still valid (limit check)
-                                                    // We'd need to fetch orders for THIS flash sale specifically if we want exact max_orders logic
-                                                    // but for now let's show the discounted price if fs exists.
+                                                    if (isResellerContext && pkg.reseller_price) {
+                                                        return (
+                                                            <>
+                                                                <span>Rp {pkg.reseller_price.toLocaleString("id-ID")}</span>
+                                                                <span className="text-xs font-bold text-slate-400 line-through">{pkg.price}</span>
+                                                            </>
+                                                        );
+                                                    }
                                                     
                                                     if (fs) {
                                                         const discounted = Math.round(rawPrice * (1 - fs.discount_percent / 100));
@@ -336,14 +377,30 @@ export default function ProductModal({ product, flashSales, isOpen, onClose }: P
                             <div className="border border-blue-100 rounded-[2rem] p-6 bg-blue-50/30">
                                 <h4 className="font-bold text-lg text-slate-900 mb-1">{selectedPackage?.name}</h4>
                                 <div className="text-3xl font-black text-blue-600 mb-4 flex items-center gap-3 flex-wrap">
-                                    {selectedPackage && flashSales?.find(fs => fs.package_id === selectedPackage.id) ? (
-                                        <>
-                                            <span>Rp {Math.round((parseInt(selectedPackage.price.replace(/\D/g, "")) || 0) * (1 - (flashSales.find(fs => fs.package_id === selectedPackage.id)?.discount_percent || 0) / 100)).toLocaleString("id-ID")}</span>
-                                            <span className="text-sm font-bold text-slate-400 line-through">{selectedPackage.price}</span>
-                                        </>
-                                    ) : (
-                                        <span>{selectedPackage?.price}</span>
-                                    )}
+                                    {(() => {
+                                        const fs = !isResellerContext && selectedPackage && flashSales?.find(f => f.package_id === selectedPackage.id);
+                                        const rawPrice = parseInt(selectedPackage?.price?.replace(/\D/g, "") || "0");
+                                        
+                                        if (isResellerContext && selectedPackage?.reseller_price) {
+                                            return (
+                                                <>
+                                                    <span className="text-purple-600">Rp {selectedPackage.reseller_price.toLocaleString("id-ID")}</span>
+                                                    <span className="text-sm font-bold text-slate-400 line-through">{selectedPackage.price}</span>
+                                                </>
+                                            );
+                                        }
+
+                                        if (fs) {
+                                            const discounted = Math.round(rawPrice * (1 - fs.discount_percent / 100));
+                                            return (
+                                                <>
+                                                    <span>Rp {discounted.toLocaleString("id-ID")}</span>
+                                                    <span className="text-sm font-bold text-slate-400 line-through">{selectedPackage?.price}</span>
+                                                </>
+                                            )
+                                        }
+                                        return <span className={cn(isResellerContext && "text-purple-600")}>{selectedPackage?.price}</span>;
+                                    })()}
                                 </div>
 
                                 <div className="space-y-2">

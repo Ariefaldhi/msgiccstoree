@@ -16,6 +16,8 @@ interface Order {
     cost_price: number;
     profit: number;
     status: string;
+    affiliator_id?: string;
+    commission?: number;
     created_at: string;
 }
 
@@ -52,12 +54,21 @@ export default function AdminOrders() {
 
     const updateStatus = async (id: string, newStatus: string) => {
         setUpdatingId(id);
+        const order = orders.find(o => o.id === id);
+
         const { error } = await supabase
             .from("orders")
             .update({ status: newStatus })
             .eq("id", id);
         
         if (!error) {
+            if (newStatus === "Pesanan Selesai" && order?.status !== "Pesanan Selesai" && order?.affiliator_id && order?.commission) {
+                const { data: prof } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
+                if (prof) {
+                    await supabase.from("profiles").update({ balance: (prof.balance || 0) + order.commission }).eq("id", order.affiliator_id);
+                }
+            }
+
             setOrders(orders.map(o => o.id === id ? { ...o, status: newStatus } : o));
         } else {
             alert("Gagal mengupdate status: " + error.message);

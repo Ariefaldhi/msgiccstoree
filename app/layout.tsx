@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import ThemeRegistry from "@/components/ThemeRegistry";
+import AffiliateTracker from "@/components/AffiliateTracker";
+import { Suspense } from "react";
 
 // Using Poppins for headings/UI to match the modern aesthetic
 const poppins = Poppins({
@@ -39,6 +41,9 @@ export default async function RootLayout({
         className={`${poppins.variable} ${inter.variable} font-sans antialiased bg-white text-[#1e1e1e] selection:bg-blue-600/30 selection:text-blue-600`}
       >
         <ThemeRegistry />
+        <Suspense fallback={null}>
+          <AffiliateTracker />
+        </Suspense>
         <Navbar storeName={settings?.store_name} logoUrl={settings?.logo_url} />
         <main className="pt-24 pb-10 min-h-screen bg-white">
           {children}

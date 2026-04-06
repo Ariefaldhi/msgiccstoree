@@ -37,7 +37,7 @@ export default function AuthButton() {
         return (
             <Link
                 href="/login"
-                className="hidden md:flex items-center gap-2 bg-[#1e293b] hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold transition-all duration-300 text-sm shadow-lg shadow-blue-900/20 hover:shadow-blue-600/30"
+                className="hidden md:flex items-center gap-2 bg-blue-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_theme(colors.blue.700)] hover:shadow-[0_3px_0_theme(colors.blue.700)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-blue-500"
             >
                 <User className="w-4 h-4" />
                 <span>Login</span>
@@ -49,14 +49,14 @@ export default function AuthButton() {
         <div className="flex items-center gap-2">
             <Link
                 href="/admin"
-                className="hidden md:flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-bold transition-all text-xs shadow-lg"
+                className="hidden md:flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_theme(colors.blue.800)] hover:shadow-[0_3px_0_theme(colors.blue.800)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-blue-600"
             >
                 <LayoutDashboard className="w-4 h-4" />
                 <span>Dashboard</span>
             </Link>
             <button
                 onClick={handleLogout}
-                className="p-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                className="p-2.5 rounded-xl bg-red-50 text-red-500 shadow-[0_4px_0_theme(colors.red.200)] hover:shadow-[0_2px_0_theme(colors.red.200)] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all border-2 border-red-50 border-b-0"
                 title="Logout"
             >
                 <LogOut className="w-4 h-4" />

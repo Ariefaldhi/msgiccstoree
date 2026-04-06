@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Menu, X, Rocket, Home as HomeIcon, Grid2X2, MessageCircle, ShoppingBag } from "lucide-react";
+import { Search, Menu, X, Rocket, Home as HomeIcon, Grid2X2, MessageCircle, ShoppingBag, Store, Megaphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AuthButton from "./AuthButton";
 import { useState, useEffect } from "react";
@@ -9,7 +9,12 @@ import { usePathname } from "next/navigation";
 
 export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeName?: string, logoUrl?: string }) {
     const [isScrolled, setIsScrolled] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathname = usePathname();
+
+    useEffect(() => {
+        setIsMenuOpen(false); // Close menu on route change
+    }, [pathname]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -55,16 +60,24 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                     </div>
                 </div>
 
+                {/* Mobile Menu Toggle */}
+                <button 
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="md:hidden ml-auto p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+                >
+                    {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
+
                 {/* Desktop Navigation - Separated 3D Buttons */}
                 <div className="hidden md:flex items-center gap-4">
                     <Link href="/" className="px-6 py-2.5 rounded-xl bg-blue-500 text-white font-bold text-sm shadow-[0_6px_0_theme(colors.blue.700)] hover:shadow-[0_3px_0_theme(colors.blue.700)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-blue-500">
                         <HomeIcon className="w-4 h-4" /> Home
                     </Link>
-                    <Link href="/apps" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
-                        <Grid2X2 className="w-4 h-4" /> Apps
+                    <Link href="/reseller" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
+                        <Store className="w-4 h-4" /> Reseller
                     </Link>
-                    <Link href="/sosmed" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
-                        <Rocket className="w-4 h-4" /> Sosmed
+                    <Link href="/afiliator" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
+                        <Megaphone className="w-4 h-4" /> Afiliator
                     </Link>
 
                     <button className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
@@ -82,6 +95,39 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                     </button>
                 </div>
             </div>
+
+            {/* Mobile Menu Overlay */}
+            {isMenuOpen && (
+                <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-xl p-4 space-y-3 animate-in slide-in-from-top-4 duration-200">
+                    <Link 
+                        href="/" 
+                        className={cn(
+                            "flex items-center gap-3 p-4 rounded-2xl font-bold text-sm transition-all",
+                            pathname === "/" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50"
+                        )}
+                    >
+                        <HomeIcon className="w-5 h-5" /> Home
+                    </Link>
+                    <Link 
+                        href="/reseller" 
+                        className={cn(
+                            "flex items-center gap-3 p-4 rounded-2xl font-bold text-sm transition-all",
+                            pathname === "/reseller" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50"
+                        )}
+                    >
+                        <Store className="w-5 h-5" /> Reseller
+                    </Link>
+                    <Link 
+                        href="/afiliator" 
+                        className={cn(
+                            "flex items-center gap-3 p-4 rounded-2xl font-bold text-sm transition-all",
+                            pathname === "/afiliator" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50"
+                        )}
+                    >
+                        <Megaphone className="w-5 h-5" /> Afiliator
+                    </Link>
+                </div>
+            )}
         </nav>
     );
 }
