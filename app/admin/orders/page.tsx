@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, RefreshCw, CheckCircle2, Clock, XCircle, ShoppingBag, Plus, Edit, Trash2, X, Save } from "lucide-react";
+import { Loader2, RefreshCw, CheckCircle2, Clock, XCircle, ShoppingBag, Plus, Edit, Trash2, X, Save, Megaphone } from "lucide-react";
 
 interface Order {
     id: string;
@@ -31,7 +31,8 @@ export default function AdminOrders() {
     const [editingOrder, setEditingOrder] = useState<Order | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderForm, setOrderForm] = useState({
-        customer_name: "", wa_number: "", product_id: "", package_id: "", status: "Pesanan Selesai", created_at: ""
+        customer_name: "", wa_number: "", product_id: "", package_id: "", status: "Pesanan Selesai", created_at: "",
+        affiliator_id: "", commission: 0
     });
 
     const supabase = createClient();
@@ -62,10 +63,19 @@ export default function AdminOrders() {
             .eq("id", id);
         
         if (!error) {
-            if (newStatus === "Pesanan Selesai" && order?.status !== "Pesanan Selesai" && order?.affiliator_id && order?.commission) {
+            // Automatic Balance Adjustment for Affiliators
+            if (newStatus === "Pesanan Selesai" && order?.status !== "Pesanan Selesai" && order?.affiliator_id) {
+                const commissionToPay = order.commission || 0;
                 const { data: prof } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
                 if (prof) {
-                    await supabase.from("profiles").update({ balance: (prof.balance || 0) + order.commission }).eq("id", order.affiliator_id);
+                    await supabase.from("profiles").update({ balance: (prof.balance || 0) + commissionToPay }).eq("id", order.affiliator_id);
+                }
+            } else if (newStatus !== "Pesanan Selesai" && order?.status === "Pesanan Selesai" && order?.affiliator_id) {
+                // Refund / Rollback commission if status is changed back from Selesai
+                const commissionToRefund = order.commission || 0;
+                const { data: prof } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
+                if (prof) {
+                    await supabase.from("profiles").update({ balance: Math.max(0, (prof.balance || 0) - commissionToRefund) }).eq("id", order.affiliator_id);
                 }
             }
 
@@ -112,6 +122,8 @@ export default function AdminOrders() {
             cost_price: selectedPackage.cost_price,
             profit: profitRaw,
             status: orderForm.status,
+            affiliator_id: orderForm.affiliator_id || null,
+            commission: orderForm.commission || 0,
             created_at: new Date(orderForm.created_at).toISOString()
         };
 
@@ -254,6 +266,7 @@ export default function AdminOrders() {
                                     <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Pelanggan</th>
                                     <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Produk / Paket</th>
                                     <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider text-right">Harga / Profit</th>
+                                    <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Afiliasi</th>
                                     <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Status</th>
                                     <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider text-right">Aksi</th>
                                 </tr>
@@ -285,6 +298,17 @@ export default function AdminOrders() {
                                                 <span className="text-sm font-black text-blue-600">Rp {order.sell_price.toLocaleString("id-ID")}</span>
                                                 <span className="text-xs font-bold text-green-500 bg-green-50 px-1.5 rounded mt-1">+Rp {order.profit.toLocaleString("id-ID")}</span>
                                             </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {order.affiliator_id ? (
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Komisi</span>
+                                                    <span className="text-sm font-black text-slate-900 leading-tight">Rp {order.commission?.toLocaleString("id-ID")}</span>
+                                                    <span className="text-[10px] text-slate-400 truncate max-w-[80px]" title={order.affiliator_id}>{order.affiliator_id.split('-')[0]}...</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-slate-300 font-bold italic">Tanpa Ref</span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
@@ -369,6 +393,28 @@ export default function AdminOrders() {
                                     <option value="Dibatalkan">Dibatalkan</option>
                                 </select>
                             </div>
+
+                            <hr className="border-slate-100 my-4" />
+
+                            <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100 space-y-4">
+                                <h3 className="text-xs font-black text-purple-600 uppercase tracking-widest flex items-center gap-2">
+                                    <Megaphone className="w-4 h-4" /> Informasi Afiliasi
+                                </h3>
+                                <div>
+                                    <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">ID Afiliator (UUID)</label>
+                                    <input type="text" className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Paste UUID from Users page" 
+                                        value={orderForm.affiliator_id} onChange={e => setOrderForm({...orderForm, affiliator_id: e.target.value})} />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">Jumlah Komisi (Rp)</label>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-purple-400">Rp</span>
+                                        <input type="number" className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 pl-8 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                                            value={orderForm.commission} onChange={e => setOrderForm({...orderForm, commission: parseInt(e.target.value) || 0})} />
+                                    </div>
+                                </div>
+                            </div>
+
 
                             <button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-blue-900/20">
                                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin"/> : <><Save className="w-5 h-5"/> {editingOrder ? "Simpan Perubahan" : "Simpan Pesanan"}</>}
