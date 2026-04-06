@@ -6,11 +6,33 @@ import { cn } from "@/lib/utils";
 import AuthButton from "./AuthButton";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeName?: string, logoUrl?: string }) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [profile, setProfile] = useState<any>(null);
     const pathname = usePathname();
+    const supabase = createClient();
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: prof } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+                setProfile(prof);
+            } else {
+                setProfile(null);
+            }
+        };
+        fetchProfile();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+            fetchProfile();
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     useEffect(() => {
         setIsMenuOpen(false); // Close menu on route change
@@ -85,8 +107,23 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                     </button>
                 </div>
 
+                {/* Partner Balance Display */}
+                {profile && (profile.is_reseller || profile.is_affiliator || profile.role === 'admin') && (
+                    <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl shadow-lg border border-slate-800 ml-auto group transition-all hover:scale-105">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Saldo Anda</span>
+                            <span className="text-sm font-black text-emerald-400 leading-none">
+                                Rp {profile.balance?.toLocaleString('id-ID') || '0'}
+                            </span>
+                        </div>
+                    </div>
+                )}
+
                 {/* Auth Button */}
-                <AuthButton />
+                <div className={cn("flex items-center gap-4", !profile && "ml-auto")}>
+                    <AuthButton />
+                </div>
 
                 {/* Hubungi Admin */}
                 <div className="hidden md:block ml-auto">

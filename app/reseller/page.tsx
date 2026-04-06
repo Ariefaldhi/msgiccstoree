@@ -73,7 +73,8 @@ export default function ResellerPage() {
     );
   }
 
-  const isReseller = profile?.is_reseller === true;
+  const isAdmin = profile?.role === 'admin';
+  const isReseller = (profile?.is_reseller === true) || isAdmin;
 
   if (!isReseller) {
     const waText = user 
@@ -133,6 +134,16 @@ export default function ResellerPage() {
     );
   }
 
+  // Calculate cheapest reseller price for each product
+  const getProductResellerPrice = (product: Product) => {
+    if (!product.packages || product.packages.length === 0) return "Cek Detail";
+    
+    const minPrice = Math.min(...product.packages.map(p => p.reseller_price || 0));
+    if (minPrice === 0) return "Cek Detail";
+    
+    return `Mulai Rp ${minPrice.toLocaleString('id-ID')}`;
+  };
+
   // Reseller Connected View
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -152,14 +163,14 @@ export default function ResellerPage() {
            </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {products.map((product) => (
-            <div key={product.id} onClick={() => handleProductClick(product)} className="cursor-pointer">
+            <div key={product.id} onClick={() => handleProductClick(product)} className="cursor-pointer group">
               <ProductCard
                 title={product.title}
-                price="Harga Cabang" // Replace text for reseller
+                price={getProductResellerPrice(product)}
                 image={product.image_url}
-                tag="VIP"
+                tag="HARGA CABANG"
                 tagColor="purple"
                 href="#"
               />

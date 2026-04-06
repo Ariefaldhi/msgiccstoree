@@ -60,7 +60,7 @@ export default function AfiliatorPage() {
     );
   }
 
-  const isAffiliator = profile?.is_affiliator === true;
+  const isAffiliator = (profile?.is_affiliator === true) || (profile?.role === 'admin');
 
   if (!isAffiliator) {
     const waText = user 
