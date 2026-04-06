@@ -66,16 +66,22 @@ export default function AdminOrders() {
             // Automatic Balance Adjustment for Affiliators
             if (newStatus === "Pesanan Selesai" && order?.status !== "Pesanan Selesai" && order?.affiliator_id) {
                 const commissionToPay = order.commission || 0;
-                const { data: prof } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
-                if (prof) {
-                    await supabase.from("profiles").update({ balance: (prof.balance || 0) + commissionToPay }).eq("id", order.affiliator_id);
+                const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
+                if (prof && !fetchErr) {
+                    const { error: updErr } = await supabase.from("profiles").update({ balance: (prof.balance || 0) + commissionToPay }).eq("id", order.affiliator_id);
+                    if (updErr) console.error("Balance update failed:", updErr.message);
+                } else {
+                    console.error("Profile fetch failed:", fetchErr?.message);
                 }
             } else if (newStatus !== "Pesanan Selesai" && order?.status === "Pesanan Selesai" && order?.affiliator_id) {
                 // Refund / Rollback commission if status is changed back from Selesai
                 const commissionToRefund = order.commission || 0;
-                const { data: prof } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
-                if (prof) {
-                    await supabase.from("profiles").update({ balance: Math.max(0, (prof.balance || 0) - commissionToRefund) }).eq("id", order.affiliator_id);
+                const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
+                if (prof && !fetchErr) {
+                    const { error: updErr } = await supabase.from("profiles").update({ balance: Math.max(0, (prof.balance || 0) - commissionToRefund) }).eq("id", order.affiliator_id);
+                    if (updErr) console.error("Balance rollback failed:", updErr.message);
+                } else {
+                    console.error("Profile fetch failed:", fetchErr?.message);
                 }
             }
 
