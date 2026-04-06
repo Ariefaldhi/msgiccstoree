@@ -174,7 +174,7 @@ export default function ResellerPage() {
 
       <ProductModal
         product={selectedProduct ? { ...selectedProduct, category: 'Reseller', packages: selectedProduct.packages } : null}
-        flashSales={[]} // Resellers don't get flash sales
+        activePromos={[]} // Resellers don't get flash sales
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         isResellerContext={true} // pass prop to ProductModal

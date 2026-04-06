@@ -175,7 +175,7 @@ export default function Home() {
           category: categories.find(c => c.id === selectedProduct.category_id)?.name || "Unknown",
           packages: selectedProduct.packages
         } : null}
-        flashSales={activePromos}
+        activePromos={activePromos}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
