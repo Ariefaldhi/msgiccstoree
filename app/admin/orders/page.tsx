@@ -173,7 +173,9 @@ export default function AdminOrders() {
                 product_id: prodId,
                 package_id: pkgId,
                 status: order.status,
-                created_at: new Date(order.created_at).toISOString().slice(0, 16)
+                created_at: new Date(order.created_at).toISOString().slice(0, 16),
+                affiliator_id: order.affiliator_id || "",
+                commission: order.commission || 0
             });
         } else {
             setEditingOrder(null);
@@ -183,7 +185,9 @@ export default function AdminOrders() {
                 product_id: "", 
                 package_id: "", 
                 status: "Pesanan Selesai",
-                created_at: new Date().toISOString().slice(0, 16)
+                created_at: new Date().toISOString().slice(0, 16),
+                affiliator_id: "",
+                commission: 0
             });
         }
         setIsModalOpen(true);
