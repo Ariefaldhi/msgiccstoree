@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Zap, Clock } from "lucide-react";
 
-interface FlashSaleItem {
+interface PromoItem {
     id: string;
     discount_percent: number;
     label: string;
@@ -24,7 +24,7 @@ interface FlashSaleItem {
     };
 }
 
-interface FlashSaleProps {
+interface PromoProps {
     onOpenProduct: (product: any) => void;
 }
 
@@ -37,7 +37,7 @@ function useCountdown(endTime: string) {
             if (diff <= 0) return setTimeLeft({ h: 0, m: 0, s: 0, expired: true });
             const h = Math.floor(diff / 3600000);
             const m = Math.floor((diff % 3600000) / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
+            const s = Math.floor((diff % 60000) / 10000);
             setTimeLeft({ h, m, s, expired: false });
         };
         calc();
@@ -59,7 +59,7 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
     );
 }
 
-function FlashCard({ item, onOpen }: { item: FlashSaleItem; onOpen: () => void }) {
+function PromoCard({ item, onOpen }: { item: PromoItem; onOpen: () => void }) {
     const { h, m, s, expired } = useCountdown(item.end_time);
 
     // Calculate discounted price from raw number in price string
@@ -110,8 +110,8 @@ function FlashCard({ item, onOpen }: { item: FlashSaleItem; onOpen: () => void }
     );
 }
 
-export default function FlashSale({ onOpenProduct }: FlashSaleProps) {
-    const [items, setItems] = useState<FlashSaleItem[]>([]);
+export default function Promo({ onOpenProduct }: PromoProps) {
+    const [items, setItems] = useState<PromoItem[]>([]);
     const [loading, setLoading] = useState(true);
     const supabase = createClient();
 
@@ -156,20 +156,16 @@ export default function FlashSale({ onOpenProduct }: FlashSaleProps) {
     if (loading || items.length === 0) return null;
 
     return (
-        <section className="container mx-auto px-4 pb-4">
-            <div className="bg-gradient-to-br from-[#0f172a] to-[#020617] rounded-[2rem] p-6 md:p-8 border border-blue-500/20 shadow-2xl relative overflow-hidden">
-                {/* Background glow */}
-                <div className="absolute top-0 left-1/4 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
-
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6 relative z-10">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                            <Zap className="w-5 h-5 text-white fill-white" />
+        <section className="py-12 bg-white relative overflow-hidden">
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-200 animate-pulse">
+                            <Zap className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-black text-white tracking-tight">FLASH SALE</h2>
-                            <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Penawaran Terbatas!</p>
+                            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Promo Spesial</h2>
+                            <p className="text-slate-500 font-medium">Jangan lewatkan penawaran terbatas ini.</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold">
@@ -181,7 +177,7 @@ export default function FlashSale({ onOpenProduct }: FlashSaleProps) {
                 {/* Products Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 relative z-10">
                     {items.map((item) => (
-                        <FlashCard
+                        <PromoCard
                             key={item.id}
                             item={item}
                             onOpen={() => onOpenProduct(item.package.product)}

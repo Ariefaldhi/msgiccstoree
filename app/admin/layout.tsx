@@ -24,7 +24,7 @@ export default function AdminLayout({
         { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
         { name: "Categories", href: "/admin/categories", icon: Tags },
         { name: "Products", href: "/admin/products", icon: Package },
-        { name: "Flash Sale", href: "/admin/flashsale", icon: Zap },
+        { name: "Promo", href: "/admin/promo", icon: Zap },
         { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
         { name: "Users", href: "/admin/users", icon: Users },
         { name: "Settings", href: "/admin/settings", icon: Settings },

@@ -30,13 +30,13 @@ interface Product {
 
 interface ProductModalProps {
     product: Product | null;
-    flashSales?: any[];
+    activePromos?: any[];
     isOpen: boolean;
     onClose: () => void;
     isResellerContext?: boolean;
 }
 
-export default function ProductModal({ product, flashSales, isOpen, onClose, isResellerContext = false }: ProductModalProps) {
+export default function ProductModal({ product, activePromos, isOpen, onClose, isResellerContext = false }: ProductModalProps) {
     const [step, setStep] = useState<"selection" | "payment">("selection");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [agreed, setAgreed] = useState(false);
@@ -107,8 +107,8 @@ export default function ProductModal({ product, flashSales, isOpen, onClose, isR
 
         setIsSubmitting(true);
 
-        const flashSaleInfo = !isResellerContext && flashSales?.find(fs => fs.package_id === selectedPackage.id);
-        const discount_percent = flashSaleInfo ? flashSaleInfo.discount_percent : null;
+        const promoInfo = !isResellerContext && activePromos?.find(fs => fs.package_id === selectedPackage.id);
+        const discount_percent = promoInfo ? promoInfo.discount_percent : null;
 
         const rawPrice = parseInt(selectedPackage.price.replace(/\D/g, "")) || 0;
         
@@ -313,7 +313,7 @@ export default function ProductModal({ product, flashSales, isOpen, onClose, isR
                                         <div className="flex justify-between items-end">
                                             <div className="text-2xl font-black text-blue-600 flex items-center gap-3 flex-wrap">
                                                 {(() => {
-                                                    const fs = !isResellerContext && flashSales?.find(f => f.package_id === pkg.id);
+                                                    const fs = !isResellerContext && activePromos?.find(f => f.package_id === pkg.id);
                                                     const rawPrice = parseInt(pkg.price.replace(/\D/g, "")) || 0;
                                                     
                                                     if (isResellerContext && pkg.reseller_price) {
@@ -391,7 +391,7 @@ export default function ProductModal({ product, flashSales, isOpen, onClose, isR
                                 <h4 className="font-bold text-lg text-slate-900 mb-1">{selectedPackage?.name}</h4>
                                 <div className="text-3xl font-black text-blue-600 mb-4 flex items-center gap-3 flex-wrap">
                                     {(() => {
-                                        const fs = !isResellerContext && selectedPackage && flashSales?.find(f => f.package_id === selectedPackage.id);
+                                        const fs = !isResellerContext && selectedPackage && activePromos?.find(f => f.package_id === selectedPackage.id);
                                         const rawPrice = parseInt(selectedPackage?.price?.replace(/\D/g, "") || "0");
                                         
                                         if (isResellerContext && selectedPackage?.reseller_price) {

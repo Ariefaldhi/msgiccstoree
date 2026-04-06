@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import FlashSale from "@/components/FlashSale";
+import Promo from "@/components/Promo";
 import CategoryFilter from "@/components/CategoryFilter";
 import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
@@ -35,7 +35,7 @@ export default function Home() {
   // Data State
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [activeFlashSales, setActiveFlashSales] = useState<any[]>([]);
+  const [activePromos, setActivePromos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const supabase = createClient();
@@ -82,7 +82,7 @@ export default function Home() {
           return count < sale.max_orders;
         });
 
-        setActiveFlashSales(validSales);
+        setActivePromos(validSales);
       }
 
       setLoading(false);
@@ -116,9 +116,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Flash Sale - replaces Hero, auto-hides if no active sales */}
+      {/* Promo Section - replaces Hero, auto-hides if no active promos */}
       <div className="pt-28">
-        <FlashSale onOpenProduct={(p) => { setSelectedProduct(p); setIsModalOpen(true); }} />
+        <Promo onOpenProduct={(p) => { setSelectedProduct(p); setIsModalOpen(true); }} />
       </div>
 
       <section id="products" className="container mx-auto px-4 py-8 relative z-20">
@@ -175,7 +175,7 @@ export default function Home() {
           category: categories.find(c => c.id === selectedProduct.category_id)?.name || "Unknown",
           packages: selectedProduct.packages
         } : null}
-        flashSales={activeFlashSales}
+        flashSales={activePromos}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />

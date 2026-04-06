@@ -14,7 +14,7 @@ interface Package {
     };
 }
 
-interface FlashSaleRow {
+interface PromoRow {
     id: string;
     discount_percent: number;
     label: string;
@@ -24,9 +24,9 @@ interface FlashSaleRow {
     package: Package;
 }
 
-export default function AdminFlashSale() {
+export default function AdminPromo() {
     const [packages, setPackages] = useState<Package[]>([]);
-    const [flashSales, setFlashSales] = useState<FlashSaleRow[]>([]);
+    const [flashSales, setFlashSales] = useState<PromoRow[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +34,7 @@ export default function AdminFlashSale() {
     const [form, setForm] = useState({
         package_id: "",
         discount_percent: "20",
-        label: "FLASH SALE",
+        label: "PROMO",
         duration_hours: "24",
         max_orders: "0",
     });
@@ -73,7 +73,7 @@ export default function AdminFlashSale() {
 
         if (!error) {
             setIsModalOpen(false);
-            setForm({ package_id: "", discount_percent: "20", label: "FLASH SALE", duration_hours: "24", max_orders: "0" });
+            setForm({ package_id: "", discount_percent: "20", label: "PROMO", duration_hours: "24", max_orders: "0" });
             fetchData();
         } else {
             alert("Error: " + error.message);
@@ -82,12 +82,12 @@ export default function AdminFlashSale() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Hapus flash sale ini?")) return;
+        if (!confirm("Hapus promo ini?")) return;
         await supabase.from("flash_sales").delete().eq("id", id);
         setFlashSales(prev => prev.filter(f => f.id !== id));
     };
 
-    const handleToggle = async (item: FlashSaleRow) => {
+    const handleToggle = async (item: PromoRow) => {
         const { error } = await supabase
             .from("flash_sales")
             .update({ is_active: !item.is_active })
@@ -110,15 +110,15 @@ export default function AdminFlashSale() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                        <Zap className="w-7 h-7 text-[#ff2d55]" /> Flash Sale
+                        <Zap className="w-7 h-7 text-[#ff2d55]" /> Promo & Produk Spesial
                     </h1>
-                    <p className="text-slate-500 mt-1">Kelola promo flash sale produk.</p>
+                    <p className="text-slate-500 mt-1">Kelola promo produk dan diskon terbatas.</p>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className="bg-[#ff2d55] hover:bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-900/20 transition-all"
                 >
-                    <Plus className="w-5 h-5" /> Buat Flash Sale
+                    <Plus className="w-5 h-5" /> Buat Promo Baru
                 </button>
             </div>
 
@@ -167,7 +167,7 @@ export default function AdminFlashSale() {
                     })}
                     {flashSales.length === 0 && (
                         <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400">
-                            Belum ada flash sale. Buat sekarang!
+                            Belum ada promo aktif. Buat sekarang!
                         </div>
                     )}
                 </div>
@@ -178,7 +178,7 @@ export default function AdminFlashSale() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
                     <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-black text-slate-900">Buat Flash Sale</h2>
+                            <h2 className="text-xl font-black text-slate-900">Buat Promo Baru</h2>
                             <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
                                 <X className="w-6 h-6" />
                             </button>
@@ -206,7 +206,7 @@ export default function AdminFlashSale() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="label-admin">Label Badge</label>
-                                    <input type="text" className="input-admin" placeholder="e.g. FLASH SALE"
+                                    <input type="text" className="input-admin" placeholder="e.g. PROMO"
                                         value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} />
                                 </div>
                                 <div>
@@ -216,7 +216,7 @@ export default function AdminFlashSale() {
                                 </div>
                             </div>
                             <button type="submit" disabled={isSubmitting} className="w-full bg-[#ff2d55] hover:bg-red-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-red-900/20 flex items-center justify-center gap-2">
-                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Zap className="w-4 h-4" /> Aktifkan Flash Sale</>}
+                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Zap className="w-4 h-4" /> Aktifkan Promo</>}
                             </button>
                         </form>
                     </div>
