@@ -32,7 +32,7 @@ export default function AdminOrders() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderForm, setOrderForm] = useState({
         customer_name: "", wa_number: "", product_id: "", package_id: "", status: "Pesanan Selesai", created_at: "",
-        affiliator_id: "", commission: 0
+        affiliator_id: "", commission: 0, sell_price: 0, cost_price: 0
     });
 
     const supabase = createClient();
@@ -124,9 +124,9 @@ export default function AdminOrders() {
             package_id: selectedPackage.id,
             product_name: selectedProduct.title,
             package_name: selectedPackage.name,
-            sell_price: rawPrice,
-            cost_price: selectedPackage.cost_price,
-            profit: profitRaw,
+            sell_price: orderForm.sell_price,
+            cost_price: orderForm.cost_price,
+            profit: orderForm.sell_price - orderForm.cost_price,
             status: orderForm.status,
             affiliator_id: orderForm.affiliator_id || null,
             commission: orderForm.commission || 0,
@@ -181,7 +181,9 @@ export default function AdminOrders() {
                 status: order.status,
                 created_at: new Date(order.created_at).toISOString().slice(0, 16),
                 affiliator_id: order.affiliator_id || "",
-                commission: order.commission || 0
+                commission: order.commission || 0,
+                sell_price: order.sell_price,
+                cost_price: order.cost_price
             });
         } else {
             setEditingOrder(null);
@@ -193,7 +195,9 @@ export default function AdminOrders() {
                 status: "Pesanan Selesai",
                 created_at: new Date().toISOString().slice(0, 16),
                 affiliator_id: "",
-                commission: 0
+                commission: 0,
+                sell_price: 0,
+                cost_price: 0
             });
         }
         setIsModalOpen(true);
@@ -376,13 +380,38 @@ export default function AdminOrders() {
                                 <div>
                                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Paket</label>
                                     <select required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        value={orderForm.package_id} onChange={e => setOrderForm({...orderForm, package_id: e.target.value})}
+                                        value={orderForm.package_id} 
+                                        onChange={e => {
+                                            const pkgId = e.target.value;
+                                            const pkg = products.find(p => p.id === orderForm.product_id)?.packages?.find((p: any) => p.id === pkgId);
+                                            setOrderForm({
+                                                ...orderForm, 
+                                                package_id: pkgId,
+                                                sell_price: pkg ? (parseInt(pkg.price.replace(/\D/g, "")) || 0) : 0,
+                                                cost_price: pkg ? (pkg.cost_price || 0) : 0
+                                            });
+                                        }}
                                     >
                                         <option value="">-- Pilih Paket --</option>
                                         {products.find(p => p.id === orderForm.product_id)?.packages?.map((pkg: any) => (
                                             <option key={pkg.id} value={pkg.id}>{pkg.name} - {pkg.price}</option>
                                         ))}
                                     </select>
+                                </div>
+                            )}
+
+                            {orderForm.package_id && (
+                                <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                    <div>
+                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Harga Jual (Rp)</label>
+                                        <input required type="number" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-900" 
+                                            value={orderForm.sell_price} onChange={e => setOrderForm({...orderForm, sell_price: parseInt(e.target.value) || 0})} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Harga Modal (Rp)</label>
+                                        <input required type="number" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-900" 
+                                            value={orderForm.cost_price} onChange={e => setOrderForm({...orderForm, cost_price: parseInt(e.target.value) || 0})} />
+                                    </div>
                                 </div>
                             )}
                             
