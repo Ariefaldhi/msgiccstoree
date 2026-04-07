@@ -21,6 +21,8 @@ export default function AdminUsers() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [savingId, setSavingId] = useState<string | null>(null);
+    const [localBalances, setLocalBalances] = useState<Record<string, number>>({});
+    const [localCodes, setLocalCodes] = useState<Record<string, string>>({});
 
     const supabase = createClient();
 
@@ -31,7 +33,17 @@ export default function AdminUsers() {
     const fetchUsers = async () => {
         setLoading(true);
         const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
-        if (data) setUsers(data);
+        if (data) {
+            setUsers(data);
+            const balances: Record<string, number> = {};
+            const codes: Record<string, string> = {};
+            data.forEach(u => {
+                balances[u.id] = u.balance || 0;
+                codes[u.id] = u.affiliate_code || "";
+            });
+            setLocalBalances(balances);
+            setLocalCodes(codes);
+        }
         if (error) console.error(error);
         setLoading(false);
     };
@@ -162,7 +174,8 @@ export default function AdminUsers() {
                                                         type="text" 
                                                         className="border border-slate-200 rounded px-2 py-1 text-xs w-32"
                                                         placeholder="Kode (opsional)"
-                                                        defaultValue={user.affiliate_code || ''}
+                                                        value={localCodes[user.id] || ""}
+                                                        onChange={(e) => setLocalCodes({ ...localCodes, [user.id]: e.target.value })}
                                                         onBlur={(e) => {
                                                             if (e.target.value !== (user.affiliate_code || '')) {
                                                                 handleUpdateCode(user.id, e.target.value);
@@ -177,7 +190,8 @@ export default function AdminUsers() {
                                                         <input 
                                                             type="number" 
                                                             className="border border-slate-200 rounded px-2 py-1 text-xs pl-7 w-32"
-                                                            defaultValue={user.balance || 0}
+                                                            value={localBalances[user.id] || 0}
+                                                            onChange={(e) => setLocalBalances({ ...localBalances, [user.id]: parseInt(e.target.value) || 0 })}
                                                             onBlur={(e) => {
                                                                 if (parseInt(e.target.value) !== (user.balance || 0)) {
                                                                     handleUpdateBalance(user.id, parseInt(e.target.value));

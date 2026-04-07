@@ -37,12 +37,23 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [activePromos, setActivePromos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
 
   const supabase = createClient();
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+
+      // Fetch Sales counts for sorting
+      const { data: salesStats } = await supabase.from("orders").select("product_name").eq("status", "Pesanan Selesai");
+      if (salesStats) {
+        const counts: Record<string, number> = {};
+        salesStats.forEach(s => {
+          counts[s.product_name] = (counts[s.product_name] || 0) + 1;
+        });
+        setSalesCounts(counts);
+      }
 
       // Fetch Categories
       const { data: cats, error: catError } = await supabase.from("categories").select("*").order("created_at", { ascending: true });
@@ -107,6 +118,11 @@ export default function Home() {
     const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesCategory && matchesSearch;
+  }).sort((a, b) => {
+    // Sort by sales count (popularity)
+    const salesA = salesCounts[a.title] || 0;
+    const salesB = salesCounts[b.title] || 0;
+    return salesB - salesA;
   });
 
   const handleProductClick = (product: Product) => {
@@ -157,6 +173,7 @@ export default function Home() {
                   tag={product.tag}
                   tagColor={product.tagColor}
                   href="#" // Prevent navigation, handle with onClick
+                  salesCount={salesCounts[product.title] || 0}
                 />
               </div>
             ))}

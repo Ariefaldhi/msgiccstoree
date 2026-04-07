@@ -24,12 +24,24 @@ export default function ResellerPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [adminPhone, setAdminPhone] = useState("6281234567890");
+  const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
 
   const supabase = createClient();
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+
+      // Fetch Sales counts for sorting
+      const { data: salesStats } = await supabase.from("orders").select("product_name").eq("status", "Pesanan Selesai");
+      if (salesStats) {
+        const counts: Record<string, number> = {};
+        salesStats.forEach(s => {
+          counts[s.product_name] = (counts[s.product_name] || 0) + 1;
+        });
+        setSalesCounts(counts);
+      }
+      
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
 
@@ -61,11 +73,13 @@ export default function ResellerPage() {
   };
 
   if (loading) {
+      return (
       <div className="min-h-screen bg-white pt-32 pb-20">
         <div className="flex items-center justify-center">
           <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
         </div>
       </div>
+      );
   }
 
   const isAdmin = profile?.role === 'admin';
@@ -156,10 +170,15 @@ export default function ResellerPage() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {products.map((product) => (
+          {[...products].sort((a, b) => {
+            const sa = salesCounts[a.title] || 0;
+            const sb = salesCounts[b.title] || 0;
+            return sb - sa;
+          }).map((product) => (
             <div key={product.id} onClick={() => handleProductClick(product)} className="cursor-pointer group">
               <ProductCard
                 title={product.title}
+                salesCount={salesCounts[product.title] || 0}
                 price={getProductResellerPrice(product)}
                 image={product.image_url}
                 tag="HARGA CABANG"

@@ -9,8 +9,9 @@ export default function AffiliateTracker() {
     useEffect(() => {
         const refCode = searchParams.get("ref");
         if (refCode) {
-            // Save to localStorage, expires/overwritten naturally
             localStorage.setItem("msgicc_affiliate_ref", refCode);
+        } else {
+            localStorage.removeItem("msgicc_affiliate_ref");
         }
     }, [searchParams]);
 

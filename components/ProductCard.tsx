@@ -9,9 +9,10 @@ interface ProductCardProps {
     tag?: string;
     tagColor?: "yellow" | "red" | "blue" | "purple";
     href: string;
+    salesCount?: number;
 }
 
-export default function ProductCard({ title, price, image, tag, tagColor = "yellow", href }: ProductCardProps) {
+export default function ProductCard({ title, price, image, tag, tagColor = "yellow", href, salesCount }: ProductCardProps) {
     return (
         <div className="group relative block bg-white rounded-[2.5rem] p-6 transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)] hover:-translate-y-1 flex flex-col items-center text-center h-full border border-slate-50 overflow-hidden">
 
@@ -45,6 +46,11 @@ export default function ProductCard({ title, price, image, tag, tagColor = "yell
                         ) : (
                             <div className="w-full h-full bg-slate-900 flex items-center justify-center">
                                 <span className="text-4xl font-black text-white">{title.charAt(0)}</span>
+                            </div>
+                        )}
+                        {salesCount !== undefined && salesCount > 0 && (
+                            <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-xl text-[9px] font-black text-slate-800 shadow-sm border border-white/20 z-10 transition-transform group-hover:scale-110">
+                                🔥 {salesCount} Terjual
                             </div>
                         )}
                     </div>

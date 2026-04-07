@@ -48,6 +48,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
     const supabase = createClient();
 
     const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
+    const [activeRefCode, setActiveRefCode] = useState<string | null>(null);
 
 
     // Reset state when modal opens/closes
@@ -59,6 +60,8 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
             setIsSubmitting(false);
             fetchSalesCounts();
             checkUser();
+            // Fetch affiliate ref from localStorage
+            setActiveRefCode(localStorage.getItem("msgicc_affiliate_ref"));
             // Fetch admin WhatsApp number
             supabase.from("store_settings").select("whatsapp_number").eq("id", 1).single().then(({ data }) => {
                 if (data?.whatsapp_number) setAdminPhone(data.whatsapp_number);
@@ -233,6 +236,11 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                                         product.tagColor === "blue" && "bg-blue-100 text-blue-700",
                                     )}>
                                         {product.tag}
+                                    </span>
+                                )}
+                                {activeRefCode && (
+                                    <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                                        Referal: {activeRefCode}
                                     </span>
                                 )}
                             </div>
