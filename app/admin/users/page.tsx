@@ -44,7 +44,10 @@ export default function AdminUsers() {
             setLocalBalances(balances);
             setLocalCodes(codes);
         }
-        if (error) console.error(error);
+        if (error) {
+            console.error("❌ Fetch Users Error:", error);
+            alert("Gagal mengambil data user: " + error.message);
+        }
         setLoading(false);
     };
 
@@ -54,7 +57,8 @@ export default function AdminUsers() {
         if (!error) {
             setUsers(users.map(u => u.id === id ? { ...u, is_reseller: !current } : u));
         } else {
-            alert("Gagal update status reseller.");
+            console.error("❌ Update Reseller Error:", error);
+            alert("Gagal update status reseller: " + error.message);
         }
         setSavingId(null);
     };
@@ -65,7 +69,8 @@ export default function AdminUsers() {
         if (!error) {
             setUsers(users.map(u => u.id === id ? { ...u, is_affiliator: !current } : u));
         } else {
-            alert("Gagal update status afiliator.");
+            console.error("❌ Update Affiliator Error:", error);
+            alert("Gagal update status afiliator: " + error.message);
         }
         setSavingId(null);
     };
@@ -76,7 +81,13 @@ export default function AdminUsers() {
         if (!error) {
             setUsers(users.map(u => u.id === id ? { ...u, affiliate_code: newCode } : u));
         } else {
-            alert("Kode afiliasi sudah ada atau gagal update.");
+            console.error("❌ Update Code Error:", error);
+            // Revert local state to the current value from the users array
+            const currentUser = users.find(u => u.id === id);
+            if (currentUser) {
+                setLocalCodes({ ...localCodes, [id]: currentUser.affiliate_code || "" });
+            }
+            alert("Kode afiliasi sudah ada atau gagal update: " + error.message);
         }
         setSavingId(null);
     };
@@ -87,7 +98,13 @@ export default function AdminUsers() {
         if (!error) {
             setUsers(users.map(u => u.id === id ? { ...u, balance: newBalance } : u));
         } else {
-            alert("Gagal update saldo.");
+            console.error("❌ Update Balance Error:", error);
+            // Revert local state to the current value from the users array
+            const currentUser = users.find(u => u.id === id);
+            if (currentUser) {
+                setLocalBalances({ ...localBalances, [id]: currentUser.balance || 0 });
+            }
+            alert("Gagal update saldo: " + error.message);
         }
         setSavingId(null);
     };

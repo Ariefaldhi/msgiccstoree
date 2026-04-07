@@ -48,11 +48,6 @@ export default function ProductCard({ title, price, image, tag, tagColor = "yell
                                 <span className="text-4xl font-black text-white">{title.charAt(0)}</span>
                             </div>
                         )}
-                        {salesCount !== undefined && salesCount > 0 && (
-                            <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-xl text-[9px] font-black text-slate-800 shadow-sm border border-white/20 z-10 transition-transform group-hover:scale-110">
-                                🔥 {salesCount} Terjual
-                            </div>
-                        )}
                     </div>
                 </div>
                 {/* Decorative Blur behind icon */}
