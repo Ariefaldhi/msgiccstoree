@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Menu, X, Rocket, Home as HomeIcon, Grid2X2, MessageCircle, ShoppingBag, Store, Megaphone } from "lucide-react";
+import { Search, Menu, X, Rocket, Home as HomeIcon, Grid2X2, MessageCircle, ShoppingBag, Store, Megaphone, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AuthButton from "./AuthButton";
 import { useState, useEffect } from "react";
@@ -82,10 +82,10 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                     </div>
                 </Link>
 
-                {/* Mobile Menu Toggle */}
+                {/* Mobile Menu Toggle - Hidden as we use Bottom Nav now */}
                 <button 
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="md:hidden ml-auto p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+                    className="hidden ml-auto p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
                 >
                     {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                 </button>
@@ -133,7 +133,7 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay */}
+            {/* Mobile Menu Overlay - Still available if needed, but primary nav is at bottom */}
             {isMenuOpen && (
                 <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-xl p-4 space-y-3 animate-in slide-in-from-top-4 duration-200">
                     <Link 
@@ -165,6 +165,48 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                     </Link>
                 </div>
             )}
+
+            {/* Mobile Bottom Navigation Bar */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-6 py-3 flex items-center justify-between z-[1000] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom,12px)]">
+                <Link href="/" className={cn(
+                    "flex flex-col items-center gap-1 transition-all active:scale-90",
+                    pathname === "/" ? "text-blue-600" : "text-gray-400"
+                )}>
+                    <HomeIcon className={cn("w-6 h-6", pathname === "/" ? "fill-blue-600/10" : "")} />
+                    <span className="text-[10px] font-bold uppercase tracking-tight">Home</span>
+                </Link>
+
+                <Link href="/reseller" className={cn(
+                    "flex flex-col items-center gap-1 transition-all active:scale-90",
+                    pathname === "/reseller" ? "text-blue-600" : "text-gray-400"
+                )}>
+                    <Store className={cn("w-6 h-6", pathname === "/reseller" ? "fill-blue-600/10" : "")} />
+                    <span className="text-[10px] font-bold uppercase tracking-tight">Reseller</span>
+                </Link>
+
+                <div className="flex flex-col items-center -mt-8">
+                    <button className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/40 border-4 border-white active:scale-95 transition-all">
+                        <Search className="w-6 h-6" />
+                    </button>
+                    <span className="text-[10px] font-bold uppercase tracking-tight text-gray-400 mt-1">Cari</span>
+                </div>
+
+                <Link href="/afiliator" className={cn(
+                    "flex flex-col items-center gap-1 transition-all active:scale-90",
+                    pathname === "/afiliator" ? "text-blue-600" : "text-gray-400"
+                )}>
+                    <Megaphone className={cn("w-6 h-6", pathname === "/afiliator" ? "fill-blue-600/10" : "")} />
+                    <span className="text-[10px] font-bold uppercase tracking-tight">Afiliator</span>
+                </Link>
+
+                <Link href={profile ? "/profile" : "/login"} className={cn(
+                    "flex flex-col items-center gap-1 transition-all active:scale-90",
+                    pathname.includes("/profile") || pathname === "/login" ? "text-blue-600" : "text-gray-400"
+                )}>
+                    <User className={cn("w-6 h-6", pathname.includes("/profile") || pathname === "/login" ? "fill-blue-600/10" : "")} />
+                    <span className="text-[10px] font-bold uppercase tracking-tight">{profile ? 'Profil' : 'Masuk'}</span>
+                </Link>
+            </div>
         </nav>
     );
 }

@@ -46,7 +46,7 @@ export default async function RootLayout({
           <AffiliateTracker />
         </Suspense>
         <Navbar storeName={settings?.store_name} logoUrl={settings?.logo_url} />
-        <main className="pt-24 pb-10 min-h-screen bg-white">
+        <main className="pt-24 pb-24 md:pb-10 min-h-screen bg-white">
           {children}
         </main>
         <Footer storeName={settings?.store_name} logoUrl={settings?.logo_url} />
