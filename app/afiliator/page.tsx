@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, Megaphone, ArrowRight, Wallet, History, Users, Copy, Check, MessageCircle } from "lucide-react";
+import { Loader2, Megaphone, ArrowRight, Wallet, History, Users, Copy, Check, MessageCircle, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 export default function AfiliatorPage() {
