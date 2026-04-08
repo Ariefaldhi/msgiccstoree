@@ -81,8 +81,8 @@ export default function AdminLayout({
                 </div>
             </main>
 
-            {/* Mobile Bottom Navigation for Admin */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-100 px-4 py-3 flex items-center justify-between z-[1000] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom,12px)]">
+            {/* Mobile Bottom Navigation for Admin - Floating Island Style */}
+            <div className="md:hidden fixed bottom-4 left-4 right-4 bg-white/90 backdrop-blur-xl border border-slate-100 px-4 py-3 flex items-center justify-between z-[1000] shadow-[0_8px_30px_rgba(0,0,0,0.12)] rounded-2xl pb-[calc(12px+env(safe-area-inset-bottom,0px))]">
                 <Link href="/admin" className={cn(
                     "flex flex-col items-center gap-1 transition-all active:scale-90 flex-1",
                     pathname === "/admin" ? "text-blue-600" : "text-slate-400"
