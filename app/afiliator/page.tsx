@@ -17,6 +17,7 @@ export default function AfiliatorPage() {
     // UI State
     const [activeTab, setActiveTab] = useState<'sales' | 'withdrawals'>('sales');
     const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
     const [wdForm, setWdForm] = useState({ amount: 0, method: "", details: "" });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -40,7 +41,8 @@ export default function AfiliatorPage() {
         
         setProfile(prof);
 
-        if (prof?.is_affiliator) {
+        const isAffiliator = (prof?.is_affiliator === true) || (prof?.role === 'admin');
+        if (isAffiliator) {
           // Fetch Sales
           const { data: ords } = await supabase.from("orders").select("*").eq("affiliator_id", user.id).order('created_at', { ascending: false });
           if (ords) setOrders(ords);
@@ -149,9 +151,8 @@ export default function AfiliatorPage() {
     if (error) {
         alert("Gagal mengajukan penarikan: " + error.message);
     } else {
-        alert("Penarikan berhasil diajukan! Tunggu persetujuan admin.");
         setIsWithdrawModalOpen(false);
-        setWdForm({ amount: 0, method: "", details: "" });
+        setIsSuccessModalOpen(true);
         // Refresh withdrawals
         const { data } = await supabase.from("withdrawals").select("*").eq("user_id", user.id).order('created_at', { ascending: false });
         if (data) setWithdrawals(data);
@@ -187,6 +188,13 @@ export default function AfiliatorPage() {
             <div className="md:col-span-2 bg-white rounded-[2rem] p-8 border border-slate-100 shadow-xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none translate-x-1/3 -translate-y-1/3"></div>
                 
+                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <Wallet className="w-4 h-4"/> Saldo Komisi
+                </h3>
+                <div className="text-5xl font-black text-slate-900 mb-8 tracking-tight">
+                    Rp {profile?.balance?.toLocaleString('id-ID') || '0'}
+                </div>
+
                 <button 
                     onClick={() => setIsWithdrawModalOpen(true)}
                     className="inline-flex px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition-all items-center gap-2 shadow-[0_4px_0_theme(colors.purple.800)] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-none"
@@ -332,6 +340,45 @@ export default function AfiliatorPage() {
                     </div>
                 )}
                 </>
+            )}
+
+            {/* Success Modal */}
+            {isSuccessModalOpen && (
+                <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-300 text-center">
+                        <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-emerald-100">
+                            <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                        </div>
+                        
+                        <h2 className="text-2xl font-black text-slate-900 mb-2">Berhasil!</h2>
+                        <p className="text-sm text-slate-500 font-medium mb-8">
+                            Permintaan penarikan Anda telah masuk ke sistem. Hubungi admin untuk pencairan lebih cepat.
+                        </p>
+
+                        <div className="flex flex-col gap-3">
+                            <a 
+                                href={`https://wa.me/${adminPhone}?text=${encodeURIComponent(`Halo Admin, saya baru saja mengajukan penarikan saldo sebesar Rp ${wdForm.amount.toLocaleString()} di Dashboard Afiliator. Mohon segera diproses ya!`)}`}
+                                target="_blank"
+                                onClick={() => {
+                                    setIsSuccessModalOpen(false);
+                                    setWdForm({ amount: 0, method: "", details: "" });
+                                }}
+                                className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-black py-4 rounded-2xl shadow-xl shadow-green-100 transition-all flex items-center justify-center gap-2"
+                            >
+                                <MessageCircle className="w-5 h-5" /> Konfirmasi ke WA
+                            </a>
+                            <button 
+                                onClick={() => {
+                                    setIsSuccessModalOpen(false);
+                                    setWdForm({ amount: 0, method: "", details: "" });
+                                }}
+                                className="w-full text-slate-400 hover:text-slate-600 font-bold py-2 text-sm"
+                            >
+                                Selesai
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
 
