@@ -140,7 +140,14 @@ export default function AdminSettings() {
                                 />
                                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
                             </div>
-                            <div className="mt-3 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                            <div className="mt-3 p-4 bg-blue-50 rounded-2xl border border-blue-100 relative group">
+                                <button 
+                                    type="button"
+                                    onClick={() => setSettings({...settings, affiliate_commission_percent: 25})}
+                                    className="absolute right-4 top-4 text-[9px] font-black text-blue-400 bg-white border border-blue-100 px-2 py-1 rounded-md hover:text-blue-600 hover:border-blue-300 transition-all opacity-0 group-hover:opacity-100"
+                                >
+                                    RESET KE 25%
+                                </button>
                                 <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Simulasi Pembagian Profit:</p>
                                 <div className="flex justify-between text-xs font-bold text-slate-600">
                                     <span>Jika Profit Rp 10.000, maka:</span>

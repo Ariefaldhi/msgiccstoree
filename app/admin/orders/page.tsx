@@ -79,24 +79,48 @@ export default function AdminOrders() {
         if (!error) {
             // Automatic Balance Adjustment for Affiliators
             if (newStatus === "Pesanan Selesai" && order?.status !== "Pesanan Selesai" && order?.affiliator_id) {
-                // LOCKDOWN: Re-calculate commission manually here to ensure 25/75 split is enforced
-                const currentCommission = Math.floor(order.profit * (globalCommissionPercent / 100));
+                // FRESH FETCH: Get settings directly from DB to avoid any state synchronization issues
+                const { data: st } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
+                const currentPercent = st?.affiliate_commission_percent ?? 25;
                 
-                const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
-                if (prof && !fetchErr) {
-                    const { error: updErr } = await supabase.from("profiles").update({ balance: (prof.balance || 0) + currentCommission }).eq("id", order.affiliator_id);
-                    if (updErr) console.error("Balance update failed:", updErr.message);
+                // CALCULATION: Explicitly calculate the commission share (25%)
+                const commissionToPay = Math.floor(order.profit * (currentPercent / 100));
+                
+                // USER CONFIRMATION: Show exact amount before adding to balance
+                const confirmed = window.confirm(
+                    `KONFIRMASI PEMBAYARAN KOMISI:\n\n` +
+                    `- Profit: Rp ${order.profit.toLocaleString("id-ID")}\n` +
+                    `- Persentase: ${currentPercent}%\n` +
+                    `- Jatah Afiliator: Rp ${commissionToPay.toLocaleString("id-ID")}\n` +
+                    `- Jatah Anda (Owner): Rp ${(order.profit - commissionToPay).toLocaleString("id-ID")}\n\n` +
+                    `Lanjutkan penambahan saldo Rp ${commissionToPay.toLocaleString("id-ID")} ke afiliator?`
+                );
+
+                if (confirmed) {
+                    const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
+                    if (prof && !fetchErr) {
+                        const { error: updErr } = await supabase.from("profiles").update({ balance: (prof.balance || 0) + commissionToPay }).eq("id", order.affiliator_id);
+                        if (updErr) {
+                            alert("Gagal update saldo: " + updErr.message);
+                        } else {
+                            console.log(`✅ Success: Added Rp ${commissionToPay} to balance.`);
+                        }
+                    }
                 } else {
-                    console.error("Profile fetch failed:", fetchErr?.message);
+                    // Revert status if cancelled
+                    await supabase.from("orders").update({ status: order.status }).eq("id", id);
+                    setUpdatingId(null);
+                    return;
                 }
             } else if (newStatus !== "Pesanan Selesai" && order?.status === "Pesanan Selesai" && order?.affiliator_id) {
                 // Refund / Rollback commission if status is changed back
-                const currentCommission = Math.floor(order.profit * (globalCommissionPercent / 100));
+                const { data: st } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
+                const currentPercent = st?.affiliate_commission_percent ?? 25;
+                const commissionToRefund = Math.floor(order.profit * (currentPercent / 100));
                 
                 const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
                 if (prof && !fetchErr) {
-                    const { error: updErr } = await supabase.from("profiles").update({ balance: Math.max(0, (prof.balance || 0) - currentCommission) }).eq("id", order.affiliator_id);
-                    if (updErr) console.error("Balance rollback failed:", updErr.message);
+                    await supabase.from("profiles").update({ balance: Math.max(0, (prof.balance || 0) - commissionToRefund) }).eq("id", order.affiliator_id);
                 }
             }
 
