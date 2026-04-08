@@ -11,15 +11,26 @@ export default function AuthButton() {
     const router = useRouter();
     const supabase = createClient();
 
+    const [profile, setProfile] = useState<any>(null);
+
     useEffect(() => {
-        const getUser = async () => {
+        const getUserAndProfile = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             setUser(user);
+            if (user) {
+                const { data: prof } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+                setProfile(prof);
+            }
         };
-        getUser();
+        getUserAndProfile();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
+            if (session?.user) {
+                supabase.from("profiles").select("role").eq("id", session.user.id).single().then(({ data }) => setProfile(data));
+            } else {
+                setProfile(null);
+            }
             if (_event === 'SIGNED_OUT') {
                 router.refresh();
             }
@@ -49,18 +60,20 @@ export default function AuthButton() {
         <div className="flex items-center gap-2">
             <Link
                 href="/profile"
-                className="hidden md:flex items-center gap-2 bg-slate-900 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_#0f172a] hover:shadow-[0_3px_0_#0f172a] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-slate-900"
+                className="hidden md:flex items-center gap-2 bg-slate-100 text-slate-800 px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-slate-100"
             >
                 <User className="w-4 h-4" />
                 <span>Profil</span>
             </Link>
-            <Link
-                href="/admin"
-                className="hidden md:flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_theme(colors.blue.800)] hover:shadow-[0_3px_0_theme(colors.blue.800)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-blue-600"
-            >
-                <LayoutDashboard className="w-4 h-4" />
-                <span>Dashboard</span>
-            </Link>
+            {profile?.role === 'admin' && (
+                <Link
+                    href="/admin"
+                    className="hidden md:flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_theme(colors.blue.800)] hover:shadow-[0_3px_0_theme(colors.blue.800)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-blue-600"
+                >
+                    <LayoutDashboard className="w-4 h-4" />
+                    <span>Dashboard</span>
+                </Link>
+            )}
             <button
                 onClick={handleLogout}
                 className="p-2.5 rounded-xl bg-red-50 text-red-500 shadow-[0_4px_0_theme(colors.red.200)] hover:shadow-[0_2px_0_theme(colors.red.200)] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all border-2 border-red-50"

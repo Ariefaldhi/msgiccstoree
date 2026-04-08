@@ -67,8 +67,11 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
         };
     }, []);
 
-    // Hide Navbar on Admin Dashboard
-    if (pathname.startsWith("/admin")) return null;
+    // Hide Navbar on Admin Dashboard - MOBILE ONLY
+    // We want to keep it on desktop as requested
+    if (typeof window !== 'undefined' && pathname.startsWith("/admin") && window.innerWidth < 768) {
+        return null;
+    }
 
     return (
         <>
