@@ -79,23 +79,24 @@ export default function AdminOrders() {
         if (!error) {
             // Automatic Balance Adjustment for Affiliators
             if (newStatus === "Pesanan Selesai" && order?.status !== "Pesanan Selesai" && order?.affiliator_id) {
-                const commissionToPay = order.commission || 0;
+                // LOCKDOWN: Re-calculate commission manually here to ensure 25/75 split is enforced
+                const currentCommission = Math.floor(order.profit * (globalCommissionPercent / 100));
+                
                 const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
                 if (prof && !fetchErr) {
-                    const { error: updErr } = await supabase.from("profiles").update({ balance: (prof.balance || 0) + commissionToPay }).eq("id", order.affiliator_id);
+                    const { error: updErr } = await supabase.from("profiles").update({ balance: (prof.balance || 0) + currentCommission }).eq("id", order.affiliator_id);
                     if (updErr) console.error("Balance update failed:", updErr.message);
                 } else {
                     console.error("Profile fetch failed:", fetchErr?.message);
                 }
             } else if (newStatus !== "Pesanan Selesai" && order?.status === "Pesanan Selesai" && order?.affiliator_id) {
-                // Refund / Rollback commission if status is changed back from Selesai
-                const commissionToRefund = order.commission || 0;
+                // Refund / Rollback commission if status is changed back
+                const currentCommission = Math.floor(order.profit * (globalCommissionPercent / 100));
+                
                 const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
                 if (prof && !fetchErr) {
-                    const { error: updErr } = await supabase.from("profiles").update({ balance: Math.max(0, (prof.balance || 0) - commissionToRefund) }).eq("id", order.affiliator_id);
+                    const { error: updErr } = await supabase.from("profiles").update({ balance: Math.max(0, (prof.balance || 0) - currentCommission) }).eq("id", order.affiliator_id);
                     if (updErr) console.error("Balance rollback failed:", updErr.message);
-                } else {
-                    console.error("Profile fetch failed:", fetchErr?.message);
                 }
             }
 
@@ -326,16 +327,16 @@ export default function AdminOrders() {
                                                 <span className="text-sm font-black text-blue-600">Rp {order.sell_price.toLocaleString("id-ID")}</span>
                                                 <div className="flex flex-col items-end gap-1 mt-1">
                                                     <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-1.5 rounded" title="Total Profit: Jual - Modal">Profit: Rp {order.profit.toLocaleString("id-ID")}</span>
-                                                    <span className="text-xs font-black text-green-500 bg-green-50 px-1.5 rounded" title="Diterima Owner: Profit - Komisi">Net: Rp {(order.profit - (order.commission || 0)).toLocaleString("id-ID")}</span>
+                                                    <span className="text-xs font-black text-green-500 bg-green-50 px-1.5 rounded" title="Diterima Owner: Profit - Jatah Afiliator">Net Owner: Rp {(order.profit - (Math.floor(order.profit * (globalCommissionPercent / 100)))).toLocaleString("id-ID")}</span>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             {order.affiliator_id ? (
                                                 <div className="flex flex-col">
-                                                    <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Komisi</span>
-                                                    <span className="text-sm font-black text-slate-900 leading-tight">Rp {order.commission?.toLocaleString("id-ID")}</span>
-                                                    <span className="text-[10px] text-slate-400 truncate max-w-[80px]" title={order.affiliator_id}>{order.affiliator_id.split('-')[0]}...</span>
+                                                    <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Jatah Afiliator</span>
+                                                    <span className="text-sm font-black text-slate-900 leading-tight">Rp {(Math.floor(order.profit * (globalCommissionPercent / 100))).toLocaleString("id-ID")}</span>
+                                                    <span className="text-[9px] text-slate-400 font-bold bg-slate-100 px-1 py-0.5 rounded mt-1 inline-block w-fit">MODAL: {globalCommissionPercent}%</span>
                                                 </div>
                                             ) : (
                                                 <span className="text-xs text-slate-300 font-bold italic">Tanpa Ref</span>
