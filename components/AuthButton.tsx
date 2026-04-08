@@ -48,6 +48,13 @@ export default function AuthButton() {
     return (
         <div className="flex items-center gap-2">
             <Link
+                href="/profile"
+                className="hidden md:flex items-center gap-2 bg-slate-900 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_#0f172a] hover:shadow-[0_3px_0_#0f172a] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-slate-900"
+            >
+                <User className="w-4 h-4" />
+                <span>Profil</span>
+            </Link>
+            <Link
                 href="/admin"
                 className="hidden md:flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_theme(colors.blue.800)] hover:shadow-[0_3px_0_theme(colors.blue.800)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-blue-600"
             >
@@ -56,7 +63,7 @@ export default function AuthButton() {
             </Link>
             <button
                 onClick={handleLogout}
-                className="p-2.5 rounded-xl bg-red-50 text-red-500 shadow-[0_4px_0_theme(colors.red.200)] hover:shadow-[0_2px_0_theme(colors.red.200)] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all border-2 border-red-50 border-b-0"
+                className="p-2.5 rounded-xl bg-red-50 text-red-500 shadow-[0_4px_0_theme(colors.red.200)] hover:shadow-[0_2px_0_theme(colors.red.200)] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all border-2 border-red-50"
                 title="Logout"
             >
                 <LogOut className="w-4 h-4" />

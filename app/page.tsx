@@ -130,6 +130,17 @@ export default function Home() {
     setIsModalOpen(true);
   };
 
+  useEffect(() => {
+    const searchParam = new URLSearchParams(window.location.search).get("search");
+    if (searchParam === "true") {
+      const input = document.getElementById("search-input");
+      if (input) {
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(() => (input as HTMLInputElement).focus(), 500);
+      }
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Promo Section - replaces Hero, auto-hides if no active promos */}
@@ -148,6 +159,7 @@ export default function Home() {
         <div className="mb-10 max-w-md mx-auto">
           <div className="relative">
             <input
+              id="search-input"
               type="text"
               placeholder="Search products..."
               value={searchQuery}

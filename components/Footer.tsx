@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 interface FooterProps {
@@ -48,8 +50,30 @@ export default function Footer({ storeName = "MSGICC STORE", logoUrl }: FooterPr
                         </ul>
                     </div>
                 </div>
-                <div className="mt-12 pt-8 border-t border-border/40 text-center text-xs text-muted-foreground font-medium">
-                    &copy; 2026 {storeName}. All rights reserved.
+                <div className="mt-12 pt-8 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground font-medium">
+                    <div>&copy; 2026 {storeName}. All rights reserved.</div>
+                    
+                    <button 
+                        id="delete-ref-btn"
+                        onClick={() => {
+                            localStorage.removeItem("msgicc_affiliate_ref");
+                            const url = new URL(window.location.href);
+                            url.searchParams.delete("ref");
+                            window.location.href = url.toString();
+                        }}
+                        className="hidden py-1 px-3 rounded-lg border border-red-100 text-red-400 hover:bg-red-50 transition-all font-bold"
+                    >
+                        Hapus Ref
+                    </button>
+
+                    <script dangerouslySetInnerHTML={{ __html: `
+                        (function() {
+                            const btn = document.getElementById('delete-ref-btn');
+                            if (localStorage.getItem('msgicc_affiliate_ref')) {
+                                btn.classList.remove('hidden');
+                            }
+                        })();
+                    `}} />
                 </div>
             </div>
         </footer>

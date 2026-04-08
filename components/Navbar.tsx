@@ -5,7 +5,7 @@ import { Search, Menu, X, Rocket, Home as HomeIcon, Grid2X2, MessageCircle, Shop
 import { cn } from "@/lib/utils";
 import AuthButton from "./AuthButton";
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeName?: string, logoUrl?: string }) {
@@ -13,7 +13,20 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [profile, setProfile] = useState<any>(null);
     const pathname = usePathname();
+    const router = useRouter();
     const supabase = createClient();
+
+    const handleSearchClick = () => {
+        if (pathname === "/") {
+            const input = document.getElementById("search-input");
+            if (input) {
+                input.scrollIntoView({ behavior: "smooth", block: "center" });
+                (input as HTMLInputElement).focus();
+            }
+        } else {
+            router.push("/?search=true#products");
+        }
+    };
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -103,7 +116,10 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                             <Megaphone className="w-4 h-4" /> Afiliator
                         </Link>
 
-                        <button className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
+                        <button 
+                            onClick={handleSearchClick}
+                            className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100"
+                        >
                             <Search className="w-4 h-4" /> Cari
                         </button>
                     </div>
@@ -187,7 +203,10 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                 </Link>
 
                 <div className="flex flex-col items-center -mt-10">
-                    <button className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/40 border-4 border-white active:scale-95 transition-all">
+                    <button 
+                        onClick={handleSearchClick}
+                        className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/40 border-4 border-white active:scale-95 transition-all"
+                    >
                         <Search className="w-6 h-6" />
                     </button>
                     <span className="text-[10px] font-bold uppercase tracking-tight text-gray-400 mt-1">Cari</span>
