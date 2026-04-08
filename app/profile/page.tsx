@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { 
     User, Mail, ShoppingBag, CreditCard, History, 
     ChevronRight, ArrowLeft, Loader2, Wallet, 
-    Calendar, Package, CheckCircle2, Clock, XCircle 
+    Calendar, Package, CheckCircle2, Clock, XCircle, Megaphone 
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
