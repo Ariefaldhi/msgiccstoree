@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface FooterProps {
@@ -8,6 +9,17 @@ interface FooterProps {
 }
 
 export default function Footer({ storeName = "MSGICC STORE", logoUrl }: FooterProps) {
+    const [hasRef, setHasRef] = useState(false);
+
+    useEffect(() => {
+        const checkRef = () => {
+            setHasRef(!!localStorage.getItem("msgicc_affiliate_ref"));
+        };
+        checkRef();
+        // Listen for storage changes in case it's added in another tab
+        window.addEventListener('storage', checkRef);
+        return () => window.removeEventListener('storage', checkRef);
+    }, []);
     return (
         <footer className="border-t border-border/40 bg-background/50 backdrop-blur-sm mt-20">
             <div className="container mx-auto px-4 py-12">
@@ -53,27 +65,22 @@ export default function Footer({ storeName = "MSGICC STORE", logoUrl }: FooterPr
                 <div className="mt-12 pt-8 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground font-medium">
                     <div>&copy; 2026 {storeName}. All rights reserved.</div>
                     
-                    <button 
-                        id="delete-ref-btn"
-                        onClick={() => {
-                            localStorage.removeItem("msgicc_affiliate_ref");
-                            const url = new URL(window.location.href);
-                            url.searchParams.delete("ref");
-                            window.location.href = url.toString();
-                        }}
-                        className="hidden py-1 px-3 rounded-lg border border-red-100 text-red-400 hover:bg-red-50 transition-all font-bold"
-                    >
-                        Hapus Ref
-                    </button>
-
-                    <script dangerouslySetInnerHTML={{ __html: `
-                        (function() {
-                            const btn = document.getElementById('delete-ref-btn');
-                            if (localStorage.getItem('msgicc_affiliate_ref')) {
-                                btn.classList.remove('hidden');
-                            }
-                        })();
-                    `}} />
+                    {hasRef && (
+                        <button 
+                            onClick={() => {
+                                if (window.confirm("Hapus data referral (ref) dari browser Anda?")) {
+                                    localStorage.removeItem("msgicc_affiliate_ref");
+                                    setHasRef(false);
+                                    const url = new URL(window.location.href);
+                                    url.searchParams.delete("ref");
+                                    window.location.href = url.toString();
+                                }
+                            }}
+                            className="py-1 px-3 rounded-lg border border-red-100 text-red-500 hover:bg-red-50 transition-all font-bold text-[10px] uppercase tracking-wider"
+                        >
+                            Hapus Ref
+                        </button>
+                    )}
                 </div>
             </div>
         </footer>

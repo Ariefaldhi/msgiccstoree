@@ -6,12 +6,19 @@ import { Loader2, Megaphone, ArrowRight, Wallet, History, Users, Copy, Check, Me
 import Link from "next/link";
 
 export default function AfiliatorPage() {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [adminPhone, setAdminPhone] = useState("6281234567890");
-  const [copied, setCopied] = useState(false);
+    const [user, setUser] = useState<any>(null);
+    const [profile, setProfile] = useState<any>(null);
+    const [orders, setOrders] = useState<any[]>([]);
+    const [withdrawals, setWithdrawals] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [adminPhone, setAdminPhone] = useState("6281234567890");
+    const [copied, setCopied] = useState(false);
+    
+    // UI State
+    const [activeTab, setActiveTab] = useState<'sales' | 'withdrawals'>('sales');
+    const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+    const [wdForm, setWdForm] = useState({ amount: 0, method: "", details: "" });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
   const supabase = createClient();
 
@@ -34,8 +41,13 @@ export default function AfiliatorPage() {
         setProfile(prof);
 
         if (prof?.is_affiliator) {
+          // Fetch Sales
           const { data: ords } = await supabase.from("orders").select("*").eq("affiliator_id", user.id).order('created_at', { ascending: false });
           if (ords) setOrders(ords);
+
+          // Fetch Withdrawals
+          const { data: wds } = await supabase.from("withdrawals").select("*").eq("user_id", user.id).order('created_at', { ascending: false });
+          if (wds) setWithdrawals(wds);
         }
       }
 
@@ -114,6 +126,39 @@ export default function AfiliatorPage() {
     );
   }
 
+  const handleWithdrawRequest = async () => {
+    if (!wdForm.amount || wdForm.amount <= 0 || !wdForm.method || !wdForm.details) {
+        alert("Mohon lengkapi semua data penarikan.");
+        return;
+    }
+
+    if (wdForm.amount > (profile.balance || 0)) {
+        alert("Saldo tidak mencukupi.");
+        return;
+    }
+
+    setIsSubmitting(true);
+    const { error } = await supabase.from("withdrawals").insert([{
+        user_id: user.id,
+        amount: wdForm.amount,
+        payment_method: wdForm.method,
+        account_details: wdForm.details,
+        status: 'PENDING'
+    }]);
+
+    if (error) {
+        alert("Gagal mengajukan penarikan: " + error.message);
+    } else {
+        alert("Penarikan berhasil diajukan! Tunggu persetujuan admin.");
+        setIsWithdrawModalOpen(false);
+        setWdForm({ amount: 0, method: "", details: "" });
+        // Refresh withdrawals
+        const { data } = await supabase.from("withdrawals").select("*").eq("user_id", user.id).order('created_at', { ascending: false });
+        if (data) setWithdrawals(data);
+    }
+    setIsSubmitting(false);
+  };
+
   // Afiliator Dashboard View
   const affiliateUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/?ref=${profile.affiliate_code}`;
   
@@ -122,13 +167,6 @@ export default function AfiliatorPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const wdText = `Halo Admin, saya ingin menarik saldo komisi afiliasi saya.
-Email: ${user.email}
-Kode: ${profile.affiliate_code}
-Jumlah: Rp ${profile.balance?.toLocaleString('id-ID')}
-Tujuan (BCA/DANA/dll): `;
-  const wdLink = `https://wa.me/${adminPhone}?text=${encodeURIComponent(wdText)}`;
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col pt-32 pb-20">
@@ -149,16 +187,12 @@ Tujuan (BCA/DANA/dll): `;
             <div className="md:col-span-2 bg-white rounded-[2rem] p-8 border border-slate-100 shadow-xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none translate-x-1/3 -translate-y-1/3"></div>
                 
-                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                    <Wallet className="w-4 h-4"/> Saldo Komisi
-                </h3>
-                <div className="text-5xl font-black text-slate-900 mb-8 tracking-tight">
-                    Rp {profile?.balance?.toLocaleString('id-ID') || '0'}
-                </div>
-                
-                <a href={wdLink} target="_blank" className="inline-flex px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold transition-all items-center gap-2 shadow-[0_4px_0_theme(colors.slate.700)] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-none">
-                    <MessageCircle className="w-4 h-4" /> Tarik Saldo Ke WA
-                </a>
+                <button 
+                    onClick={() => setIsWithdrawModalOpen(true)}
+                    className="inline-flex px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition-all items-center gap-2 shadow-[0_4px_0_theme(colors.purple.800)] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-none"
+                >
+                    <Wallet className="w-4 h-4" /> Tarik Saldo Ke Rekening
+                </button>
             </div>
 
             {/* Code Card */}
@@ -183,55 +217,182 @@ Tujuan (BCA/DANA/dll): `;
             </div>
         </div>
 
-        {/* Orders Log */}
+        {/* History Tabs & Content */}
         <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden">
-            <div className="p-6 border-b border-slate-100 flex items-center gap-3">
-                 <History className="w-5 h-5 text-slate-400" />
-                 <h2 className="font-bold text-slate-900">Histori Penjualan Referral</h2>
+            <div className="p-2 border-b border-slate-100 bg-slate-50 flex gap-2">
+                <button 
+                    onClick={() => setActiveTab('sales')}
+                    className={`flex-1 py-3 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                        activeTab === 'sales' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                    }`}
+                >
+                    <History className="w-4 h-4" /> Histori Penjualan
+                </button>
+                <button 
+                    onClick={() => setActiveTab('withdrawals')}
+                    className={`flex-1 py-3 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                        activeTab === 'withdrawals' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                    }`}
+                >
+                    <Wallet className="w-4 h-4" /> Status Penarikan
+                </button>
             </div>
             
-            {orders.length > 0 ? (
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm whitespace-nowrap">
-                        <thead>
-                            <tr className="bg-slate-50 border-b border-slate-100">
-                                <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">Tanggal</th>
-                                <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">Produk</th>
-                                <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">Status</th>
-                                <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs text-right">Komisi</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {orders.map((order, i) => (
-                                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="p-4 font-medium text-slate-600">{new Date(order.created_at).toLocaleDateString('id-ID')}</td>
-                                    <td className="p-4">
-                                        <div className="font-bold text-slate-900">{order.product_name}</div>
-                                        <div className="text-xs text-slate-500">{order.package_name}</div>
-                                    </td>
-                                    <td className="p-4">
-                                        <span className={`px-2 py-1 rounded-md text-xs font-bold ${
-                                            order.status === 'Pesanan Selesai' ? 'bg-green-100 text-green-700' :
-                                            order.status === 'Dibatalkan' ? 'bg-red-100 text-red-700' :
-                                            'bg-yellow-100 text-yellow-700'
-                                        }`}>
-                                            {order.status}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-right font-black text-purple-600">
-                                        + Rp {order.commission?.toLocaleString('id-ID') || '0'}
-                                    </td>
+            {activeTab === 'sales' ? (
+                <>
+                {orders.length > 0 ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm whitespace-nowrap">
+                            <thead>
+                                <tr className="bg-slate-50 border-b border-slate-100">
+                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">Tanggal</th>
+                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">Produk</th>
+                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">Status</th>
+                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs text-right">Komisi</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {orders.map((order, i) => (
+                                    <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                        <td className="p-4 font-medium text-slate-600 font-mono">{new Date(order.created_at).toLocaleDateString('id-ID')}</td>
+                                        <td className="p-4">
+                                            <div className="font-bold text-slate-900">{order.product_name}</div>
+                                            <div className="text-xs text-slate-500">{order.package_name}</div>
+                                        </td>
+                                        <td className="p-4">
+                                            <span className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${
+                                                order.status === 'Pesanan Selesai' ? 'bg-emerald-100 text-emerald-700' :
+                                                order.status === 'Dibatalkan' ? 'bg-red-100 text-red-700' :
+                                                'bg-amber-100 text-amber-700'
+                                            }`}>
+                                                {order.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 text-right font-black text-purple-600 text-base">
+                                            + Rp {order.commission?.toLocaleString('id-ID') || '0'}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="p-16 text-center text-slate-400 font-medium">
+                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                            <History className="w-8 h-8 text-slate-200" />
+                        </div>
+                        Belum ada riwayat transaksi masuk.
+                    </div>
+                )}
+                </>
             ) : (
-                <div className="p-12 text-center text-slate-500 font-medium">
-                    Belum ada riwayat transaksi dari link referral Anda.
-                </div>
+                <>
+                {withdrawals.length > 0 ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm whitespace-nowrap">
+                            <thead>
+                                <tr className="bg-slate-50 border-b border-slate-100">
+                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">ID Tarik</th>
+                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">Metode</th>
+                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs text-right">Jumlah</th>
+                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {withdrawals.map((wd, i) => (
+                                    <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                        <td className="p-4 font-mono text-xs text-slate-400">{wd.id.substring(0,8).toUpperCase()}</td>
+                                        <td className="p-4">
+                                            <div className="font-bold text-slate-900">{wd.payment_method}</div>
+                                            <div className="text-xs text-slate-500">{wd.account_details}</div>
+                                        </td>
+                                        <td className="p-4 text-right font-black text-slate-900">
+                                            Rp {wd.amount.toLocaleString('id-ID')}
+                                        </td>
+                                        <td className="p-4 text-center">
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                                wd.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' :
+                                                wd.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
+                                                'bg-blue-100 text-blue-700 border border-blue-200 shadow-sm'
+                                            }`}>
+                                                {wd.status === 'PENDING' ? '⏳ Menunggu' : wd.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="p-16 text-center text-slate-400 font-medium">
+                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                            <Wallet className="w-8 h-8 text-slate-200" />
+                        </div>
+                        Anda belum pernah mengajukan penarikan.
+                    </div>
+                )}
+                </>
             )}
         </div>
+
+        {/* Withdraw Modal */}
+        {isWithdrawModalOpen && (
+            <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="bg-white rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-300">
+                    <h2 className="text-2xl font-black text-slate-900 mb-2">Tarik Saldo</h2>
+                    <p className="text-sm text-slate-500 font-medium mb-8">Masukkan rincian penarikan saldo komisi Anda.</p>
+
+                    <div className="space-y-4 mb-8">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jumlah (Rp)</label>
+                            <input 
+                                type="number" 
+                                placeholder="Contoh: 50000"
+                                value={wdForm.amount || ''}
+                                onChange={(e) => setWdForm({ ...wdForm, amount: parseInt(e.target.value) })}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                            />
+                            <p className="text-[10px] text-slate-400 mt-2 ml-1">Maksimal: Rp {profile?.balance?.toLocaleString('id-ID')}</p>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Metode</label>
+                            <input 
+                                type="text" 
+                                placeholder="BCA / DANA / OVO / GoPay"
+                                value={wdForm.method}
+                                onChange={(e) => setWdForm({ ...wdForm, method: e.target.value })}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Rincian Rekening</label>
+                            <textarea 
+                                placeholder="Nomor Rekening - Atas Nama"
+                                value={wdForm.details}
+                                onChange={(e) => setWdForm({ ...wdForm, details: e.target.value })}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all h-24 resize-none"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                        <button 
+                            onClick={handleWithdrawRequest}
+                            disabled={isSubmitting}
+                            className="w-full bg-purple-600 hover:bg-purple-500 text-white font-black py-4 rounded-2xl shadow-xl shadow-purple-200 transition-all disabled:opacity-50"
+                        >
+                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Kirim Pengajuan"}
+                        </button>
+                        <button 
+                            onClick={() => setIsWithdrawModalOpen(false)}
+                            className="w-full text-slate-400 hover:text-slate-600 font-bold py-2 text-sm"
+                        >
+                            Batalkan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
 
       </main>
     </div>
