@@ -468,6 +468,18 @@ export default function AdminOrders() {
                                         <input type="number" className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 pl-8 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500" 
                                             value={orderForm.commission} onChange={e => setOrderForm({...orderForm, commission: parseInt(e.target.value) || 0})} />
                                     </div>
+                                    
+                                    {/* Breakdown display */}
+                                    <div className="mt-3 space-y-1 pt-3 border-t border-purple-100">
+                                        <div className="flex justify-between text-[10px] font-bold">
+                                            <span className="text-slate-400 uppercase">Jatah Afiliator:</span>
+                                            <span className="text-purple-600">Rp {orderForm.commission.toLocaleString('id-ID')} ({globalCommissionPercent}%)</span>
+                                        </div>
+                                        <div className="flex justify-between text-[10px] font-bold">
+                                            <span className="text-slate-400 uppercase">Laba Bersih Anda:</span>
+                                            <span className="text-emerald-600">Rp {( (orderForm.sell_price - orderForm.cost_price) - orderForm.commission ).toLocaleString('id-ID')} ({100 - globalCommissionPercent}%)</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

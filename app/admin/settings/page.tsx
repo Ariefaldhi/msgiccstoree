@@ -127,12 +127,12 @@ export default function AdminSettings() {
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                                 {/* Percent Icon */}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><line x1="19" y1="5" x2="5" y2="19"></line><circle cx="6.5" cy="6.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle></svg>
-                                Komisi Afiliator (%)
+                                Jatah Komisi Afiliator (%)
                             </label>
                             <div className="relative max-w-xs">
                                 <input 
                                     type="number" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 outline-none" 
-                                    placeholder="5" 
+                                    placeholder="25" 
                                     min="0"
                                     max="100"
                                     value={settings.affiliate_commission_percent} 
@@ -140,7 +140,23 @@ export default function AdminSettings() {
                                 />
                                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
                             </div>
-                            <p className="text-xs text-slate-500 mt-2">Persentase dari profit (harga jual - harga modal) yang diberikan kepada afiliator.</p>
+                            <div className="mt-3 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Simulasi Pembagian Profit:</p>
+                                <div className="flex justify-between text-xs font-bold text-slate-600">
+                                    <span>Jika Profit Rp 10.000, maka:</span>
+                                </div>
+                                <div className="mt-2 space-y-1">
+                                    <div className="flex justify-between text-xs">
+                                        <span className="text-slate-500">Afiliator ({settings.affiliate_commission_percent}%):</span>
+                                        <span className="text-purple-600 font-black">Rp {(10000 * settings.affiliate_commission_percent / 100).toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div className="flex justify-between text-xs">
+                                        <span className="text-slate-500">Anda / Owner ({100 - settings.affiliate_commission_percent}%):</span>
+                                        <span className="text-emerald-600 font-black">Rp {(10000 * (100 - settings.affiliate_commission_percent) / 100).toLocaleString('id-ID')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="text-[10px] text-slate-400 mt-2 italic">*Persentase ini diambil dari Profit (Harga Jual - Harga Modal).</p>
                         </div>
 
                         <div>
