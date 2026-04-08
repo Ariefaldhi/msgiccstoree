@@ -34,24 +34,38 @@ export default function AdminOrders() {
         customer_name: "", wa_number: "", product_id: "", package_id: "", status: "Pesanan Selesai", created_at: "",
         affiliator_id: "", commission: 0, sell_price: 0, cost_price: 0
     });
+    const [globalCommissionPercent, setGlobalCommissionPercent] = useState(25);
 
     const supabase = createClient();
 
     const fetchOrdersAndProducts = async () => {
         setLoading(true);
-        const [ordersRes, productsRes] = await Promise.all([
+        const [ordersRes, productsRes, settingsRes] = await Promise.all([
             supabase.from("orders").select("*").order("created_at", { ascending: false }),
-            supabase.from("products").select("*, packages(*)")
+            supabase.from("products").select("*, packages(*)"),
+            supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single()
         ]);
-
+ 
         if (ordersRes.data) setOrders(ordersRes.data);
         if (productsRes.data) setProducts(productsRes.data);
+        if (settingsRes.data) setGlobalCommissionPercent(settingsRes.data.affiliate_commission_percent ?? 25);
         setLoading(false);
     };
 
     useEffect(() => {
         fetchOrdersAndProducts();
     }, []);
+
+    // Auto-calculate commission in modal
+    useEffect(() => {
+        if (isModalOpen && orderForm.affiliator_id) {
+            const profit = orderForm.sell_price - orderForm.cost_price;
+            if (profit > 0) {
+                const autoCommission = Math.floor(profit * (globalCommissionPercent / 100));
+                setOrderForm(prev => ({ ...prev, commission: autoCommission }));
+            }
+        }
+    }, [orderForm.sell_price, orderForm.cost_price, orderForm.affiliator_id, isModalOpen]);
 
     const updateStatus = async (id: string, newStatus: string) => {
         setUpdatingId(id);
@@ -310,7 +324,10 @@ export default function AdminOrders() {
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex flex-col items-end">
                                                 <span className="text-sm font-black text-blue-600">Rp {order.sell_price.toLocaleString("id-ID")}</span>
-                                                <span className="text-xs font-bold text-green-500 bg-green-50 px-1.5 rounded mt-1">+Rp {order.profit.toLocaleString("id-ID")}</span>
+                                                <div className="flex flex-col items-end gap-1 mt-1">
+                                                    <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-1.5 rounded" title="Total Profit: Jual - Modal">Profit: Rp {order.profit.toLocaleString("id-ID")}</span>
+                                                    <span className="text-xs font-black text-green-500 bg-green-50 px-1.5 rounded" title="Diterima Owner: Profit - Komisi">Net: Rp {(order.profit - (order.commission || 0)).toLocaleString("id-ID")}</span>
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">

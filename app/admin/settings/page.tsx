@@ -12,7 +12,7 @@ export default function AdminSettings() {
         primary_color: "blue",
         logo_url: "",
         whatsapp_number: "",
-        affiliate_commission_percent: 5
+        affiliate_commission_percent: 25
     });
 
     const supabase = createClient();
@@ -26,7 +26,7 @@ export default function AdminSettings() {
                     primary_color: data.primary_color,
                     logo_url: data.logo_url || "",
                     whatsapp_number: data.whatsapp_number || "",
-                    affiliate_commission_percent: data.affiliate_commission_percent || 5
+                    affiliate_commission_percent: data.affiliate_commission_percent ?? 25
                 });
             }
             setLoading(false);

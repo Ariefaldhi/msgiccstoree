@@ -133,15 +133,22 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
         let commission = 0;
         let affiliate_code_used = null;
 
-        const refCode = localStorage.getItem("msgicc_affiliate_ref");
-        if (refCode) {
-            const { data: affl } = await supabase.from("profiles").select("id").eq("affiliate_code", refCode).single();
-            if (affl) {
-                const { data: st } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
-                affiliator_id = affl.id;
-                affiliate_code_used = refCode;
-                const percent = st?.affiliate_commission_percent || 5;
-                commission = Math.floor(profitRaw * (percent / 100));
+        const savedRef = localStorage.getItem("msgicc_affiliate_ref");
+        if (savedRef) {
+            try {
+                const { code } = JSON.parse(savedRef);
+                if (code) {
+                    const { data: affl } = await supabase.from("profiles").select("id").eq("affiliate_code", code).single();
+                    if (affl) {
+                        const { data: st } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
+                        affiliator_id = affl.id;
+                        affiliate_code_used = code;
+                        const percent = st?.affiliate_commission_percent ?? 25;
+                        commission = Math.floor(profitRaw * (percent / 100));
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to parse affiliate ref:", e);
             }
         }
 
