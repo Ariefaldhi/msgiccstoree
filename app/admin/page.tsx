@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, TrendingUp, TrendingDown, DollarSign, ShoppingBag, PieChart, Users, Package, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, DollarSign, ShoppingBag, PieChart, Users, Package, ArrowUpRight, ArrowDownRight, Wallet } from "lucide-react";
+import Link from "next/link";
 import DashboardChart, { TopProductsChart } from "@/components/admin/DashboardChart";
 
 export default function AdminDashboard() {
@@ -13,6 +14,7 @@ export default function AdminDashboard() {
         activeOrders: 0,
         totalOrders: 0,
         commission: 0,
+        pendingWithdrawals: 0,
     });
     const [chartData, setChartData] = useState<any[]>([]);
     const [topProducts, setTopProducts] = useState<any[]>([]);
@@ -77,8 +79,15 @@ export default function AdminDashboard() {
                     profit: prof,
                     activeOrders: active,
                     totalOrders: orders.length,
-                    commission: comm
+                    commission: comm,
+                    pendingWithdrawals: 0 // Will fetch separately
                 });
+
+                // Fetch Pending Withdrawals
+                const { data: wds } = await supabase.from("withdrawals").select("id").eq("status", "PENDING");
+                if (wds) {
+                    setStats(prev => ({ ...prev, pendingWithdrawals: wds.length }));
+                }
             }
             setLoading(false);
         }
@@ -185,6 +194,17 @@ export default function AdminDashboard() {
                                         </div>
                                         <span className="text-xl font-black text-orange-400">{stats.activeOrders}</span>
                                     </div>
+                                    <Link href="/admin/withdrawals" className="flex items-center justify-between group/wd hover:bg-slate-800/50 p-2 -m-2 rounded-xl transition-all">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
+                                                <Wallet className="w-5 h-5 text-purple-400" />
+                                            </div>
+                                            <span className="text-sm font-bold text-slate-300">Tarik Saldo Pending</span>
+                                        </div>
+                                        <span className={`text-xl font-black ${stats.pendingWithdrawals > 0 ? 'text-purple-400 animate-pulse' : 'text-slate-500'}`}>
+                                            {stats.pendingWithdrawals}
+                                        </span>
+                                    </Link>
                                     <div className="flex items-center gap-2 mt-4 pt-6 border-t border-slate-800">
                                         <Users className="w-4 h-4 text-slate-500" />
                                         <p className="text-[10px] font-bold text-slate-500 uppercase">Data diperbarui otomatis</p>
