@@ -86,26 +86,24 @@ export default function AdminOrders() {
                 // CALCULATION: Explicitly calculate the commission share (25%)
                 const commissionToPay = Math.floor(order.profit * (currentPercent / 100));
                 
-                // USER CONFIRMATION: Show exact amount before adding to balance
+                // 🧪 GHOST TEST: Melakukan pengetesan "pemicu tersembunyi" (hidden triggers)
                 const confirmed = window.confirm(
-                    `KONFIRMASI PEMBAYARAN KOMISI:\n\n` +
+                    `🧪 GHOST TEST (DIAGNOSTIK):\n\n` +
+                    `SAYA TELAH MENONAKTIFKAN KODE SAYA. Jika saldo tetap bertambah menjadi Rp 3.000 setelah Anda klik OK, berarti ada "DATABASE TRIGGER" di Supabase Dashboard Anda yang salah hitung.\n\n` +
                     `- Profit: Rp ${order.profit.toLocaleString("id-ID")}\n` +
-                    `- Persentase: ${currentPercent}%\n` +
-                    `- Jatah Afiliator: Rp ${commissionToPay.toLocaleString("id-ID")}\n` +
-                    `- Jatah Anda (Owner): Rp ${(order.profit - commissionToPay).toLocaleString("id-ID")}\n\n` +
-                    `Lanjutkan penambahan saldo Rp ${commissionToPay.toLocaleString("id-ID")} ke afiliator?`
+                    `- Target Jatah Afiliator (Seharusnya): Rp ${commissionToPay.toLocaleString("id-ID")}\n\n` +
+                    `Klik OK untuk memulai tes.`
                 );
 
                 if (confirmed) {
-                    const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
-                    if (prof && !fetchErr) {
-                        const { error: updErr } = await supabase.from("profiles").update({ balance: (prof.balance || 0) + commissionToPay }).eq("id", order.affiliator_id);
-                        if (updErr) {
-                            alert("Gagal update saldo: " + updErr.message);
-                        } else {
-                            console.log(`✅ Success: Added Rp ${commissionToPay} to balance.`);
-                        }
-                    }
+                    /* 
+                       KODE SAYA DIKOMENTARI UNTUK PENGETESAN:
+                       const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
+                       if (prof && !fetchErr) {
+                           await supabase.from("profiles").update({ balance: (prof.balance || 0) + commissionToPay }).eq("id", order.affiliator_id);
+                       }
+                    */
+                    console.log("🧪 Diagnostic: My code is bypassed. If balance still changes, a DB trigger exists.");
                 } else {
                     // Revert status if cancelled
                     await supabase.from("orders").update({ status: order.status }).eq("id", id);
