@@ -36,6 +36,10 @@ export default function AdminOrders() {
     });
     const [globalCommissionPercent, setGlobalCommissionPercent] = useState(25);
 
+    // Payout Confirmation Modal
+    const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
+    const [payoutData, setPayoutData] = useState<any>(null);
+
     const supabase = createClient();
 
     const fetchOrdersAndProducts = async () => {
@@ -79,44 +83,25 @@ export default function AdminOrders() {
         if (!error) {
             // Automatic Balance Adjustment for Affiliators
             if (newStatus === "Pesanan Selesai" && order?.status !== "Pesanan Selesai" && order?.affiliator_id) {
-                // FRESH FETCH: Get settings directly from DB to avoid any state synchronization issues
+                // FRESH FETCH: Get settings directly from DB
                 const { data: st } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
                 const currentPercent = st?.affiliate_commission_percent ?? 25;
-                
-                // CALCULATION: Explicitly calculate the commission share (25%)
                 const commissionToPay = Math.floor(order.profit * (currentPercent / 100));
                 
-                // KONFIRMASI PEMBAYARAN: Menampilkan rincian sebelum saldo ditambahkan
-                const confirmed = window.confirm(
-                    `KONFIRMASI PEMBAYARAN KOMISI:\n\n` +
-                    `- Profit Pesanan: Rp ${order.profit.toLocaleString("id-ID")}\n` +
-                    `- Persentase Komisi: ${currentPercent}%\n\n` +
-                    `--------------------------------------\n` +
-                    `👉 Jatah Afiliator: Rp ${commissionToPay.toLocaleString("id-ID")}\n` +
-                    `👉 Jatah Anda (Owner): Rp ${(order.profit - commissionToPay).toLocaleString("id-ID")}\n` +
-                    `--------------------------------------\n\n` +
-                    `Lanjutkan penambahan saldo Rp ${commissionToPay.toLocaleString("id-ID")} ke akun afiliator?`
-                );
-
-                if (confirmed) {
-                    const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", order.affiliator_id).single();
-                    if (prof && !fetchErr) {
-                        const { error: updErr } = await supabase.from("profiles").update({ 
-                            balance: (prof.balance || 0) + commissionToPay 
-                        }).eq("id", order.affiliator_id);
-                        
-                        if (updErr) {
-                            alert("Gagal update saldo: " + updErr.message);
-                        } else {
-                            console.log(`✅ Success: Payout of Rp ${commissionToPay} completed.`);
-                        }
-                    }
-                } else {
-                    // Revert status update if user cancels
-                    await supabase.from("orders").update({ status: order.status }).eq("id", id);
-                    setUpdatingId(null);
-                    return;
-                }
+                // Open Custom Modal instead of window.confirm
+                setPayoutData({
+                    id,
+                    newStatus,
+                    oldStatus: order.status,
+                    profit: order.profit,
+                    percent: currentPercent,
+                    commission: commissionToPay,
+                    ownerNet: order.profit - commissionToPay,
+                    affiliatorId: order.affiliator_id
+                });
+                setIsPayoutModalOpen(true);
+                setUpdatingId(null);
+                return;
             } else if (newStatus !== "Pesanan Selesai" && order?.status === "Pesanan Selesai" && order?.affiliator_id) {
                 // Refund / Rollback commission if status is changed back
                 const { data: st } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
@@ -518,6 +503,70 @@ export default function AdminOrders() {
                                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin"/> : <><Save className="w-5 h-5"/> {editingOrder ? "Simpan Perubahan" : "Simpan Pesanan"}</>}
                             </button>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Payout Confirmation Modal */}
+            {isPayoutModalOpen && payoutData && (
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl border border-white/20 animate-in zoom-in-95 duration-300">
+                        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6">
+                            <Megaphone className="w-8 h-8 text-blue-600" />
+                        </div>
+                        
+                        <h2 className="text-xl font-black text-slate-900 mb-2">Konfirmasi Komisi</h2>
+                        <p className="text-sm text-slate-500 font-medium mb-6">
+                            Sistem akan menambahkan jatah laba ke saldo afiliator secara otomatis.
+                        </p>
+
+                        <div className="space-y-3 bg-slate-50 p-5 rounded-3xl border border-slate-100 mb-8">
+                            <div className="flex justify-between items-center text-xs font-bold">
+                                <span className="text-slate-400 uppercase tracking-widest">Total Profit</span>
+                                <span className="text-slate-900">Rp {payoutData.profit.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-xs font-bold">
+                                <span className="text-slate-400 uppercase tracking-widest">Persentase</span>
+                                <span className="text-slate-900">{payoutData.percent}%</span>
+                            </div>
+                            <div className="h-px bg-slate-200 my-2" />
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Jatah Afiliator</span>
+                                <span className="text-lg font-black text-purple-600">Rp {payoutData.commission.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Net Owner (Anda)</span>
+                                <span className="text-sm font-black text-emerald-600">Rp {payoutData.ownerNet.toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <button 
+                                onClick={async () => {
+                                    setIsSubmitting(true);
+                                    const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", payoutData.affiliatorId).single();
+                                    if (prof && !fetchErr) {
+                                        await supabase.from("profiles").update({ balance: (prof.balance || 0) + payoutData.commission }).eq("id", payoutData.affiliatorId);
+                                    }
+                                    setIsPayoutModalOpen(false);
+                                    setIsSubmitting(false);
+                                    setOrders(orders.map(o => o.id === payoutData.id ? { ...o, status: payoutData.newStatus } : o));
+                                }}
+                                disabled={isSubmitting}
+                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2"
+                            >
+                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Konfirmasi & Selesai"}
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    setIsPayoutModalOpen(false);
+                                    setOrders(orders.map(o => o.id === payoutData.id ? { ...o, status: payoutData.oldStatus } : o));
+                                }}
+                                className="w-full bg-white text-slate-400 hover:text-slate-600 font-bold py-3 text-sm transition-all"
+                            >
+                                Batalkan
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
