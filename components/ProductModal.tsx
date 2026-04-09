@@ -37,13 +37,15 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ product, activePromos, isOpen, onClose, isResellerContext = false }: ProductModalProps) {
-    const [step, setStep] = useState<"selection" | "payment" | "success">("selection");
+    const [step, setStep] = useState<"selection" | "payment" | "success" | "cooldown">("selection");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [agreed, setAgreed] = useState(false);
     const [customerName, setCustomerName] = useState("");
     const [waNumber, setWaNumber] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [user, setUser] = useState<any>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [remainingMinutes, setRemainingMinutes] = useState(0);
     const [adminPhone, setAdminPhone] = useState("6285720892082");
     const supabase = createClient();
 
@@ -74,11 +76,14 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
         setUser(user);
         if (user) {
             setCustomerName(user.user_metadata?.full_name || user.email?.split('@')[0] || "");
-            // Don't auto-fill WA with email, let user enter it manually
             setWaNumber(""); 
+            // Check if admin
+            const { data: prof } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+            if (prof?.role === 'admin') setIsAdmin(true);
         } else {
             setCustomerName("");
             setWaNumber("");
+            setIsAdmin(false);
         }
     };
 
@@ -110,6 +115,31 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
         if (!selectedPackage || !agreed || !customerName || !waNumber) return;
 
         setIsSubmitting(true);
+
+        // Rate Limit Check (Exempt Admin)
+        if (!isAdmin) {
+            const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+            const { data: recentOrders } = await supabase
+                .from("orders")
+                .select("created_at")
+                .eq("wa_number", waNumber)
+                .gt("created_at", thirtyMinsAgo)
+                .order("created_at", { ascending: false })
+                .limit(1);
+
+            if (recentOrders && recentOrders.length > 0) {
+                const lastOrderTime = new Date(recentOrders[0].created_at).getTime();
+                const diff = Date.now() - lastOrderTime;
+                const remaining = Math.ceil((30 * 60 * 1000 - diff) / (60 * 1000));
+                
+                if (remaining > 0) {
+                    setRemainingMinutes(remaining);
+                    setStep("cooldown");
+                    setIsSubmitting(false);
+                    return;
+                }
+            }
+        }
 
         const promoInfo = !isResellerContext && activePromos?.find(fs => fs.package_id === selectedPackage.id);
         const discount_percent = promoInfo ? promoInfo.discount_percent : null;
@@ -298,10 +328,47 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                     )}
 
                     <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">
-                        {step === "selection" ? "Pilih Paket Layanan" : "Konfirmasi Pesanan"}
+                        {step === "selection" ? "Pilih Paket Layanan" : step === "cooldown" ? "Akses Dibatasi" : "Konfirmasi Pesanan"}
                     </h3>
 
-                    {step === "success" ? (
+                    {step === "cooldown" ? (
+                        <div className="flex flex-col items-center justify-center py-10 text-center animate-in zoom-in-95 fade-in duration-500">
+                            <div className="relative mb-8">
+                                <div className="absolute inset-0 bg-red-100 rounded-full animate-pulse scale-125 opacity-50"></div>
+                                <div className="relative w-28 h-28 bg-white border-4 border-red-500 rounded-full flex items-center justify-center shadow-2xl shadow-red-100 text-red-500">
+                                    <ShieldCheck className="w-14 h-14" />
+                                </div>
+                                <div className="absolute -bottom-2 -right-2 bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg animate-bounce">
+                                    SHIELD ACTIVE
+                                </div>
+                            </div>
+                            
+                            <h3 className="text-2xl font-black text-slate-900 mb-4">Waduh, Tunggu Sebentar!</h3>
+                            <div className="bg-red-50 border border-red-100 rounded-2xl p-4 mb-8">
+                                <p className="text-sm text-red-700 font-bold mb-2">
+                                    Kamu masih memiliki transaksi yang baru dilakukan.
+                                </p>
+                                <p className="text-xs text-red-500 font-medium leading-relaxed">
+                                    Untuk keamanan dan kenyamanan, silakan order kembali dalam:
+                                </p>
+                                <div className="text-3xl font-black text-red-600 mt-2">
+                                    {remainingMinutes} Menit
+                                </div>
+                            </div>
+
+                            <div className="w-full space-y-3">
+                                <button
+                                    onClick={onClose}
+                                    className="w-full py-4 rounded-2xl bg-[#0f172a] hover:bg-slate-800 text-white text-sm font-bold shadow-xl transition-all active:scale-95"
+                                >
+                                    Mengerti & Tutup
+                                </button>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    Pencegahan Spam & Duplikasi Pesanan
+                                </p>
+                            </div>
+                        </div>
+                    ) : step === "success" ? (
                         <div className="flex flex-col items-center justify-center py-10 text-center animate-in zoom-in-95 fade-in duration-500">
                             <div className="relative mb-8">
                                 <div className="absolute inset-0 bg-blue-100 rounded-full animate-ping opacity-20 scale-150"></div>
