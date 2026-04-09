@@ -187,7 +187,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
             if (afflProf) affiliatorName = afflProf.full_name || "-";
         }
 
-        const groupMessage = `📢 *PESANAN BARU!*\n\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n👤 Buyer: ${customerName}\n📱 WA: ${waNumber}\n🔗 Ref: ${affiliatorName}\n💰 Profit: Rp ${profitRaw.toLocaleString('id-ID')}\n\n_Segera diproses di Dashboard Admin!_`;
+        const groupMessage = `📢 *PESANAN BARU!*\n\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n👤 Buyer: ${customerName}\n📱 WA: ${waNumber}\n🔗 Ref: ${affiliatorName}\n💰 Harga: ${finalPriceDisplay}\n\n🔗 *Kelola Pesanan:* ${window.location.origin}/admin/orders`;
 
         try {
             const res = await fetch("/api/send-message", {
