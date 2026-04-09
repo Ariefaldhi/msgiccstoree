@@ -4,7 +4,17 @@ import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, Store, ArrowRight, CheckCircle2 } from "lucide-react";
+import { 
+    Loader2, 
+    Store, 
+    ArrowRight, 
+    CheckCircle2, 
+    ShieldCheck, 
+    Zap, 
+    TrendingUp, 
+    Smartphone,
+    Rocket
+} from "lucide-react";
 import Link from "next/link";
 
 interface Product {
@@ -32,7 +42,6 @@ export default function ResellerPage() {
     async function fetchData() {
       setLoading(true);
 
-      // Fetch Sales counts for sorting
       const { data: salesStats } = await supabase.from("orders").select("product_name").eq("status", "Pesanan Selesai");
       if (salesStats) {
         const counts: Record<string, number> = {};
@@ -50,7 +59,6 @@ export default function ResellerPage() {
         setProfile(prof);
       }
 
-      // Fetch products anyway
       const { data: prods } = await supabase
         .from("products")
         .select("*, packages(*)")
@@ -58,7 +66,6 @@ export default function ResellerPage() {
       
       if (prods) setProducts(prods);
 
-      // Try to get admin phone from settings if exists
       const { data: settings } = await supabase.from("store_settings").select("whatsapp_number").eq("id", 1).single();
       if (settings?.whatsapp_number) setAdminPhone(settings.whatsapp_number);
 
@@ -92,49 +99,84 @@ export default function ResellerPage() {
     const waLink = `https://wa.me/${adminPhone}?text=${encodeURIComponent(waText)}`;
 
     return (
-      <div className="min-h-screen bg-white flex flex-col pt-32 pb-20">
-        <main className="flex-1 container mx-auto px-4 flex items-center justify-center">
-          <div className="max-w-2xl w-full bg-white border border-slate-100 rounded-[2rem] p-8 md:p-12 shadow-2xl text-center relative overflow-hidden">
-             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-             
-             <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-blue-100">
-               <Store className="w-10 h-10 text-blue-600" />
-             </div>
-             
-             <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">Gabung Reseller VIP</h1>
-             <p className="text-slate-500 font-medium mb-8 text-lg max-w-lg mx-auto">
-               Dapatkan akses ke harga dasar yang jauh lebih murah dan mulai bisnis top up Anda sendiri. Profit maksimal, proses otomatis.
-             </p>
+      <div className="min-h-screen bg-slate-50 flex flex-col pt-32 pb-20 overflow-hidden relative">
+        {/* Animated Background Elements */}
+        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] animate-pulse delay-700"></div>
 
-             <div className="bg-slate-50 rounded-2xl p-6 mb-8 text-left space-y-4 border border-slate-100 inline-block">
-               <div className="flex items-center gap-3">
-                 <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                 <span className="font-bold text-slate-700">Harga Paket Khusus Reseller</span>
-               </div>
-               <div className="flex items-center gap-3">
-                 <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                 <span className="font-bold text-slate-700">Prioritas Proses Transaksi</span>
-               </div>
-               <div className="flex items-center gap-3">
-                 <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                 <span className="font-bold text-slate-700">Akses Eksklusif Dashboard Reseller</span>
-               </div>
-             </div>
+        <main className="flex-1 container mx-auto px-4 flex flex-col items-center justify-center relative z-10">
+          
+          <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Left: Content */}
+            <div className="text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-black text-[10px] uppercase tracking-widest mb-6">
+                    <Rocket className="w-3 h-3" /> Business Opportunity
+                </div>
+                <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                    Mulai Bisnis <br /> 
+                    <span className="text-blue-600 italic">Top-Up Digital</span> <br />
+                    Dari Sekarang!
+                </h1>
+                <p className="text-slate-500 font-medium text-lg mb-8 leading-relaxed">
+                    Dapatkan akses ke harga modal (supplier) yang jauh lebih murah. Jual kembali di platform Anda sendiri dan raup profit maksimal setiap hari.
+                </p>
 
-             <div className="flex flex-col items-center">
-               <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Biaya Pendaftaran</p>
-               <p className="text-4xl font-black text-blue-600 mb-8">Rp 25.000</p>
-               
-               {user ? (
-                 <a href={waLink} target="_blank" className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-[0_6px_0_theme(colors.blue.700)] hover:shadow-[0_3px_0_theme(colors.blue.700)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px]">
-                   Daftar Reseller Sekarang <ArrowRight className="w-5 h-5" />
-                 </a>
-               ) : (
-                 <Link href="/login" className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-[0_6px_0_theme(colors.slate.700)] hover:shadow-[0_3px_0_theme(colors.slate.700)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px]">
-                   Login Untuk Mendaftar <ArrowRight className="w-5 h-5" />
-                 </Link>
-               )}
-             </div>
+                <div className="space-y-4 mb-10">
+                    {[
+                        { title: "Harga Supplier (VIP)", icon: <Zap className="w-5 h-5 text-amber-500" /> },
+                        { title: "Proses Instan & Otomatis", icon: <TrendingUp className="w-5 h-5 text-emerald-500" /> },
+                        { title: "Dukungan Admin 24/7", icon: <ShieldCheck className="w-5 h-5 text-blue-500" /> },
+                        { title: "Aplikasi Mobile Friendly", icon: <Smartphone className="w-5 h-5 text-purple-500" /> }
+                    ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-4 bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-white shadow-sm hover:shadow-md transition-all">
+                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                                {item.icon}
+                            </div>
+                            <span className="font-black text-slate-800 text-sm uppercase tracking-tight">{item.title}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Right: Registration Card */}
+            <div className="bg-white rounded-[3.5rem] p-8 md:p-12 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative text-center">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                
+                <div className="w-24 h-24 bg-blue-600 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-200 border-4 border-white rotate-6">
+                    <Store className="w-12 h-12 text-white" />
+                </div>
+
+                <h2 className="text-2xl font-black text-slate-900 mb-2 italic uppercase">Daftar Reseller</h2>
+                <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-8">One-time payment for lifetime access</p>
+
+                <div className="bg-slate-50 rounded-[2rem] py-8 mb-10 relative overflow-hidden group">
+                    <div className="relative z-10">
+                        <span className="text-sm font-black text-slate-400 line-through block mb-1 opacity-50">Rp 25.000</span>
+                        <div className="flex items-center justify-center gap-1">
+                            <span className="text-xl font-black text-blue-600 mt-2">Rp</span>
+                            <span className="text-6xl font-black text-blue-600 tracking-tighter">15.000</span>
+                        </div>
+                        <span className="inline-block mt-4 px-3 py-1 bg-emerald-500 text-white text-[10px] font-black rounded-full uppercase tracking-widest animate-pulse">Promo Terbatas!</span>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+
+                {user ? (
+                    <a href={waLink} target="_blank" className="w-full py-5 bg-blue-600 hover:bg-black text-white rounded-3xl font-black text-xl transition-all flex items-center justify-center gap-3 shadow-2xl shadow-blue-200 hover:shadow-none translate-y-[-4px] hover:translate-y-0 active:scale-95">
+                        Ambil Slot Sekarang <ArrowRight className="w-6 h-6" />
+                    </a>
+                ) : (
+                    <Link href="/login" className="w-full py-5 bg-slate-900 hover:bg-slate-800 text-white rounded-3xl font-black text-xl transition-all flex items-center justify-center gap-3 shadow-2xl shadow-slate-200 hover:shadow-none translate-y-[-4px] hover:translate-y-0 active:scale-95">
+                        Login Untuk Gabung <ArrowRight className="w-6 h-6" />
+                    </Link>
+                )}
+
+                <p className="mt-8 text-[11px] font-bold text-slate-400 leading-relaxed max-w-[240px] mx-auto">
+                    Bergabung bersama <span className="text-slate-900">500+ Reseller</span> lainnya dan mulai perjalanan sukses Anda.
+                </p>
+            </div>
+
           </div>
         </main>
       </div>
@@ -156,33 +198,36 @@ export default function ResellerPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col pt-32 pb-20">
       <main className="flex-1 container mx-auto px-4">
         
-        <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-200">
+        <div className="flex items-center justify-between mb-12 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
            <div>
-             <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-               <Store className="w-8 h-8 text-blue-600" />
-               Dashboard Reseller
-             </h1>
-             <p className="text-slate-500 mt-2 font-medium">Selamat datang, {user?.user_metadata?.full_name || 'Reseller'}. Nikmati harga spesial.</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full font-black text-[10px] uppercase tracking-widest mb-2">
+                <Store className="w-3 h-3" /> Reseller VIP
+              </div>
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight">Katalog Harga Cabang</h1>
+              <p className="text-slate-500 mt-1 font-medium italic">Halo, {user?.user_metadata?.full_name || 'Partner'}. Harga supplier aktif otomatis.</p>
            </div>
-           <div className="hidden md:block px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-bold text-sm">
-             Status: Aktif
+           <div className="hidden md:flex flex-col items-end">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status Keanggotaan</span>
+              <div className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl font-bold text-sm border border-emerald-200 flex items-center gap-2 shadow-sm">
+                 <ShieldCheck className="w-4 h-4" /> VIP ACTIVE
+              </div>
            </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
           {[...products].sort((a, b) => {
             const sa = salesCounts[a.title] || 0;
             const sb = salesCounts[b.title] || 0;
             return sb - sa;
           }).map((product) => (
-            <div key={product.id} onClick={() => handleProductClick(product)} className="cursor-pointer group">
+            <div key={product.id} onClick={() => handleProductClick(product)} className="cursor-pointer group transform hover:-translate-y-2 transition-all duration-500">
               <ProductCard
                 title={product.title}
                 salesCount={salesCounts[product.title] || 0}
                 price={getProductResellerPrice(product)}
                 image={product.image_url}
-                tag="HARGA CABANG"
-                tagColor="purple"
+                tag="CABANG VIP"
+                tagColor="indigo"
                 href="#"
               />
             </div>
@@ -193,10 +238,10 @@ export default function ResellerPage() {
 
       <ProductModal
         product={selectedProduct ? { ...selectedProduct, category: 'Reseller', packages: selectedProduct.packages } : null}
-        activePromos={[]} // Resellers don't get flash sales
+        activePromos={[]} 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        isResellerContext={true} // pass prop to ProductModal
+        isResellerContext={true}
       />
     </div>
   );

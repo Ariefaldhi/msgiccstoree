@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, Tags, Settings, LogOut, ShoppingBag, Zap, Users, Wallet, MoreVertical, X } from "lucide-react";
+import { LayoutDashboard, Package, Tags, Settings, LogOut, ShoppingBag, Zap, Users, Wallet, MoreVertical, X, Star, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,8 @@ export default function AdminLayout({
         { name: "Categories", href: "/admin/categories", icon: Tags },
         { name: "Products", href: "/admin/products", icon: Package },
         { name: "Promo", href: "/admin/promo", icon: Zap },
+        { name: "Testimoni", href: "/admin/testimonies", icon: Star },
+        { name: "Reviews", href: "/admin/reviews", icon: MessageSquare },
         { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
         { name: "Users", href: "/admin/users", icon: Users },
         { name: "Withdrawals", href: "/admin/withdrawals", icon: Wallet },
@@ -134,6 +136,12 @@ export default function AdminLayout({
                         <Link href="/admin/orders" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all">
                             <ShoppingBag className="w-4 h-4 text-blue-500" /> Pesanan
                         </Link>
+                        <Link href="/admin/testimonies" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all">
+                            <Star className="w-4 h-4 text-amber-500" /> Testimoni
+                        </Link>
+                        <Link href="/admin/reviews" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all">
+                            <MessageSquare className="w-4 h-4 text-emerald-500" /> Reviews
+                        </Link>
                         <Link href="/admin/categories" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all">
                             <Tags className="w-4 h-4 text-orange-500" /> Kategori
                         </Link>
@@ -143,12 +151,12 @@ export default function AdminLayout({
                         <Link href="/admin/withdrawals" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all">
                             <Wallet className="w-4 h-4 text-purple-500" /> Penarikan
                         </Link>
-                        <Link href="/admin/settings" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all">
+                        <Link href="/admin/settings" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all col-span-2">
                             <Settings className="w-4 h-4 text-slate-500" /> Settings
                         </Link>
                         <button 
                             onClick={handleLogout}
-                            className="flex items-center gap-3 p-4 rounded-2xl bg-red-50 border border-red-100 font-bold text-xs text-red-600 active:scale-95 transition-all"
+                            className="flex items-center gap-3 p-4 rounded-2xl bg-red-50 border border-red-100 font-bold text-xs text-red-600 active:scale-95 transition-all col-span-2"
                         >
                             <LogOut className="w-4 h-4" /> Logout
                         </button>

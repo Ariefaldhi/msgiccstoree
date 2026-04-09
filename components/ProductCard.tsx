@@ -7,7 +7,7 @@ interface ProductCardProps {
     price: string;
     image?: string;
     tag?: string;
-    tagColor?: "yellow" | "red" | "blue" | "purple";
+    tagColor?: "yellow" | "red" | "blue" | "purple" | "indigo";
     href: string;
     salesCount?: number;
 }
@@ -31,7 +31,8 @@ export default function ProductCard({ title, price, image, tag, tagColor = "yell
                     tagColor === "yellow" && "bg-yellow-400 text-black shadow-yellow-200",
                     tagColor === "red" && "bg-red-500 text-white shadow-red-200",
                     tagColor === "blue" && "bg-blue-500 text-white shadow-blue-200",
-                    tagColor === "purple" && "bg-purple-500 text-white shadow-purple-200"
+                    tagColor === "purple" && "bg-purple-500 text-white shadow-purple-200",
+                    tagColor === "indigo" && "bg-indigo-600 text-white shadow-indigo-200"
                 )}>
                     {tag}
                 </div>

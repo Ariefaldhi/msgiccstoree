@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Menu, X, Rocket, Home as HomeIcon, Grid2X2, MessageCircle, ShoppingBag, Store, Megaphone, User } from "lucide-react";
+import { Search, Menu, X, Rocket, Home as HomeIcon, Grid2X2, MessageCircle, ShoppingBag, Store, Megaphone, User, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AuthButton from "./AuthButton";
 import { useState, useEffect } from "react";
@@ -223,12 +223,12 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                     <span className="text-[10px] font-bold uppercase tracking-tight">Afiliator</span>
                 </Link>
 
-                <Link href={profile ? "/profile" : "/login"} className={cn(
+                <Link href="/more" className={cn(
                     "flex flex-col items-center gap-1 transition-all active:scale-90",
-                    pathname.includes("/profile") || pathname === "/login" ? "text-blue-600" : "text-gray-400"
+                    pathname === "/more" ? "text-blue-600" : "text-gray-400"
                 )}>
-                    <User className={cn("w-6 h-6", pathname.includes("/profile") || pathname === "/login" ? "fill-blue-600/10" : "")} />
-                    <span className="text-[10px] font-bold uppercase tracking-tight">{profile ? 'Profil' : 'Masuk'}</span>
+                    <MoreHorizontal className={cn("w-6 h-6", pathname === "/more" ? "fill-blue-600/10" : "")} />
+                    <span className="text-[10px] font-bold uppercase tracking-tight">Lainnya</span>
                 </Link>
             </div>
         </>
