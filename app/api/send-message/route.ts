@@ -3,14 +3,19 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     try {
-        const { target, adminTarget, message } = await request.json();
+        const { 
+            customerTarget, 
+            customerMessage, 
+            groupTarget, 
+            groupMessage 
+        } = await request.json();
 
-        if (!target || !message) {
-            return NextResponse.json({ error: "Missing target or message" }, { status: 400 });
+        if (!customerTarget || !customerMessage) {
+            return NextResponse.json({ error: "Missing customer target or message" }, { status: 400 });
         }
 
         const supabase = await createClient();
-        const { data: settings } = await supabase.from("store_settings").select("fonnte_token").eq("id", 1).single();
+        const { data: settings } = await supabase.from("store_settings").select("fonnte_token, fonnte_group_id").eq("id", 1).single();
 
         const token = settings?.fonnte_token || process.env.FONNTE_TOKEN;
 
@@ -18,33 +23,48 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Fonnte token not configured" }, { status: 500 });
         }
 
-        // Clean targets: remove + and spaces
-        const cleanTarget = target.replace(/\D/g, '');
-        const cleanAdmin = adminTarget ? adminTarget.replace(/\D/g, '') : null;
-
-        // Combine targets
-        const allTargets = cleanAdmin ? `${cleanTarget},${cleanAdmin}` : cleanTarget;
-
-        const response = await fetch("https://api.fonnte.com/send", {
+        // 1. Send to Customer
+        const cleanCustomerTarget = customerTarget.replace(/\D/g, '');
+        const customerResponse = await fetch("https://api.fonnte.com/send", {
             method: "POST",
-            headers: {
-                Authorization: token,
-            },
+            headers: { Authorization: token },
             body: new URLSearchParams({
-                target: allTargets,
-                message: message,
+                target: cleanCustomerTarget,
+                message: customerMessage,
                 countryCode: "62",
-                delay: "2-5", // Recommended when sending to multiple targets
             }),
         });
+        const customerResult = await customerResponse.json();
 
-        const result = await response.json();
+        // 2. Send to Group (if target and message provided)
+        let groupResult = null;
+        const finalGroupTarget = groupTarget || settings?.fonnte_group_id;
+        
+        if (finalGroupTarget && groupMessage) {
+            // Small delay to prevent issues with simultaneous sending
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
-        if (result.status) {
-            return NextResponse.json({ success: true, result });
+            const groupResponse = await fetch("https://api.fonnte.com/send", {
+                method: "POST",
+                headers: { Authorization: token },
+                body: new URLSearchParams({
+                    target: finalGroupTarget,
+                    message: groupMessage,
+                    delay: "2-5",
+                }),
+            });
+            groupResult = await groupResponse.json();
+        }
+
+        if (customerResult.status) {
+            return NextResponse.json({ 
+                success: true, 
+                customerResult, 
+                groupResult 
+            });
         } else {
-            console.error("Fonnte API Error:", result);
-            return NextResponse.json({ error: result.reason || "Failed to send message" }, { status: 500 });
+            console.error("Fonnte Customer API Error:", customerResult);
+            return NextResponse.json({ error: customerResult.reason || "Failed to send message to customer" }, { status: 500 });
         }
     } catch (error: any) {
         console.error("Internal Server Error:", error);

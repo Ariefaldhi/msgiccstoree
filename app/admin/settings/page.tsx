@@ -13,7 +13,8 @@ export default function AdminSettings() {
         logo_url: "",
         whatsapp_number: "",
         affiliate_commission_percent: 25,
-        fonnte_token: ""
+        fonnte_token: "",
+        fonnte_group_id: ""
     });
 
     const supabase = createClient();
@@ -28,7 +29,8 @@ export default function AdminSettings() {
                     logo_url: data.logo_url || "",
                     whatsapp_number: data.whatsapp_number || "",
                     affiliate_commission_percent: data.affiliate_commission_percent ?? 25,
-                    fonnte_token: data.fonnte_token || ""
+                    fonnte_token: data.fonnte_token || "",
+                    fonnte_group_id: data.fonnte_group_id || ""
                 });
             }
             setLoading(false);
@@ -47,7 +49,8 @@ export default function AdminSettings() {
             logo_url: settings.logo_url,
             whatsapp_number: settings.whatsapp_number,
             affiliate_commission_percent: settings.affiliate_commission_percent,
-            fonnte_token: settings.fonnte_token
+            fonnte_token: settings.fonnte_token,
+            fonnte_group_id: settings.fonnte_group_id
         });
 
         if (!error) {
@@ -181,6 +184,20 @@ export default function AdminSettings() {
                                 onChange={e => setSettings({...settings, fonnte_token: e.target.value})} 
                             />
                             <p className="text-xs text-slate-500 mt-2">Dapatkan token Anda di dashboard <a href="https://fonnte.com" target="_blank" className="text-blue-600 hover:underline">Fonnte</a>. Digunakan untuk mengirim pesan otomatis setelah pembelian.</p>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                Fonnte Group ID (Untuk Notifikasi Pesanan Baru)
+                            </label>
+                            <input 
+                                type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                placeholder="e.g. 120363000000000000@g.us" 
+                                value={settings.fonnte_group_id} 
+                                onChange={e => setSettings({...settings, fonnte_group_id: e.target.value})} 
+                            />
+                            <p className="text-xs text-slate-500 mt-2">Masukkan ID Grup WhatsApp untuk menerima notifikasi <b>Pesanan Baru</b>. Kosongkan jika tidak ingin kirim ke grup.</p>
                         </div>
 
                         <div>

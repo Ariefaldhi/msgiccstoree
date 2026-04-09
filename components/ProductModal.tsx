@@ -178,24 +178,31 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
         }
 
         // Kirim via API Fonnte
-        const message = `Halo Kak ${customerName},\n\nTerima kasih telah melakukan pesanan di *MsgiccStore*!\n\n*Detail Pesanan:*\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n💰 Total: ${finalPriceDisplay}\n⏳ Durasi: ${selectedPackage.duration}\n\n_Mohon tunggu sebentar ya kak, Admin kami sedang menyiapkan detail pesanan Anda. Admin akan segera membalas pesan ini untuk memberikan *Info Pembayaran* dan *Instruksi Selanjutnya*._\n\n📌 *Harap tidak spam pesan agar antrian Anda tetap terjaga.*\n\nTerima kasih atas kesabarannya! 🙏`;
+        const customerMessage = `Halo Kak ${customerName},\n\nTerima kasih telah melakukan pesanan di *MsgiccStore*!\n\n*Detail Pesanan:*\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n💰 Total: ${finalPriceDisplay}\n⏳ Durasi: ${selectedPackage.duration}\n\n_Mohon tunggu sebentar ya kak, Admin kami sedang menyiapkan detail pesanan Anda. Admin akan segera membalas pesan ini untuk memberikan *Info Pembayaran* dan *Instruksi Selanjutnya*._\n\n📌 *Harap tidak spam pesan agar antrian Anda tetap terjaga.*\n\nTerima kasih atas kesabarannya! 🙏`;
         
+        // Construct Group Message
+        let affiliatorName = "-";
+        if (affiliate_code_used) {
+            const { data: afflProf } = await supabase.from("profiles").select("full_name").eq("affiliate_code", affiliate_code_used).single();
+            if (afflProf) affiliatorName = afflProf.full_name || "-";
+        }
+
+        const groupMessage = `📢 *PESANAN BARU!*\n\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n👤 Buyer: ${customerName}\n📱 WA: ${waNumber}\n🔗 Ref: ${affiliatorName}\n💰 Profit: Rp ${profitRaw.toLocaleString('id-ID')}\n\n_Segera diproses di Dashboard Admin!_`;
+
         try {
             const res = await fetch("/api/send-message", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    target: waNumber,
-                    adminTarget: adminPhone,
-                    message: message
+                    customerTarget: waNumber,
+                    customerMessage: customerMessage,
+                    groupMessage: groupMessage
                 })
             });
 
             if (!res.ok) {
                 const data = await res.json();
                 console.error("Fonnte failed:", data.error);
-                // Even if Fonnte fails, the order is already in DB, so we can show success 
-                // but maybe log it.
             }
         } catch (err) {
             console.error("Fetch error:", err);
