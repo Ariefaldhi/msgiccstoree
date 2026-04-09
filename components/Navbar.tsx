@@ -118,6 +118,9 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                         <Link href="/afiliator" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
                             <Megaphone className="w-4 h-4" /> Afiliator
                         </Link>
+                        <Link href="/more" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
+                            <MoreHorizontal className="w-4 h-4" /> Lainnya
+                        </Link>
 
                         <button 
                             onClick={handleSearchClick}

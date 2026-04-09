@@ -88,9 +88,6 @@ export default function AfiliatorPage() {
              
              <div className="flex flex-col md:flex-row items-center gap-10">
                  <div className="flex-1 text-center md:text-left">
-                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full font-bold text-xs mb-6">
-                         <Megaphone className="w-3 h-3" /> PROGRAM KEMITRAAN
-                     </div>
                      <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">Gabung Afiliator<br/> <span className="text-purple-600">Gratis!</span></h1>
                      <p className="text-slate-500 font-medium mb-8 text-lg">
                        Cukup sebar link, dapatkan komisi untuk setiap transaksi yang berhasil dari referral Anda. Tanpa modal, potensi penghasilan tak terbatas.

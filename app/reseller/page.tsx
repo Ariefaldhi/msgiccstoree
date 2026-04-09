@@ -110,9 +110,6 @@ export default function ResellerPage() {
             
             {/* Left: Content */}
             <div className="text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-black text-[10px] uppercase tracking-widest mb-6">
-                    <Rocket className="w-3 h-3" /> Business Opportunity
-                </div>
                 <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
                     Mulai Bisnis <br /> 
                     <span className="text-blue-600 italic">Top-Up Digital</span> <br />
@@ -172,11 +169,7 @@ export default function ResellerPage() {
                     </Link>
                 )}
 
-                <p className="mt-8 text-[11px] font-bold text-slate-400 leading-relaxed max-w-[240px] mx-auto">
-                    Bergabung bersama <span className="text-slate-900">500+ Reseller</span> lainnya dan mulai perjalanan sukses Anda.
-                </p>
             </div>
-
           </div>
         </main>
       </div>

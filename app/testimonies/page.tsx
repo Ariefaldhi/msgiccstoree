@@ -35,9 +35,6 @@ export default function TestimoniesPage() {
                 
                 <div className="text-center mb-16 relative">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-full font-black text-xs uppercase tracking-widest mb-6 border border-amber-100 shadow-sm relative z-10">
-                        <Star className="w-4 h-4 fill-amber-500 text-amber-500" /> Bukti Kepuasan
-                    </div>
                     <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight relative z-10">
                         Real Transactions, <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">Real Happiness</span>
