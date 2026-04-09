@@ -420,13 +420,6 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                                             : "hover:shadow-lg hover:border-blue-200 border-slate-100"
                                     )}
                                 >
-                                    {pkg.is_available === false && (
-                                        <div className="absolute top-4 right-20 z-20">
-                                            <span className="bg-slate-800 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-xl">
-                                                TUTUP
-                                            </span>
-                                        </div>
-                                    )}
                                     <div className="flex flex-col gap-4">
 
                                         {/* Header */}
@@ -443,7 +436,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                                                         : "bg-[#0f172a] hover:bg-[#1e293b]"
                                                 )}
                                             >
-                                                {pkg.is_available === false ? "TUTUP" : "ORDER"}
+                                                {pkg.is_available === false ? "STOK HABIS" : "ORDER"}
                                             </button>
                                         </div>
 
