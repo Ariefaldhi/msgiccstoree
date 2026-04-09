@@ -12,7 +12,8 @@ export default function AdminSettings() {
         primary_color: "blue",
         logo_url: "",
         whatsapp_number: "",
-        affiliate_commission_percent: 25
+        affiliate_commission_percent: 25,
+        fonnte_token: ""
     });
 
     const supabase = createClient();
@@ -26,7 +27,8 @@ export default function AdminSettings() {
                     primary_color: data.primary_color,
                     logo_url: data.logo_url || "",
                     whatsapp_number: data.whatsapp_number || "",
-                    affiliate_commission_percent: data.affiliate_commission_percent ?? 25
+                    affiliate_commission_percent: data.affiliate_commission_percent ?? 25,
+                    fonnte_token: data.fonnte_token || ""
                 });
             }
             setLoading(false);
@@ -44,7 +46,8 @@ export default function AdminSettings() {
             primary_color: settings.primary_color,
             logo_url: settings.logo_url,
             whatsapp_number: settings.whatsapp_number,
-            affiliate_commission_percent: settings.affiliate_commission_percent
+            affiliate_commission_percent: settings.affiliate_commission_percent,
+            fonnte_token: settings.fonnte_token
         });
 
         if (!error) {
@@ -164,6 +167,20 @@ export default function AdminSettings() {
                                 </div>
                             </div>
                             <p className="text-[10px] text-slate-400 mt-2 italic">*Persentase ini diambil dari Profit (Harga Jual - Harga Modal).</p>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                WhatsApp Bot (Fonnte) Token
+                            </label>
+                            <input 
+                                type="password" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                placeholder="Masukkan Token Fonnte Anda" 
+                                value={settings.fonnte_token} 
+                                onChange={e => setSettings({...settings, fonnte_token: e.target.value})} 
+                            />
+                            <p className="text-xs text-slate-500 mt-2">Dapatkan token Anda di dashboard <a href="https://fonnte.com" target="_blank" className="text-blue-600 hover:underline">Fonnte</a>. Digunakan untuk mengirim pesan otomatis setelah pembelian.</p>
                         </div>
 
                         <div>

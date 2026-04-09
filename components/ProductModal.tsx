@@ -37,7 +37,7 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ product, activePromos, isOpen, onClose, isResellerContext = false }: ProductModalProps) {
-    const [step, setStep] = useState<"selection" | "payment">("selection");
+    const [step, setStep] = useState<"selection" | "payment" | "success">("selection");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [agreed, setAgreed] = useState(false);
     const [customerName, setCustomerName] = useState("");
@@ -176,10 +176,31 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
             return;
         }
 
-        const message = `Halo Admin, saya mau order paket ini:%0A%0A*${product.title}*%0A📦 ${selectedPackage.name}%0A💰 ${finalPriceDisplay}%0A⏳ ${selectedPackage.duration}%0A👤 Nama: ${customerName}%0A📱 WA: ${waNumber}%0A%0A_Mohon diproses ya kak!_`;
-        window.open(`https://wa.me/${adminPhone}?text=${message}`, "_blank");
+        // Kirim via API Fonnte
+        const message = `Halo Kak ${customerName},\n\nTerima kasih telah melakukan pesanan di *MsgiccStore*!\n\n*Detail Pesanan:*\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n💰 Total: ${finalPriceDisplay}\n⏳ Durasi: ${selectedPackage.duration}\n\n_Mohon tunggu sebentar, pesanan Anda sedang kami proses. Kami akan menghubungi Anda segera melalui nomor ini._\n\nTerima kasih!`;
         
-        onClose();
+        try {
+            const res = await fetch("/api/send-message", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    target: waNumber,
+                    adminTarget: adminPhone,
+                    message: message
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                console.error("Fonnte failed:", data.error);
+                // Even if Fonnte fails, the order is already in DB, so we can show success 
+                // but maybe log it.
+            }
+        } catch (err) {
+            console.error("Fetch error:", err);
+        }
+
+        setStep("success");
     };
 
     return (
@@ -272,7 +293,34 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                         {step === "selection" ? "Pilih Paket Layanan" : "Konfirmasi Pesanan"}
                     </h3>
 
-                    {step === "selection" ? (
+                    {step === "success" ? (
+                        <div className="flex flex-col items-center justify-center py-10 text-center animate-in zoom-in-95 fade-in duration-500">
+                            <div className="relative mb-8">
+                                <div className="absolute inset-0 bg-blue-100 rounded-full animate-ping opacity-20 scale-150"></div>
+                                <div className="relative w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center shadow-2xl shadow-blue-200">
+                                    <CheckCircle2 className="w-12 h-12 text-white" />
+                                </div>
+                            </div>
+                            
+                            <h3 className="text-2xl font-black text-slate-900 mb-3">Pesanan Terkonfirmasi!</h3>
+                            <p className="text-slate-500 font-medium px-4 mb-8">
+                                Yeay! Pesanan <span className="text-blue-600 font-bold">{selectedPackage?.name}</span> sedang diproses. 
+                                Silakan <span className="text-slate-900 font-bold">cek WhatsApp Anda</span> untuk konfirmasi otomatis.
+                            </p>
+
+                            <div className="w-full space-y-3">
+                                <button
+                                    onClick={onClose}
+                                    className="w-full py-4 rounded-2xl bg-[#0f172a] hover:bg-slate-800 text-white text-sm font-bold shadow-xl transition-all active:scale-95"
+                                >
+                                    Selesai & Tutup
+                                </button>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    Terima kasih telah berlangganan!
+                                </p>
+                            </div>
+                        </div>
+                    ) : step === "selection" ? (
                         <div className="space-y-4">
                             {[...(product.packages || [])]
                                 .sort((a, b) => {
