@@ -423,7 +423,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                                     {pkg.is_available === false && (
                                         <div className="absolute top-4 right-20 z-20">
                                             <span className="bg-slate-800 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-xl">
-                                                STOK HABIS
+                                                TUTUP
                                             </span>
                                         </div>
                                     )}

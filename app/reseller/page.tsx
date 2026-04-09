@@ -122,7 +122,6 @@ export default function ResellerPage() {
                 <div className="space-y-4 mb-10">
                     {[
                         { title: "Harga Supplier (VIP)", icon: <Zap className="w-5 h-5 text-amber-500" /> },
-                        { title: "Proses Instan & Otomatis", icon: <TrendingUp className="w-5 h-5 text-emerald-500" /> },
                         { title: "Dukungan Admin 24/7", icon: <ShieldCheck className="w-5 h-5 text-blue-500" /> },
                         { title: "Aplikasi Mobile Friendly", icon: <Smartphone className="w-5 h-5 text-purple-500" /> }
                     ].map((item, i) => (

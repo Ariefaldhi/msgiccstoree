@@ -7,6 +7,7 @@ import { Star, Loader2, Sparkles, MessageCircle, ExternalLink } from "lucide-rea
 export default function TestimoniesPage() {
     const [testimonies, setTestimonies] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const supabase = createClient();
 
     useEffect(() => {
@@ -40,30 +41,34 @@ export default function TestimoniesPage() {
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">Real Happiness</span>
                     </h1>
                     <p className="text-slate-500 font-medium text-lg max-w-2xl mx-auto relative z-10">
-                        Lihat bukti transaksi dan testimoni dari ribuan pelanggan yang telah mempercayakan kebutuhan digitalnya kepada kami.
+                        Lihat bukti transaksi dan testimoni dari pelanggan yang telah mempercayakan kebutuhan digitalnya kepada kami.
                     </p>
                 </div>
 
                 {testimonies.length > 0 ? (
-                    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+                    <div className="columns-2 sm:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
                         {testimonies.map((item) => (
-                            <div key={item.id} className="break-inside-avoid bg-slate-50 border border-slate-100 rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500 group">
+                            <div 
+                                key={item.id} 
+                                onClick={() => setSelectedImage(item.image_url)}
+                                className="break-inside-avoid bg-slate-50 border border-slate-100 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500 group cursor-zoom-in"
+                            >
                                 <div className="relative overflow-hidden aspect-auto">
                                     <img 
                                         src={item.image_url} 
                                         alt="Testimony" 
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
-                                        <p className="text-white font-bold text-sm leading-relaxed">{item.caption || "Terima kasih MsgiccStore!"}</p>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                        <p className="text-white font-bold text-[10px] leading-tight line-clamp-2">{item.caption || "Terima kasih MsgiccStore!"}</p>
                                     </div>
                                 </div>
                                 {item.caption && (
-                                    <div className="p-5 bg-white border-t border-slate-50">
-                                        <p className="text-slate-600 text-sm font-medium italic">"{item.caption}"</p>
-                                        <div className="flex items-center gap-1 mt-3">
+                                    <div className="p-3 bg-white border-t border-slate-50">
+                                        <p className="text-slate-600 text-[10px] font-medium italic line-clamp-2">"{item.caption}"</p>
+                                        <div className="flex items-center gap-0.5 mt-2">
                                             {[...Array(5)].map((_, i) => (
-                                                <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                                <Star key={i} className="w-2 h-2 fill-amber-400 text-amber-400" />
                                             ))}
                                         </div>
                                     </div>
@@ -78,6 +83,26 @@ export default function TestimoniesPage() {
                         </div>
                         <h3 className="text-xl font-black text-slate-900 mb-2">Belum ada testimoni</h3>
                         <p className="text-slate-400 font-medium">Bantu kami menjadi lebih baik dengan memberikan ulasan Anda!</p>
+                    </div>
+                )}
+
+                {/* Lightbox Modal */}
+                {selectedImage && (
+                    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-xl animate-in fade-in duration-300">
+                        <div className="absolute inset-0" onClick={() => setSelectedImage(null)}></div>
+                        <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center animate-in zoom-in-95 duration-300">
+                            <img 
+                                src={selectedImage} 
+                                alt="Full Testimony" 
+                                className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl" 
+                            />
+                            <button 
+                                onClick={() => setSelectedImage(null)}
+                                className="absolute -top-4 -right-4 bg-white text-slate-900 p-2 rounded-full shadow-xl hover:bg-slate-100 transition-all font-bold"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
                 )}
 
@@ -97,3 +122,6 @@ export default function TestimoniesPage() {
         </div>
     );
 }
+
+// X icon needs import
+import { X } from "lucide-react";
