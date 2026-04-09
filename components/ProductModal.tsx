@@ -74,7 +74,8 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
         setUser(user);
         if (user) {
             setCustomerName(user.user_metadata?.full_name || user.email?.split('@')[0] || "");
-            setWaNumber(user.email || ""); // Using email as a placeholder for WA if logged in
+            // Don't auto-fill WA with email, let user enter it manually
+            setWaNumber(""); 
         } else {
             setCustomerName("");
             setWaNumber("");
@@ -177,7 +178,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
         }
 
         // Kirim via API Fonnte
-        const message = `Halo Kak ${customerName},\n\nTerima kasih telah melakukan pesanan di *MsgiccStore*!\n\n*Detail Pesanan:*\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n💰 Total: ${finalPriceDisplay}\n⏳ Durasi: ${selectedPackage.duration}\n\n_Mohon tunggu sebentar, pesanan Anda sedang kami proses. Kami akan menghubungi Anda segera melalui nomor ini._\n\nTerima kasih!`;
+        const message = `Halo Kak ${customerName},\n\nTerima kasih telah melakukan pesanan di *MsgiccStore*!\n\n*Detail Pesanan:*\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n💰 Total: ${finalPriceDisplay}\n⏳ Durasi: ${selectedPackage.duration}\n\n_Mohon tunggu sebentar ya kak, Admin kami sedang menyiapkan detail pesanan Anda. Admin akan segera membalas pesan ini untuk memberikan *Info Pembayaran* dan *Instruksi Selanjutnya*._\n\n📌 *Harap tidak spam pesan agar antrian Anda tetap terjaga.*\n\nTerima kasih atas kesabarannya! 🙏`;
         
         try {
             const res = await fetch("/api/send-message", {
@@ -505,17 +506,30 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                             {/* Customer Form */}
                             <div className="space-y-4 px-1">
                                 {user ? (
-                                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
-                                            <span className="text-white font-black text-lg uppercase">{customerName.charAt(0)}</span>
+                                    <div className="space-y-4">
+                                        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                                                <span className="text-white font-black text-lg uppercase">{customerName.charAt(0)}</span>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-0.5">Sudah Login</p>
+                                                <p className="text-sm font-black text-slate-900 truncate">{customerName}</p>
+                                                <p className="text-[11px] font-bold text-slate-500 truncate">{user.email}</p>
+                                            </div>
+                                            <div className="p-2 bg-white rounded-lg shadow-sm">
+                                                <ShieldCheck className="w-5 h-5 text-blue-600" />
+                                            </div>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-0.5">Sudah Login</p>
-                                            <p className="text-sm font-black text-slate-900 truncate">{customerName}</p>
-                                            <p className="text-[11px] font-bold text-slate-500 truncate">{user.email}</p>
-                                        </div>
-                                        <div className="p-2 bg-white rounded-lg shadow-sm">
-                                            <ShieldCheck className="w-5 h-5 text-blue-600" />
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nomor WhatsApp Aktif</label>
+                                            <input 
+                                                type="text" 
+                                                required 
+                                                placeholder="Contoh: 08123456789" 
+                                                value={waNumber}
+                                                onChange={(e) => setWaNumber(e.target.value.replace(/\D/g, ''))}
+                                                className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                            />
                                         </div>
                                     </div>
                                 ) : (
