@@ -212,7 +212,6 @@ export default function AdminPromo() {
                                     <input type="text" className="input-admin" placeholder="FLASH SALE"
                                         value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} />
                                 </div>
-                            </div>
 
                             <div>
                                 <label className="label-admin">Waktu Mulai</label>
