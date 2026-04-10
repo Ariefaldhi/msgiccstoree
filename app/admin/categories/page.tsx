@@ -157,7 +157,7 @@ export default function AdminCategories() {
 
             {/* Add Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
                     <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-black text-slate-900">{editCategory ? "Edit Category" : "New Category"}</h2>

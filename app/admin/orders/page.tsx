@@ -377,7 +377,7 @@ export default function AdminOrders() {
             )}
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
                     <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-black text-slate-900">{editingOrder ? "Edit Pesanan" : "Tambah Pesanan Manual"}</h2>
@@ -509,7 +509,7 @@ export default function AdminOrders() {
 
             {/* Payout Confirmation Modal */}
             {isPayoutModalOpen && payoutData && (
-                <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
                     <div className="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl border border-white/20 animate-in zoom-in-95 duration-300">
                         <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6">
                             <Megaphone className="w-8 h-8 text-blue-600" />

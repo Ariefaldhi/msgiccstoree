@@ -1,4 +1,4 @@
-import { X, CheckCircle2, ChevronLeft, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
+import { X, CheckCircle2, ChevronLeft, ArrowRight, ShieldCheck, Loader2, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -48,6 +48,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
     const [remainingMinutes, setRemainingMinutes] = useState(0);
     const [cooldownSeconds, setCooldownSeconds] = useState(0);
     const [adminPhone, setAdminPhone] = useState("6285720892082");
+    const [fallbackCounter, setFallbackCounter] = useState(15);
     const supabase = createClient();
 
     const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
@@ -69,6 +70,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
             setSelectedPackage(null);
             setAgreed(false);
             setIsSubmitting(false);
+            setFallbackCounter(15);
             fetchSalesCounts();
             checkUser();
             // Fetch affiliate ref from localStorage
@@ -89,6 +91,17 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
             return () => clearTimeout(timer);
         }
     }, [cooldownSeconds]);
+
+    // Manual Fallback Timer
+    useEffect(() => {
+        let timer: any;
+        if (step === "success" && fallbackCounter > 0) {
+            timer = setInterval(() => {
+                setFallbackCounter(prev => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(timer);
+    }, [step, fallbackCounter]);
 
     const checkUser = async () => {
         const { data: { user } } = await supabase.auth.getUser();
@@ -407,6 +420,23 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                             </p>
 
                             <div className="w-full space-y-3">
+                                {fallbackCounter === 0 && (
+                                    <div className="animate-in fade-in slide-in-from-top-2 duration-500">
+                                        <p className="text-[11px] font-bold text-red-500 mb-3 leading-relaxed">
+                                            Jika dalam 15 detik tidak ada pesan di WhatsApp, mohon hubungi manual:
+                                        </p>
+                                        <a 
+                                            href={`https://wa.me/${adminPhone}?text=Halo%20Admin,%20saya%20sudah%20melakukan%20pesanan%20${product.title}%20(${selectedPackage?.name})%20tetapi%20belum%20menerima%20konfirmasi%20otomatis.%20Mohon%20dibantu.`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white text-xs font-bold shadow-xl shadow-green-100 transition-all flex items-center justify-center gap-2 mb-4 hover:-translate-y-1 active:scale-95"
+                                        >
+                                            <MessageCircle className="w-5 h-5" />
+                                            HUBUNGI MANUAL VIA WHATSAPP
+                                        </a>
+                                    </div>
+                                )}
+                                
                                 <button
                                     onClick={onClose}
                                     className="w-full py-4 rounded-2xl bg-[#0f172a] hover:bg-slate-800 text-white text-sm font-bold shadow-xl transition-all active:scale-95"
