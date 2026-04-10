@@ -46,6 +46,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
     const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [remainingMinutes, setRemainingMinutes] = useState(0);
+    const [cooldownSeconds, setCooldownSeconds] = useState(0);
     const [adminPhone, setAdminPhone] = useState("6285720892082");
     const supabase = createClient();
 
@@ -56,6 +57,14 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
     // Reset state when modal opens/closes
     useEffect(() => {
         if (isOpen) {
+            // Check for persistent cooldown
+            const lastTime = localStorage.getItem("msgicc_order_cooldown");
+            if (lastTime) {
+                const diff = Date.now() - parseInt(lastTime);
+                const remaining = Math.max(0, Math.ceil((60000 - diff) / 1000));
+                if (remaining > 0) setCooldownSeconds(remaining);
+            }
+
             setStep("selection");
             setSelectedPackage(null);
             setAgreed(false);
@@ -70,6 +79,16 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
             });
         }
     }, [isOpen, product?.id]);
+
+    // Cooldown Timer
+    useEffect(() => {
+        if (cooldownSeconds > 0) {
+            const timer = setTimeout(() => {
+                setCooldownSeconds(prev => prev - 1);
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [cooldownSeconds]);
 
     const checkUser = async () => {
         const { data: { user } } = await supabase.auth.getUser();
@@ -200,12 +219,15 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
             status: "Menunggu Konfirmasi"
         }]);
 
-        setIsSubmitting(false);
-
         if (error) {
+            setIsSubmitting(false);
             alert("Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.");
             return;
         }
+
+        // Set cooldown after successful DB insert
+        localStorage.setItem("msgicc_order_cooldown", Date.now().toString());
+        setCooldownSeconds(60);
 
         // Kirim via API Fonnte
         const customerMessage = `Halo Kak ${customerName},\n\nTerima kasih telah melakukan pesanan di *MsgiccStore*!\n\n*Detail Pesanan:*\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n💰 Total: ${finalPriceDisplay}\n⏳ Durasi: ${selectedPackage.duration}\n\n_Mohon tunggu sebentar ya kak, Admin kami sedang menyiapkan detail pesanan Anda. Admin akan segera membalas pesan ini untuk memberikan *Info Pembayaran* dan *Instruksi Selanjutnya*._\n\n📌 *Harap tidak spam pesan agar antrian Anda tetap terjaga.*\n\nTerima kasih atas kesabarannya! 🙏`;
@@ -238,6 +260,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
             console.error("Fetch error:", err);
         }
 
+        setIsSubmitting(false);
         setStep("success");
     };
 
@@ -654,16 +677,21 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                             {/* Order Button */}
                             <button
                                 onClick={handleOrder}
-                                disabled={!agreed || !customerName || !waNumber || isSubmitting}
+                                disabled={!agreed || !customerName || !waNumber || isSubmitting || cooldownSeconds > 0}
                                 className={cn(
                                     "w-full py-4 rounded-2xl text-sm font-bold shadow-xl transition-all flex items-center justify-center gap-3",
-                                    (agreed && customerName && waNumber && !isSubmitting)
+                                    (agreed && customerName && waNumber && !isSubmitting && cooldownSeconds === 0)
                                         ? "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-300 hover:-translate-y-1 active:scale-95 cursor-pointer"
                                         : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
                                 )}
                             >
                                 {isSubmitting ? (
                                     <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : cooldownSeconds > 0 ? (
+                                    <>
+                                        <span>TUNGGU ({cooldownSeconds}s)</span>
+                                        <Loader2 className="w-4 h-4 animate-spin opacity-50" />
+                                    </>
                                 ) : (
                                     <>
                                         <span>KONFIRMASI VIA WHATSAPP</span>
