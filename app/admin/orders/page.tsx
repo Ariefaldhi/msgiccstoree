@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, RefreshCw, CheckCircle2, Clock, XCircle, ShoppingBag, Plus, Edit, Trash2, X, Save, Megaphone } from "lucide-react";
+import { toLocalISOString } from "@/lib/utils";
 
 interface Order {
     id: string;
@@ -208,7 +209,7 @@ export default function AdminOrders() {
                 product_id: prodId,
                 package_id: pkgId,
                 status: order.status,
-                created_at: new Date(order.created_at).toISOString().slice(0, 16),
+                created_at: toLocalISOString(new Date(order.created_at)),
                 affiliator_id: order.affiliator_id || "",
                 commission: order.commission || 0,
                 sell_price: order.sell_price,
@@ -222,7 +223,7 @@ export default function AdminOrders() {
                 product_id: "", 
                 package_id: "", 
                 status: "Pesanan Selesai",
-                created_at: new Date().toISOString().slice(0, 16),
+                created_at: toLocalISOString(new Date()),
                 affiliator_id: "",
                 commission: 0,
                 sell_price: 0,

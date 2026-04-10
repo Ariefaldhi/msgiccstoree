@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, Trash2, Loader2, X, Zap } from "lucide-react";
+import { Plus, Trash2, Loader2, X, Zap, Calendar } from "lucide-react";
+import { toLocalISOString } from "@/lib/utils";
 
 interface Package {
     id: string;
@@ -35,7 +36,8 @@ export default function AdminPromo() {
         package_id: "",
         discount_percent: "20",
         label: "PROMO",
-        duration_hours: "24",
+        start_time: toLocalISOString(new Date()),
+        end_time: toLocalISOString(new Date(Date.now() + 24 * 3600000)),
         max_orders: "0",
     });
 
@@ -60,12 +62,14 @@ export default function AdminPromo() {
         e.preventDefault();
         setIsSubmitting(true);
 
-        const endTime = new Date(Date.now() + parseFloat(form.duration_hours) * 3600000).toISOString();
+        const startTime = new Date(form.start_time).toISOString();
+        const endTime = new Date(form.end_time).toISOString();
 
         const { error } = await supabase.from("flash_sales").insert([{
             package_id: form.package_id,
             discount_percent: parseInt(form.discount_percent),
             label: form.label,
+            start_time: startTime,
             end_time: endTime,
             is_active: true,
             max_orders: parseInt(form.max_orders) || 0,
@@ -73,7 +77,14 @@ export default function AdminPromo() {
 
         if (!error) {
             setIsModalOpen(false);
-            setForm({ package_id: "", discount_percent: "20", label: "PROMO", duration_hours: "24", max_orders: "0" });
+            setForm({ 
+                package_id: "", 
+                discount_percent: "20", 
+                label: "PROMO", 
+                start_time: toLocalISOString(new Date()),
+                end_time: toLocalISOString(new Date(Date.now() + 24 * 3600000)),
+                max_orders: "0" 
+            });
             fetchData();
         } else {
             alert("Error: " + error.message);
@@ -191,29 +202,33 @@ export default function AdminPromo() {
                                     {packages.map(p => <option key={p.id} value={p.id}>{p.product.title} - {p.name}</option>)}
                                 </select>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="label-admin">Diskon (%)</label>
-                                    <input required type="number" min="1" max="100" className="input-admin" placeholder="e.g. 30"
+                                    <label className="label-admin">Disk (%)</label>
+                                    <input required type="number" min="1" max="100" className="input-admin" placeholder="30"
                                         value={form.discount_percent} onChange={e => setForm({ ...form, discount_percent: e.target.value })} />
                                 </div>
                                 <div>
-                                    <label className="label-admin">Durasi (Jam)</label>
-                                    <input required type="number" min="0.5" step="0.5" className="input-admin" placeholder="e.g. 24"
-                                        value={form.duration_hours} onChange={e => setForm({ ...form, duration_hours: e.target.value })} />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="label-admin">Label Badge</label>
-                                    <input type="text" className="input-admin" placeholder="e.g. PROMO"
+                                    <label className="label-admin">Label</label>
+                                    <input type="text" className="input-admin" placeholder="FLASH SALE"
                                         value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} />
                                 </div>
-                                <div>
-                                    <label className="label-admin">Batas Transaksi</label>
-                                    <input type="number" min="0" className="input-admin" placeholder="0 = tanpa batas"
-                                        value={form.max_orders} onChange={e => setForm({ ...form, max_orders: e.target.value })} />
-                                </div>
+                            </div>
+
+                            <div>
+                                <label className="label-admin">Waktu Mulai</label>
+                                <input required type="datetime-local" className="input-admin"
+                                    value={form.start_time} onChange={e => setForm({ ...form, start_time: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="label-admin">Waktu Selesai</label>
+                                <input required type="datetime-local" className="input-admin"
+                                    value={form.end_time} onChange={e => setForm({ ...form, end_time: e.target.value })} />
+                            </div>
+
+                            <div>
+                                <label className="label-admin">Maks Transaksi (0 = Tanpa Batas)</label>
+                                <input type="number" min="0" className="input-admin"
+                                    value={form.max_orders} onChange={e => setForm({ ...form, max_orders: e.target.value })} />
                             </div>
                             <button type="submit" disabled={isSubmitting} className="w-full bg-[#ff2d55] hover:bg-red-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-red-900/20 flex items-center justify-center gap-2">
                                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Zap className="w-4 h-4" /> Aktifkan Promo</>}
