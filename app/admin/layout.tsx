@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, Tags, Settings, LogOut, ShoppingBag, Zap, Users, Wallet, MoreVertical, X, Star, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Package, Tags, Settings, LogOut, ShoppingBag, Zap, Users, Wallet, MoreVertical, X, Star, MessageSquare, Megaphone } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -37,6 +37,7 @@ export default function AdminLayout({
         { name: "Reviews", href: "/admin/reviews", icon: MessageSquare },
         { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
         { name: "Users", href: "/admin/users", icon: Users },
+        { name: "Afiliasi", href: "/admin/affiliates", icon: Megaphone },
         { name: "Withdrawals", href: "/admin/withdrawals", icon: Wallet },
         { name: "Settings", href: "/admin/settings", icon: Settings },
     ];
@@ -147,6 +148,9 @@ export default function AdminLayout({
                         </Link>
                         <Link href="/admin/users" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all">
                             <Users className="w-4 h-4 text-indigo-500" /> Pengguna
+                        </Link>
+                        <Link href="/admin/affiliates" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all">
+                            <Megaphone className="w-4 h-4 text-purple-500" /> Afiliasi
                         </Link>
                         <Link href="/admin/withdrawals" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all">
                             <Wallet className="w-4 h-4 text-purple-500" /> Penarikan

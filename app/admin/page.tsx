@@ -15,6 +15,7 @@ export default function AdminDashboard() {
         totalOrders: 0,
         commission: 0,
         pendingWithdrawals: 0,
+        dailyReport: [] as any[],
     });
     const [chartData, setChartData] = useState<any[]>([]);
     const [topProducts, setTopProducts] = useState<any[]>([]);
@@ -34,7 +35,7 @@ export default function AdminDashboard() {
                 let active = 0;
                 let comm = 0;
 
-                const dailyStats: Record<string, { revenue: number; profit: number }> = {};
+                const dailyStats: Record<string, { revenue: number; cost: number; profit: number; orders: number }> = {};
                 const productSales: Record<string, number> = {};
 
                 orders.forEach(o => {
@@ -46,9 +47,11 @@ export default function AdminDashboard() {
 
                         // Daily Trend Logic
                         const date = new Date(o.created_at).toLocaleDateString("id-ID", { day: 'numeric', month: 'short' });
-                        if (!dailyStats[date]) dailyStats[date] = { revenue: 0, profit: 0 };
+                        if (!dailyStats[date]) dailyStats[date] = { revenue: 0, cost: 0, profit: 0, orders: 0 };
                         dailyStats[date].revenue += o.sell_price;
+                        dailyStats[date].cost += o.cost_price;
                         dailyStats[date].profit += o.profit;
+                        dailyStats[date].orders += 1;
                     }
 
                     // Top Products Logic
@@ -66,6 +69,11 @@ export default function AdminDashboard() {
                     profit: vals.profit
                 })).slice(-14); // Last 14 days
 
+                const dailyReportArr = Object.entries(dailyStats).map(([date, vals]) => ({
+                    date,
+                    ...vals
+                })).reverse();
+
                 const topProdsArr = Object.entries(productSales)
                     .map(([name, sales]) => ({ name, sales }))
                     .sort((a, b) => b.sales - a.sales)
@@ -80,7 +88,8 @@ export default function AdminDashboard() {
                     activeOrders: active,
                     totalOrders: orders.length,
                     commission: comm,
-                    pendingWithdrawals: 0 // Will fetch separately
+                    pendingWithdrawals: 0,
+                    dailyReport: dailyReportArr
                 });
 
                 // Fetch Pending Withdrawals
@@ -211,6 +220,62 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Daily Financial Report Table */}
+                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+                        <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-lg font-black text-slate-900 tracking-tight">Laporan Harian</h3>
+                                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Rincian Keuangan Per Hari</p>
+                            </div>
+                            <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-emerald-100">
+                                Update Real-time
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm whitespace-nowrap">
+                                <thead>
+                                    <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        <th className="p-6">Tanggal</th>
+                                        <th className="p-6">Pesanan Selesai</th>
+                                        <th className="p-6">Omset (Revenue)</th>
+                                        <th className="p-6 text-rose-500">Modal (Cost)</th>
+                                        <th className="p-6 text-emerald-600">Laba (Profit)</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {(stats.dailyReport || []).slice(0, 14).map((day, i) => (
+                                        <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                            <td className="p-6 font-bold text-slate-900">{day.date}</td>
+                                            <td className="p-6">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs">
+                                                        {day.orders}
+                                                    </div>
+                                                    <span className="text-xs font-bold text-slate-500 uppercase">Trx</span>
+                                                </div>
+                                            </td>
+                                            <td className="p-6 font-black text-slate-900">Rp {day.revenue.toLocaleString('id-ID')}</td>
+                                            <td className="p-6 font-bold text-rose-500">Rp {day.cost.toLocaleString('id-ID')}</td>
+                                            <td className="p-6">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-black text-emerald-600 text-base">Rp {day.profit.toLocaleString('id-ID')}</span>
+                                                    <span className="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-black">
+                                                        {day.revenue > 0 ? ((day.profit / day.revenue) * 100).toFixed(0) : 0}%
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {(stats.dailyReport || []).length === 0 && (
+                                        <tr>
+                                            <td colSpan={5} className="p-12 text-center text-slate-400 font-medium italic">Belum ada data keuangan untuk ditampilkan.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </>
