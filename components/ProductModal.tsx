@@ -49,6 +49,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
     const [cooldownSeconds, setCooldownSeconds] = useState(0);
     const [adminPhone, setAdminPhone] = useState("6285720892082");
     const [fallbackCounter, setFallbackCounter] = useState(15);
+    const [automationStatus, setAutomationStatus] = useState<"idle" | "sending" | "success" | "failed">("idle");
     const supabase = createClient();
 
     const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
@@ -71,6 +72,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
             setAgreed(false);
             setIsSubmitting(false);
             setFallbackCounter(15);
+            setAutomationStatus("idle");
             fetchSalesCounts();
             checkUser();
             // Fetch affiliate ref from localStorage
@@ -255,6 +257,7 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
         const groupMessage = `📢 *PESANAN BARU!*\n\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n👤 Buyer: ${customerName}\n📱 WA: ${waNumber}\n🔗 Ref: ${affiliatorName}\n💰 Harga: ${finalPriceDisplay}\n\n🔗 *Kelola Pesanan:* ${window.location.origin}/admin/orders`;
 
         try {
+            setAutomationStatus("sending");
             const res = await fetch("/api/send-message", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -265,11 +268,18 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                 })
             });
 
-            if (!res.ok) {
+            if (res.ok) {
+                // Dimulasikan delay 3 detik agar user merasa "menunggu pesan"
+                setTimeout(() => {
+                    setAutomationStatus("success");
+                }, 3000);
+            } else {
+                setAutomationStatus("failed");
                 const data = await res.json();
                 console.error("Fonnte failed:", data.error);
             }
         } catch (err) {
+            setAutomationStatus("failed");
             console.error("Fetch error:", err);
         }
 
@@ -407,44 +417,75 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                     ) : step === "success" ? (
                         <div className="flex flex-col items-center justify-center py-10 text-center animate-in zoom-in-95 fade-in duration-500">
                             <div className="relative mb-8">
-                                <div className="absolute inset-0 bg-blue-100 rounded-full animate-ping opacity-20 scale-150"></div>
-                                <div className="relative w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center shadow-2xl shadow-blue-200">
-                                    <CheckCircle2 className="w-12 h-12 text-white" />
-                                </div>
+                                {automationStatus === "sending" ? (
+                                    <>
+                                        <div className="absolute inset-0 bg-blue-100 rounded-full animate-ping opacity-20 scale-150"></div>
+                                        <div className="relative w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center border-4 border-dashed border-blue-400">
+                                            <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+                                        </div>
+                                    </>
+                                ) : automationStatus === "success" ? (
+                                    <>
+                                        <div className="absolute inset-0 bg-emerald-100 rounded-full animate-ping opacity-20 scale-150"></div>
+                                        <div className="relative w-24 h-24 bg-emerald-600 rounded-full flex items-center justify-center shadow-2xl shadow-emerald-200">
+                                            <CheckCircle2 className="w-12 h-12 text-white" />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="relative w-24 h-24 bg-red-50 rounded-full flex items-center justify-center border-4 border-dashed border-red-400">
+                                        <MessageCircle className="w-12 h-12 text-red-500" />
+                                    </div>
+                                )}
                             </div>
                             
-                            <h3 className="text-2xl font-black text-slate-900 mb-3">Pesanan Terkonfirmasi!</h3>
+                            <h3 className="text-2xl font-black text-slate-900 mb-3">
+                                {automationStatus === "sending" ? "Menunggu Pesan Masuk..." : 
+                                 automationStatus === "success" ? "Pesanan Terkonfirmasi!" : 
+                                 "Pesan Belum Masuk?"}
+                            </h3>
+                            
                             <p className="text-slate-500 font-medium px-4 mb-8">
-                                Yeay! Pesanan <span className="text-blue-600 font-bold">{selectedPackage?.name}</span> sedang diproses. 
-                                Silakan <span className="text-slate-900 font-bold">cek WhatsApp Anda</span> untuk konfirmasi otomatis.
+                                {automationStatus === "sending" ? (
+                                    <>Sistem sedang mengirim pesan otomatis ke WhatsApp Anda. Mohon tunggu sejenak...</>
+                                ) : automationStatus === "success" ? (
+                                    <>Yeay! Pesanan <span className="text-emerald-600 font-bold">{selectedPackage?.name}</span> sedang diproses. Silakan cek WhatsApp Anda.</>
+                                ) : (
+                                    <>Pesan otomatis mungkin terhambat. Jika dalam <span className="text-red-500 font-bold">15 detik</span> tidak ada pesan, silakan hubungi kami manual.</>
+                                )}
                             </p>
 
                             <div className="w-full space-y-3">
-                                {fallbackCounter === 0 && (
-                                    <div className="animate-in fade-in slide-in-from-top-2 duration-500">
-                                        <p className="text-[11px] font-bold text-red-500 mb-3 leading-relaxed">
-                                            Jika dalam 15 detik tidak ada pesan di WhatsApp, mohon hubungi manual:
-                                        </p>
-                                        <a 
-                                            href={`https://wa.me/${adminPhone}?text=Halo%20Admin,%20saya%20sudah%20melakukan%20pesanan%20${product.title}%20(${selectedPackage?.name})%20tetapi%20belum%20menerima%20konfirmasi%20otomatis.%20Mohon%20dibantu.`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white text-xs font-bold shadow-xl shadow-green-100 transition-all flex items-center justify-center gap-2 mb-4 hover:-translate-y-1 active:scale-95"
-                                        >
-                                            <MessageCircle className="w-5 h-5" />
-                                            HUBUNGI MANUAL VIA WHATSAPP
-                                        </a>
-                                    </div>
+                                {automationStatus === "success" ? (
+                                    <button
+                                        onClick={onClose}
+                                        className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold shadow-xl shadow-emerald-100 transition-all active:scale-95 animate-in slide-in-from-bottom-4 duration-500"
+                                    >
+                                        Selesai & Tutup
+                                    </button>
+                                ) : (
+                                    <>
+                                        {(fallbackCounter === 0 || automationStatus === "failed") && (
+                                            <a 
+                                                href={`https://wa.me/${adminPhone}?text=Halo%20Admin,%20saya%20sudah%20melakukan%20pesanan%20${product.title}%20(${selectedPackage?.name})%20tetapi%20belum%20menerima%20konfirmasi%20otomatis.%20Mohon%20dibantu.`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="w-full py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white text-xs font-bold shadow-xl shadow-green-100 transition-all flex items-center justify-center gap-2 mb-4 hover:-translate-y-1 active:scale-95 animate-in fade-in"
+                                            >
+                                                <MessageCircle className="w-5 h-5" />
+                                                HUBUNGI MANUAL VIA WHATSAPP
+                                            </a>
+                                        )}
+                                        
+                                        {automationStatus === "sending" && (
+                                            <div className="py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
+                                                <Loader2 className="w-3 h-3 animate-spin" /> Tunggu {fallbackCounter}s untuk hubungi manual
+                                            </div>
+                                        )}
+                                    </>
                                 )}
-                                
-                                <button
-                                    onClick={onClose}
-                                    className="w-full py-4 rounded-2xl bg-[#0f172a] hover:bg-slate-800 text-white text-sm font-bold shadow-xl transition-all active:scale-95"
-                                >
-                                    Selesai & Tutup
-                                </button>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                    Terima kasih telah berlangganan!
+
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pt-4">
+                                    {automationStatus === "success" ? "Terima kasih telah berlangganan!" : "MsgiccStore • Anti Badai & Terpercaya"}
                                 </p>
                             </div>
                         </div>
