@@ -42,16 +42,16 @@ export default function AdminDashboard() {
                     if (o.status === "Pesanan Selesai") {
                         rev += o.sell_price;
                         cost += o.cost_price;
-                        prof += o.profit;
                         comm += o.commission || 0;
+                        prof += (o.profit - (o.commission || 0));
 
                         // Daily Trend Logic
                         const date = new Date(o.created_at).toLocaleDateString("id-ID", { day: 'numeric', month: 'short' });
                         if (!dailyStats[date]) dailyStats[date] = { revenue: 0, cost: 0, profit: 0, commission: 0, orders: 0 };
                         dailyStats[date].revenue += o.sell_price;
                         dailyStats[date].cost += o.cost_price;
-                        dailyStats[date].profit += o.profit;
                         dailyStats[date].commission += (o.commission || 0);
+                        dailyStats[date].profit += (o.profit - (o.commission || 0));
                         dailyStats[date].orders += 1;
                     }
 
