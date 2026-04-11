@@ -304,14 +304,14 @@ export default function AdminProducts() {
 
     return (
         <div className="space-y-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight">Products</h1>
                     <p className="text-slate-500 mt-1">Manage products and their packages.</p>
                 </div>
                 <button
                     onClick={() => setIsProductModalOpen(true)}
-                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-900/20 transition-all"
+                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 transition-all"
                 >
                     <Plus className="w-5 h-5" />
                     Add Product
@@ -325,9 +325,9 @@ export default function AdminProducts() {
                     {products.map((product) => (
                         <div key={product.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                             {/* Product Header */}
-                            <div className="p-6 flex items-start justify-between border-b border-slate-50 bg-slate-50/50">
+                            <div className="p-6 flex flex-col md:flex-row items-start justify-between border-b border-slate-50 bg-slate-50/50 gap-4">
                                 <div className="flex gap-4">
-                                    <div className="w-16 h-16 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-3xl font-black text-slate-900 overflow-hidden relative">
+                                    <div className="w-16 h-16 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-3xl font-black text-slate-900 overflow-hidden relative shrink-0">
                                         {product.image_url ? (
                                             <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
                                         ) : (
@@ -335,7 +335,7 @@ export default function AdminProducts() {
                                         )}
                                     </div>
                                     <div>
-                                        <div className="flex gap-2 mb-1">
+                                        <div className="flex flex-wrap gap-2 mb-1">
                                             {product.tag && (
                                                 <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md text-white bg-${product.tag_color === 'yellow' ? 'yellow-500' : product.tag_color === 'red' ? 'red-500' : 'blue-500'}`}>
                                                     {product.tag}
@@ -349,23 +349,23 @@ export default function AdminProducts() {
                                         <p className="text-blue-600 font-bold">{product.price}</p>
                                     </div>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
                                     <button
                                         onClick={() => openPackageModal(product)}
-                                        className="text-xs font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1"
+                                        className="flex-1 md:flex-none text-xs font-bold bg-blue-50 text-blue-600 px-4 py-2.5 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-1"
                                     >
                                         <Plus className="w-3 h-3" /> Add Package
                                     </button>
                                     <button
                                         onClick={() => openEditModal(product)}
-                                        className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        className="p-2.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-100 shrink-0"
                                         title="Edit Product"
                                     >
                                         <Edit className="w-5 h-5" />
                                     </button>
                                     <button
                                         onClick={() => handleDeleteProduct(product.id)}
-                                        className="p-2 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                        className="p-2.5 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100 shrink-0"
                                     >
                                         <Trash2 className="w-5 h-5" />
                                     </button>

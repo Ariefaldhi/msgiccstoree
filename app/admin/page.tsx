@@ -35,7 +35,7 @@ export default function AdminDashboard() {
                 let active = 0;
                 let comm = 0;
 
-                const dailyStats: Record<string, { revenue: number; cost: number; profit: number; orders: number }> = {};
+                const dailyStats: Record<string, { revenue: number; cost: number; profit: number; commission: number; orders: number }> = {};
                 const productSales: Record<string, number> = {};
 
                 orders.forEach(o => {
@@ -47,10 +47,11 @@ export default function AdminDashboard() {
 
                         // Daily Trend Logic
                         const date = new Date(o.created_at).toLocaleDateString("id-ID", { day: 'numeric', month: 'short' });
-                        if (!dailyStats[date]) dailyStats[date] = { revenue: 0, cost: 0, profit: 0, orders: 0 };
+                        if (!dailyStats[date]) dailyStats[date] = { revenue: 0, cost: 0, profit: 0, commission: 0, orders: 0 };
                         dailyStats[date].revenue += o.sell_price;
                         dailyStats[date].cost += o.cost_price;
                         dailyStats[date].profit += o.profit;
+                        dailyStats[date].commission += (o.commission || 0);
                         dailyStats[date].orders += 1;
                     }
 
@@ -106,7 +107,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="space-y-8 pb-12">
-            <div className="flex justify-between items-end pb-4 border-b border-slate-100">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end pb-4 border-b border-slate-100 gap-4">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                         <TrendingUp className="w-8 h-8 text-blue-600" />
@@ -114,7 +115,7 @@ export default function AdminDashboard() {
                     </h1>
                     <p className="text-slate-500 font-medium mt-1">Laporan Keuangan & Performa Bisnis Real-time.</p>
                 </div>
-                <div className="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 flex items-center gap-2 text-xs font-bold text-slate-500">
+                <div className="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 flex items-center gap-2 text-xs font-bold text-slate-500 w-fit">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                     Sistem Operasional Normal
                 </div>
@@ -242,6 +243,7 @@ export default function AdminDashboard() {
                                         <th className="p-6">Pesanan Selesai</th>
                                         <th className="p-6">Omset (Revenue)</th>
                                         <th className="p-6 text-rose-500">Modal (Cost)</th>
+                                        <th className="p-6 text-purple-600">Komisi</th>
                                         <th className="p-6 text-emerald-600">Laba (Profit)</th>
                                     </tr>
                                 </thead>
@@ -259,6 +261,7 @@ export default function AdminDashboard() {
                                             </td>
                                             <td className="p-6 font-black text-slate-900">Rp {day.revenue.toLocaleString('id-ID')}</td>
                                             <td className="p-6 font-bold text-rose-500">Rp {day.cost.toLocaleString('id-ID')}</td>
+                                            <td className="p-6 font-bold text-purple-600">Rp {day.commission.toLocaleString('id-ID')}</td>
                                             <td className="p-6">
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-black text-emerald-600 text-base">Rp {day.profit.toLocaleString('id-ID')}</span>

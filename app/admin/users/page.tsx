@@ -117,8 +117,8 @@ export default function AdminUsers() {
 
     return (
         <div>
-            <div className="flex items-center gap-3 mb-8">
-                <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-8">
+                <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center shrink-0">
                     <User className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
@@ -127,14 +127,14 @@ export default function AdminUsers() {
                 </div>
             </div>
 
-            <div className="mb-6 relative max-w-md">
+            <div className="mb-6 relative w-full md:max-w-md">
                 <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input 
                     type="text" 
                     placeholder="Cari user (email, nama, kode)..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium text-sm"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3.5 pl-12 pr-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium text-sm shadow-sm"
                 />
             </div>
 

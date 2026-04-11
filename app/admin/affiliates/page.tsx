@@ -111,7 +111,7 @@ export default function AffiliateManagement() {
 
     return (
         <div className="space-y-8 pb-12">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end pb-6 border-b border-slate-200 gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end pb-6 border-b border-slate-200 gap-6">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                         <Megaphone className="w-8 h-8 text-purple-600" />
@@ -119,8 +119,8 @@ export default function AffiliateManagement() {
                     </h1>
                     <p className="text-slate-500 font-medium mt-1">Kelola affiliator, pantau saldo, dan statistik referral.</p>
                 </div>
-                <div className="flex gap-2">
-                     <Link href="/admin/withdrawals" className="bg-white border border-slate-200 px-5 py-2.5 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2">
+                <div className="flex gap-2 w-full md:w-auto">
+                     <Link href="/admin/withdrawals" className="flex-1 md:flex-none justify-center bg-white border border-slate-200 px-5 py-2.5 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">
                         <Wallet className="w-4 h-4 text-purple-500" /> Cek Penarikan
                     </Link>
                 </div>
