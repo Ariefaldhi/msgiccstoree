@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, RefreshCw, CheckCircle2, Clock, XCircle, ShoppingBag, Plus, Edit, Trash2, X, Save, Megaphone } from "lucide-react";
+import { Loader2, RefreshCw, CheckCircle2, Clock, XCircle, ShoppingBag, Plus, Edit, Trash2, X, Save, Megaphone, Search } from "lucide-react";
 import { toLocalISOString } from "@/lib/utils";
 
 interface Order {
@@ -31,6 +31,9 @@ export default function AdminOrders() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingOrder, setEditingOrder] = useState<Order | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [affiliators, setAffiliators] = useState<any[]>([]);
+    const [affSearch, setAffSearch] = useState("");
+    const [showAffSuggestions, setShowAffSuggestions] = useState(false);
     const [orderForm, setOrderForm] = useState({
         customer_name: "", wa_number: "", product_id: "", package_id: "", status: "Pesanan Selesai", created_at: "",
         affiliator_id: "", commission: 0, sell_price: 0, cost_price: 0
@@ -45,15 +48,17 @@ export default function AdminOrders() {
 
     const fetchOrdersAndProducts = async () => {
         setLoading(true);
-        const [ordersRes, productsRes, settingsRes] = await Promise.all([
+        const [ordersRes, productsRes, settingsRes, affRes] = await Promise.all([
             supabase.from("orders").select("*").order("created_at", { ascending: false }),
             supabase.from("products").select("*, packages(*)"),
-            supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single()
+            supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single(),
+            supabase.from("profiles").select("id, full_name, affiliate_code").eq("is_affiliator", true)
         ]);
  
         if (ordersRes.data) setOrders(ordersRes.data);
         if (productsRes.data) setProducts(productsRes.data);
         if (settingsRes.data) setGlobalCommissionPercent(settingsRes.data.affiliate_commission_percent ?? 25);
+        if (affRes.data) setAffiliators(affRes.data);
         setLoading(false);
     };
 
@@ -230,6 +235,8 @@ export default function AdminOrders() {
                 cost_price: 0
             });
         }
+        setAffSearch("");
+        setShowAffSuggestions(false);
         setIsModalOpen(true);
     };
 
@@ -472,10 +479,62 @@ export default function AdminOrders() {
                                 <h3 className="text-xs font-black text-purple-600 uppercase tracking-widest flex items-center gap-2">
                                     <Megaphone className="w-4 h-4" /> Informasi Afiliasi
                                 </h3>
-                                <div>
-                                    <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">ID Afiliator (UUID)</label>
-                                    <input type="text" className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Paste UUID from Users page" 
-                                        value={orderForm.affiliator_id} onChange={e => setOrderForm({...orderForm, affiliator_id: e.target.value})} />
+                                <div className="relative">
+                                    <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">Cari Afiliator (Nama/Kode)</label>
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-purple-300" />
+                                        <input 
+                                            type="text" 
+                                            className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 pl-8 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                                            placeholder="Ketik nama atau kode referral..." 
+                                            value={affSearch}
+                                            onFocus={() => setShowAffSuggestions(true)}
+                                            onChange={e => {
+                                                setAffSearch(e.target.value);
+                                                setShowAffSuggestions(true);
+                                            }}
+                                        />
+                                    </div>
+                                    
+                                    {showAffSuggestions && affSearch && (
+                                        <div className="absolute z-[10001] left-0 right-0 mt-1 bg-white border border-slate-100 rounded-xl shadow-xl max-h-40 overflow-y-auto overflow-x-hidden">
+                                            {affiliators.filter(a => 
+                                                a.full_name?.toLowerCase().includes(affSearch.toLowerCase()) || 
+                                                a.affiliate_code?.toLowerCase().includes(affSearch.toLowerCase())
+                                            ).map(aff => (
+                                                <button
+                                                    key={aff.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setOrderForm({ ...orderForm, affiliator_id: aff.id });
+                                                        setAffSearch(aff.full_name);
+                                                        setShowAffSuggestions(false);
+                                                    }}
+                                                    className="w-full text-left px-4 py-2.5 hover:bg-purple-50 transition-colors border-b border-slate-50 last:border-0"
+                                                >
+                                                    <div className="text-[10px] font-black text-slate-900">{aff.full_name}</div>
+                                                    <div className="text-[9px] text-purple-500 font-bold uppercase">{aff.affiliate_code}</div>
+                                                </button>
+                                            ))}
+                                            {affiliators.filter(a => 
+                                                a.full_name?.toLowerCase().includes(affSearch.toLowerCase()) || 
+                                                a.affiliate_code?.toLowerCase().includes(affSearch.toLowerCase())
+                                            ).length === 0 && (
+                                                <div className="p-3 text-[10px] text-slate-400 italic text-center">Tidak ditemukan</div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    <div className="mt-4">
+                                        <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">ID Afiliator (UUID)</label>
+                                        <input 
+                                            type="text" 
+                                            className="w-full bg-slate-50 border border-purple-100 rounded-xl px-4 py-2 text-[10px] font-mono text-slate-400 focus:outline-none" 
+                                            placeholder="Otomatis terisi..." 
+                                            readOnly
+                                            value={orderForm.affiliator_id} 
+                                        />
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">Jumlah Komisi (Rp)</label>

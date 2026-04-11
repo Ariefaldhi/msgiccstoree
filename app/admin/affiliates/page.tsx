@@ -34,7 +34,7 @@ export default function AffiliateManagement() {
 
         const { data: ords, error: ordError } = await supabase
             .from("orders")
-            .select("*")
+            .select("*, profiles!inner(full_name)")
             .not("affiliator_id", "is", null)
             .order("created_at", { ascending: false });
 
@@ -244,7 +244,7 @@ export default function AffiliateManagement() {
                                         <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-black">
                                             {order.affiliate_code?.charAt(4) || 'A'}
                                         </div>
-                                        <p className="text-xs font-medium text-slate-500">Oleh: <span className="font-bold text-slate-700">{order.affiliate_code || 'REF-UNK'}</span></p>
+                                        <p className="text-xs font-medium text-slate-500">Oleh: <span className="font-bold text-slate-700">{(order.profiles as any)?.full_name || order.affiliate_code || 'REF-UNK'}</span></p>
                                     </div>
                                 </div>
                             ))}
