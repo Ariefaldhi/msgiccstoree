@@ -206,15 +206,16 @@ export default function AdminWithdrawals() {
                     )}
                 </div>
 
-                {/* History Table */}
-                <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+                {/* History */}
+                <div className="bg-white md:bg-white rounded-[2rem] md:border border-slate-100 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                         <h2 className="font-bold text-slate-900 flex items-center gap-3">
-                            <History className="w-5 h-5 text-slate-400" /> Riwayat Penarikan
+                            <HistoryIcon className="w-5 h-5 text-slate-400" /> Riwayat Penarikan
                         </h2>
                     </div>
 
-                    <div className="overflow-x-auto">
+                    {/* Desktop History View */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left text-sm whitespace-nowrap">
                             <thead>
                                 <tr className="bg-slate-50 border-b border-slate-100">
@@ -252,14 +253,51 @@ export default function AdminWithdrawals() {
                             </tbody>
                         </table>
                     </div>
+
+                    {/* Mobile History View */}
+                    <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
+                        {historyWds.length > 0 ? historyWds.map((wd) => (
+                            <div key={wd.id} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="flex flex-col">
+                                        <h3 className="font-bold text-slate-900">{wd.profiles?.full_name}</h3>
+                                        <p className="text-[10px] text-slate-500 font-medium">{wd.profiles?.email}</p>
+                                    </div>
+                                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                                        wd.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                                    }`}>
+                                        {wd.status}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-end">
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Jumlah Cair</p>
+                                        <p className="font-black text-blue-600">Rp {wd.amount.toLocaleString()}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metode</p>
+                                        <p className="font-bold text-slate-900 text-xs">{wd.payment_method}</p>
+                                    </div>
+                                </div>
+                                <div className="mt-3 pt-3 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                    <span>TDR: {new Date(wd.created_at).toLocaleDateString('id-ID')}</span>
+                                    <span className="font-mono">{wd.id.split('-')[0]}</span>
+                                </div>
+                            </div>
+                        )) : (
+                            <div className="text-center py-8 text-xs text-slate-400 font-bold uppercase tracking-widest italic">
+                                Belum ada riwayat
+                            </div>
+                        )}
+                    </div>
                 </div>
             </main>
         </div>
     );
 }
 
-// Minimal History Component local mock for table icon
-function History({ className }: { className?: string }) {
+// Minimal History component local mock for table icon
+function HistoryIcon({ className }: { className?: string }) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg>
     );

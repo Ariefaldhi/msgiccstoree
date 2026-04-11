@@ -76,7 +76,7 @@ export default function AdminTestimonies() {
 
     return (
         <div className="space-y-8 pb-20">
-            <div className="flex justify-between items-center pb-6 border-b border-slate-100">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                         <Star className="w-8 h-8 text-amber-500" />
@@ -86,7 +86,7 @@ export default function AdminTestimonies() {
                 </div>
                 <button 
                     onClick={() => setShowForm(!showForm)}
-                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold shadow-xl shadow-blue-200 hover:bg-blue-500 transition-all"
+                    className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold shadow-xl shadow-blue-200 hover:bg-blue-500 transition-all"
                 >
                     {showForm ? "Batal" : <><Plus className="w-5 h-5" /> Tambah Testimoni</>}
                 </button>
@@ -159,7 +159,7 @@ export default function AdminTestimonies() {
                         <div key={item.id} className="group bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl transition-all relative">
                             <div className="aspect-square bg-slate-100 relative overflow-hidden">
                                 <img src={item.image_url} alt="Testimony" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <div className="absolute inset-0 bg-black/40 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <button 
                                         onClick={() => handleDelete(item.id)}
                                         className="p-4 bg-white text-red-600 rounded-full shadow-xl hover:bg-red-50 active:scale-95 transition-all"

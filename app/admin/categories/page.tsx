@@ -94,7 +94,7 @@ export default function AdminCategories() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight">Categories</h1>
                     <p className="text-slate-500 mt-1">Manage product categories.</p>
@@ -105,7 +105,7 @@ export default function AdminCategories() {
                         setFormData({ name: "", slug: "", icon: "" });
                         setIsModalOpen(true);
                     }}
-                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-900/20 transition-all"
+                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 transition-all"
                 >
                     <Plus className="w-5 h-5" />
                     Add Category
@@ -119,7 +119,7 @@ export default function AdminCategories() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {categories.map((cat) => (
-                        <div key={cat.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group">
+                        <div key={cat.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group relative">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-2xl border border-slate-100">
                                     {cat.icon || "📦"}
@@ -129,7 +129,7 @@ export default function AdminCategories() {
                                     <code className="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-md">/{cat.slug}</code>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                            <div className="flex items-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-all">
                                 <button
                                     onClick={() => openEdit(cat)}
                                     className="p-2 rounded-xl bg-blue-50 text-blue-500 hover:bg-blue-100"

@@ -30,7 +30,7 @@ export default function AdminReviews() {
 
     return (
         <div className="space-y-8 pb-20">
-            <div className="flex justify-between items-center pb-6 border-b border-slate-100">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                         <MessageSquare className="w-8 h-8 text-emerald-500" />
@@ -48,7 +48,7 @@ export default function AdminReviews() {
                         <div key={rev.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm relative group hover:shadow-lg transition-all">
                             <button 
                                 onClick={() => handleDelete(rev.id)}
-                                className="absolute top-4 right-4 p-2 bg-red-50 text-red-500 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all"
+                                className="absolute top-4 right-4 p-2 bg-red-50 text-red-500 rounded-lg md:opacity-0 md:group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all"
                             >
                                 <Trash2 className="w-4 h-4" />
                             </button>

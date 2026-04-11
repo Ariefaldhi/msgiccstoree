@@ -136,96 +136,175 @@ export default function AdminUsers() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-white border border-slate-200 rounded-xl py-3.5 pl-12 pr-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium text-sm shadow-sm"
                 />
-            </div>
-
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                      <div className="bg-white md:bg-white rounded-3xl md:border border-slate-100 shadow-sm overflow-hidden">
                 {loading ? (
                     <div className="p-12 flex justify-center">
                         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm whitespace-nowrap">
-                            <thead>
-                                <tr className="bg-slate-50 border-b border-slate-100">
-                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">User Info</th>
-                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs text-center">Status</th>
-                                    <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">Data Afiliasi</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {filteredUsers.map((user) => (
-                                    <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
-                                        <td className="p-4">
-                                            <div className="font-bold text-slate-900">{user.full_name || 'Tidak ada nama'}</div>
-                                            <div className="text-xs text-slate-500">{user.email}</div>
-                                            <div className="text-[10px] text-slate-400 mt-1 uppercase bg-slate-100 px-2 py-0.5 rounded-md inline-block">ROLE: {user.role}</div>
-                                        </td>
-                                        <td className="p-4">
-                                            <div className="flex flex-col gap-2 items-center">
-                                                <button 
-                                                    onClick={() => handleToggleReseller(user.id, user.is_reseller)}
-                                                    disabled={savingId === user.id}
-                                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold w-full transition-all flex items-center justify-center gap-2 border ${
-                                                        user.is_reseller ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-blue-300'
-                                                    }`}
-                                                >
-                                                    <Store className="w-3 h-3" /> Reseller: {user.is_reseller ? 'AKTIF' : 'NONAKTIF'}
-                                                </button>
-                                                <button 
-                                                    onClick={() => handleToggleAffiliator(user.id, user.is_affiliator)}
-                                                    disabled={savingId === user.id}
-                                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold w-full transition-all flex items-center justify-center gap-2 border ${
-                                                        user.is_affiliator ? 'bg-purple-100 text-purple-700 border-purple-200' : 'bg-white text-slate-400 border-slate-200 hover:border-purple-300'
-                                                    }`}
-                                                >
-                                                    <Megaphone className="w-3 h-3" /> Afiliator: {user.is_affiliator ? 'AKTIF' : 'NONAKTIF'}
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td className="p-4">
-                                            <div className="flex flex-col gap-2">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs font-bold text-slate-500 w-12">Kode:</span>
-                                                    <input 
-                                                        type="text" 
-                                                        className="border border-slate-200 rounded px-2 py-1 text-xs w-32"
-                                                        placeholder="Kode (opsional)"
-                                                        value={localCodes[user.id] || ""}
-                                                        onChange={(e) => setLocalCodes({ ...localCodes, [user.id]: e.target.value })}
-                                                        onBlur={(e) => {
-                                                            if (e.target.value !== (user.affiliate_code || '')) {
-                                                                handleUpdateCode(user.id, e.target.value);
-                                                            }
-                                                        }}
-                                                    />
+                    <>
+                        {/* Desktop View */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full text-left text-sm whitespace-nowrap">
+                                <thead>
+                                    <tr className="bg-slate-50 border-b border-slate-100">
+                                        <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">User Info</th>
+                                        <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs text-center">Status</th>
+                                        <th className="p-4 font-bold text-slate-500 uppercase tracking-wider text-xs">Data Afiliasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {filteredUsers.map((user) => (
+                                        <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
+                                            <td className="p-4">
+                                                <div className="font-bold text-slate-900">{user.full_name || 'Tidak ada nama'}</div>
+                                                <div className="text-xs text-slate-500">{user.email}</div>
+                                                <div className="text-[10px] text-slate-400 mt-1 uppercase bg-slate-100 px-2 py-0.5 rounded-md inline-block">ROLE: {user.role}</div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex flex-col gap-2 items-center">
+                                                    <button 
+                                                        onClick={() => handleToggleReseller(user.id, user.is_reseller)}
+                                                        disabled={savingId === user.id}
+                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold w-full transition-all flex items-center justify-center gap-2 border ${
+                                                            user.is_reseller ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-blue-300'
+                                                        }`}
+                                                    >
+                                                        <Store className="w-3 h-3" /> Reseller: {user.is_reseller ? 'AKTIF' : 'NONAKTIF'}
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleToggleAffiliator(user.id, user.is_affiliator)}
+                                                        disabled={savingId === user.id}
+                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold w-full transition-all flex items-center justify-center gap-2 border ${
+                                                            user.is_affiliator ? 'bg-purple-100 text-purple-700 border-purple-200' : 'bg-white text-slate-400 border-slate-200 hover:border-purple-300'
+                                                        }`}
+                                                    >
+                                                        <Megaphone className="w-3 h-3" /> Afiliator: {user.is_affiliator ? 'AKTIF' : 'NONAKTIF'}
+                                                    </button>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs font-bold text-slate-500 w-12">Saldo:</span>
-                                                    <div className="relative">
-                                                        <span className="absolute left-2 top-1 text-xs text-slate-400">Rp</span>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs font-bold text-slate-500 w-12">Kode:</span>
                                                         <input 
-                                                            type="number" 
-                                                            className="border border-slate-200 rounded px-2 py-1 text-xs pl-7 w-32"
-                                                            value={localBalances[user.id] || 0}
-                                                            onChange={(e) => setLocalBalances({ ...localBalances, [user.id]: parseInt(e.target.value) || 0 })}
+                                                            type="text" 
+                                                            className="border border-slate-200 rounded px-2 py-1 text-xs w-32"
+                                                            placeholder="Kode (opsional)"
+                                                            value={localCodes[user.id] || ""}
+                                                            onChange={(e) => setLocalCodes({ ...localCodes, [user.id]: e.target.value })}
                                                             onBlur={(e) => {
-                                                                if (parseInt(e.target.value) !== (user.balance || 0)) {
-                                                                    handleUpdateBalance(user.id, parseInt(e.target.value));
+                                                                if (e.target.value !== (user.affiliate_code || '')) {
+                                                                    handleUpdateCode(user.id, e.target.value);
                                                                 }
                                                             }}
                                                         />
                                                     </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs font-bold text-slate-500 w-12">Saldo:</span>
+                                                        <div className="relative">
+                                                            <span className="absolute left-2 top-1 text-xs text-slate-400">Rp</span>
+                                                            <input 
+                                                                type="number" 
+                                                                className="border border-slate-200 rounded px-2 py-1 text-xs pl-7 w-32"
+                                                                value={localBalances[user.id] || 0}
+                                                                onChange={(e) => setLocalBalances({ ...localBalances, [user.id]: parseInt(e.target.value) || 0 })}
+                                                                onBlur={(e) => {
+                                                                    if (parseInt(e.target.value) !== (user.balance || 0)) {
+                                                                        handleUpdateBalance(user.id, parseInt(e.target.value));
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </div>
                                                 </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile View */}
+                        <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
+                            {filteredUsers.map((user) => (
+                                <div key={user.id} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm transition-all">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex flex-col">
+                                            <h3 className="font-bold text-slate-900 leading-tight">{user.full_name || 'Tanpa Nama'}</h3>
+                                            <p className="text-xs text-slate-500 font-medium">{user.email}</p>
+                                        </div>
+                                        <span className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest bg-slate-100 text-slate-500">
+                                            {user.role}
+                                        </span>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2 mb-4">
+                                        <button 
+                                            onClick={() => handleToggleReseller(user.id, user.is_reseller)}
+                                            disabled={savingId === user.id}
+                                            className={`px-3 py-2 rounded-xl text-[10px] font-black w-full flex flex-col items-center justify-center gap-1 border ${
+                                                user.is_reseller ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-slate-50 text-slate-400 border-slate-100'
+                                            }`}
+                                        >
+                                            <Store className="w-3 h-3" /> RESELLER: {user.is_reseller ? 'ON' : 'OFF'}
+                                        </button>
+                                        <button 
+                                            onClick={() => handleToggleAffiliator(user.id, user.is_affiliator)}
+                                            disabled={savingId === user.id}
+                                            className={`px-3 py-2 rounded-xl text-[10px] font-black w-full flex flex-col items-center justify-center gap-1 border ${
+                                                user.is_affiliator ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-slate-50 text-slate-400 border-slate-100'
+                                            }`}
+                                        >
+                                            <Megaphone className="w-3 h-3" /> AFILIATOR: {user.is_affiliator ? 'ON' : 'OFF'}
+                                        </button>
+                                    </div>
+
+                                    <div className="bg-slate-50 rounded-2xl p-4 space-y-3 border border-slate-100">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Kode Afiliasi</span>
+                                            <input 
+                                                type="text" 
+                                                className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs w-28 font-bold text-right outline-none focus:ring-1 focus:ring-blue-500"
+                                                value={localCodes[user.id] || ""}
+                                                onChange={(e) => setLocalCodes({ ...localCodes, [user.id]: e.target.value })}
+                                                onBlur={(e) => {
+                                                    if (e.target.value !== (user.affiliate_code || '')) {
+                                                        handleUpdateCode(user.id, e.target.value);
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="h-px bg-slate-200" />
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Saldo User</span>
+                                            <div className="relative">
+                                                <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">Rp</span>
+                                                <input 
+                                                    type="number" 
+                                                    className="bg-white border border-slate-200 rounded-lg px-2 py-1 pl-6 text-xs w-28 font-bold text-right outline-none focus:ring-1 focus:ring-blue-500"
+                                                    value={localBalances[user.id] || 0}
+                                                    onChange={(e) => setLocalBalances({ ...localBalances, [user.id]: parseInt(e.target.value) || 0 })}
+                                                    onBlur={(e) => {
+                                                        if (parseInt(e.target.value) !== (user.balance || 0)) {
+                                                            handleUpdateBalance(user.id, parseInt(e.target.value));
+                                                        }
+                                                    }}
+                                                />
                                             </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                        </div>
+                                    </div>
+                                    {savingId === user.id && (
+                                        <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+                                            <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
-            </div>
+            </div>    </div>
         </div>
     );
 }

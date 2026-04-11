@@ -118,7 +118,7 @@ export default function AdminPromo() {
 
     return (
         <div className="space-y-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
                         <Zap className="w-7 h-7 text-[#ff2d55]" /> Promo & Produk Spesial
@@ -127,7 +127,7 @@ export default function AdminPromo() {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-[#ff2d55] hover:bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-900/20 transition-all"
+                    className="w-full md:w-auto bg-[#ff2d55] hover:bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-red-900/20 transition-all"
                 >
                     <Plus className="w-5 h-5" /> Buat Promo Baru
                 </button>
@@ -152,24 +152,24 @@ export default function AdminPromo() {
 
                                 {/* Info */}
                                 <div className="flex-1 min-w-0">
-                                    <p className="font-black text-slate-900 truncate">{item.package.product.title} - {item.package.name}</p>
+                                    <p className="font-black text-slate-900 truncate text-sm md:text-base">{item.package.product.title} - {item.package.name}</p>
                                     <div className="flex items-center gap-3 mt-1 flex-wrap">
-                                        <span className="text-xs bg-red-50 text-[#ff2d55] font-bold px-2 py-0.5 rounded-lg">-{item.discount_percent}%</span>
-                                        <span className="text-xs text-slate-400 line-through">{item.package.price}</span>
+                                        <span className="text-[10px] bg-red-50 text-[#ff2d55] font-black px-1.5 py-0.5 rounded-md">-{item.discount_percent}%</span>
+                                        <span className="text-[10px] text-slate-400 line-through">{item.package.price}</span>
                                         <span className="text-xs font-black text-[#ff2d55]">Rp {discounted.toLocaleString("id-ID")}</span>
                                     </div>
-                                    <p className="text-[10px] text-slate-400 mt-1 font-bold">⏱ Sisa: {timeLeft(item.end_time)}</p>
+                                    <p className="text-[9px] text-slate-400 mt-1 font-bold">⏱ Sisa: {timeLeft(item.end_time)}</p>
                                 </div>
 
                                 {/* Controls */}
                                 <div className="flex items-center gap-2 shrink-0">
                                     <button
                                         onClick={() => handleToggle(item)}
-                                        className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${item.is_active ? "bg-green-50 text-green-600 hover:bg-green-100" : "bg-slate-100 text-slate-400 hover:bg-slate-200"}`}
+                                        className={`text-[10px] font-black px-2.5 py-1.5 rounded-xl transition-all ${item.is_active ? "bg-green-50 text-green-600 hover:bg-green-100" : "bg-slate-100 text-slate-400 hover:bg-slate-200"}`}
                                     >
-                                        {item.is_active ? "Aktif" : "Nonaktif"}
+                                        {item.is_active ? "Aktif" : "Off"}
                                     </button>
-                                    <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                                    <button onClick={() => handleDelete(item.id)} className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
                                         <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>

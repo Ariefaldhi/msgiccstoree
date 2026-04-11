@@ -224,9 +224,9 @@ export default function AdminDashboard() {
                         </div>
                     </div>
 
-                    {/* Daily Financial Report Table */}
+                    {/* Daily Financial Report */}
                     <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-                        <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+                        <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                             <div>
                                 <h3 className="text-lg font-black text-slate-900 tracking-tight">Laporan Harian</h3>
                                 <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Rincian Keuangan Per Hari</p>
@@ -235,7 +235,9 @@ export default function AdminDashboard() {
                                 Update Real-time
                             </div>
                         </div>
-                        <div className="overflow-x-auto">
+
+                        {/* Desktop View Table */}
+                        <div className="hidden md:block overflow-x-auto">
                             <table className="w-full text-left text-sm whitespace-nowrap">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -272,14 +274,50 @@ export default function AdminDashboard() {
                                             </td>
                                         </tr>
                                     ))}
-                                    {(stats.dailyReport || []).length === 0 && (
-                                        <tr>
-                                            <td colSpan={5} className="p-12 text-center text-slate-400 font-medium italic">Belum ada data keuangan untuk ditampilkan.</td>
-                                        </tr>
-                                    )}
                                 </tbody>
                             </table>
                         </div>
+
+                        {/* Mobile View Cards */}
+                        <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
+                            {(stats.dailyReport || []).slice(0, 10).map((day, i) => (
+                                <div key={i} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h4 className="font-black text-slate-900 text-sm">{day.date}</h4>
+                                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase">
+                                            {day.orders} TRXS
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3 mb-4">
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Revenue</p>
+                                            <p className="font-black text-slate-900 text-xs">Rp {day.revenue.toLocaleString('id-ID')}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Modal (Cost)</p>
+                                            <p className="font-black text-rose-500 text-xs">Rp {day.cost.toLocaleString('id-ID')}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Komisi</p>
+                                            <p className="font-black text-purple-600 text-xs">Rp {day.commission.toLocaleString('id-ID')}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Profit</p>
+                                            <div className="flex items-center gap-1">
+                                                <p className="font-black text-emerald-600 text-xs">Rp {day.profit.toLocaleString('id-ID')}</p>
+                                                <span className="text-[8px] bg-emerald-50 text-emerald-600 px-1 py-0.5 rounded-md font-black">
+                                                    {day.revenue > 0 ? ((day.profit / day.revenue) * 100).toFixed(0) : 0}%
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {(stats.dailyReport || []).length === 0 && (
+                            <div className="p-12 text-center text-slate-400 font-medium italic">Belum ada data keuangan untuk ditampilkan.</div>
+                        )}
                     </div>
                 </>
             )}

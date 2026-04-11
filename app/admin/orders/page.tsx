@@ -308,8 +308,9 @@ export default function AdminOrders() {
                     <p className="text-sm text-slate-500 max-w-sm">Pesanan dari website akan otomatis muncul di sini setelah pembeli mengklik Konfirmasi.</p>
                 </div>
             ) : (
-                <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
+                <div className="bg-white md:bg-white rounded-3xl md:border border-slate-100 shadow-sm overflow-hidden">
+                    {/* Desktop View */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="border-b border-slate-100 bg-slate-50/50">
@@ -380,6 +381,53 @@ export default function AdminOrders() {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Mobile View */}
+                    <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
+                        {orders.map((order) => (
+                            <div key={order.id} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden active:scale-[0.98] transition-all">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">ID: {order.id.split('-')[0]}</span>
+                                        <h3 className="font-bold text-slate-900 leading-tight">{order.customer_name}</h3>
+                                        <p className="text-xs text-slate-500 font-medium">{order.wa_number}</p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => openModal(order)} className="p-2 bg-slate-50 text-slate-400 rounded-xl"><Edit className="w-4 h-4" /></button>
+                                        <button onClick={() => handleDeleteOrder(order.id)} className="p-2 bg-red-50 text-red-400 rounded-xl"><Trash2 className="w-4 h-4" /></button>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-50 rounded-2xl p-3 mb-4 space-y-2">
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="font-bold text-slate-500">{order.product_name}</span>
+                                        <span className="font-medium text-slate-400">{order.package_name}</span>
+                                    </div>
+                                    <div className="h-px bg-slate-200" />
+                                    <div className="flex justify-between items-end">
+                                        <div>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Harga Jual</p>
+                                            <p className="font-black text-blue-600">Rp {order.sell_price.toLocaleString("id-ID")}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Profit</p>
+                                            <p className="font-bold text-slate-900 text-sm">Rp {order.profit.toLocaleString("id-ID")}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <div className="text-[10px] font-bold text-slate-400">
+                                        {new Date(order.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {updatingId === order.id && <Loader2 className="w-3 h-3 animate-spin text-blue-500" />}
+                                        <StatusDropdown order={order} />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             )}

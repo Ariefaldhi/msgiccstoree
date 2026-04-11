@@ -64,14 +64,16 @@ export default function AdminSettings() {
 
     return (
         <div className="space-y-6 max-w-2xl">
-            <div>
-                <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-                    <Store className="w-6 h-6 text-blue-600" />
-                    Pengaturan Toko
-                </h1>
-                <p className="text-sm text-slate-500 font-medium mt-1">
-                    Sesuaikan nama toko, logo, dan warna tema website utama.
-                </p>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100 mb-6">
+                <div>
+                    <h1 className="text-3xl font-black text-slate-900 flex items-center gap-2">
+                        <Store className="w-8 h-8 text-blue-600" />
+                        Pengaturan Toko
+                    </h1>
+                    <p className="text-sm text-slate-500 font-medium mt-1">
+                        Sesuaikan nama toko, logo, dan warna tema website utama.
+                    </p>
+                </div>
             </div>
 
             {loading ? (

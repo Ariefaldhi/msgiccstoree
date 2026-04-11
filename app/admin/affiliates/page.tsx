@@ -167,55 +167,95 @@ export default function AffiliateManagement() {
                             </div>
                         </div>
 
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm whitespace-nowrap">
-                                <thead>
-                                    <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                        <th className="p-4">Affiliator</th>
-                                        <th className="p-4">Kode</th>
-                                        <th className="p-4">Saldo</th>
-                                        <th className="p-4">Total Referral</th>
-                                        <th className="p-4 text-right">Penghasilan</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {filteredAffiliates.map((aff, i) => (
-                                        <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                            <td className="p-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 bg-slate-900 rounded-xl flex items-center justify-center text-white font-black text-xs">
-                                                        {aff.full_name?.charAt(0) || 'U'}
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-bold text-slate-900">{aff.full_name || 'No Name'}</div>
-                                                        <div className="text-[10px] text-slate-400">{aff.email}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="p-4">
-                                                <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-lg font-mono font-bold text-xs border border-purple-100">
-                                                    {aff.affiliate_code || '-'}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 font-black text-slate-900">Rp {aff.balance?.toLocaleString() || '0'}</td>
-                                            <td className="p-4">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-slate-700">{aff.totalOrders}</span>
-                                                    <span className="text-[10px] text-slate-400 uppercase font-bold">Trx</span>
-                                                </div>
-                                            </td>
-                                            <td className="p-4 text-right font-black text-emerald-600">
-                                                Rp {aff.totalEarned.toLocaleString()}
-                                            </td>
+                        <div className="bg-white md:bg-white rounded-[2.5rem] md:border-t border-slate-100 overflow-hidden">
+                            {/* Desktop Affiliators View */}
+                            <div className="hidden md:block overflow-x-auto">
+                                <table className="w-full text-left text-sm whitespace-nowrap">
+                                    <thead>
+                                        <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            <th className="p-4">Affiliator</th>
+                                            <th className="p-4">Kode</th>
+                                            <th className="p-4">Saldo</th>
+                                            <th className="p-4">Total Referral</th>
+                                            <th className="p-4 text-right">Penghasilan</th>
                                         </tr>
-                                    ))}
-                                    {filteredAffiliates.length === 0 && (
-                                        <tr>
-                                            <td colSpan={5} className="p-12 text-center text-slate-400 font-medium italic">Data affiliator tidak ditemukan.</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {filteredAffiliates.map((aff, i) => (
+                                            <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                                <td className="p-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-9 h-9 bg-slate-900 rounded-xl flex items-center justify-center text-white font-black text-xs">
+                                                            {aff.full_name?.charAt(0) || 'U'}
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-bold text-slate-900">{aff.full_name || 'No Name'}</div>
+                                                            <div className="text-[10px] text-slate-400">{aff.email}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="p-4">
+                                                    <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-lg font-mono font-bold text-xs border border-purple-100">
+                                                        {aff.affiliate_code || '-'}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4 font-black text-slate-900">Rp {aff.balance?.toLocaleString() || '0'}</td>
+                                                <td className="p-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-slate-700">{aff.totalOrders}</span>
+                                                        <span className="text-[10px] text-slate-400 uppercase font-bold">Trx</span>
+                                                    </div>
+                                                </td>
+                                                <td className="p-4 text-right font-black text-emerald-600">
+                                                    Rp {aff.totalEarned.toLocaleString()}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Mobile Affiliators View */}
+                            <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
+                                {filteredAffiliates.map((aff, i) => (
+                                    <div key={i} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-md shadow-slate-200">
+                                                    {aff.full_name?.charAt(0) || 'U'}
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-slate-900 leading-tight">{aff.full_name || 'Tanpa Nama'}</h3>
+                                                    <p className="text-[10px] text-slate-500 font-medium">{aff.email}</p>
+                                                </div>
+                                            </div>
+                                            <span className="bg-purple-50 text-purple-600 px-2.5 py-1 rounded-xl font-mono font-black text-[10px] border border-purple-100">
+                                                {aff.affiliate_code || '-'}
+                                            </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4 mb-4">
+                                            <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100">
+                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Saldo</p>
+                                                <p className="font-black text-slate-900 text-sm">Rp {aff.balance?.toLocaleString() || '0'}</p>
+                                            </div>
+                                            <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100">
+                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Ref</p>
+                                                <p className="font-black text-slate-900 text-sm">{aff.totalOrders} <span className="text-[10px] text-slate-400 font-normal ml-0.5">Trx</span></p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Penghasilan</p>
+                                            <p className="font-black text-emerald-600">Rp {aff.totalEarned.toLocaleString()}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {filteredAffiliates.length === 0 && (
+                                <div className="p-12 text-center text-slate-400 font-medium italic">Data affiliator tidak ditemukan.</div>
+                            )}
                         </div>
                     </div>
                 </div>
