@@ -8,11 +8,7 @@ interface ProductCardProps {
     image?: string;
     tag?: string;
     tagColor?: "yellow" | "red" | "blue" | "purple" | "indigo";
-    href: string;
     salesCount?: number;
-    isAffiliator?: boolean;
-    commissionPercent?: number;
-    packages?: any[];
 }
 
 export default function ProductCard({ 
@@ -21,36 +17,11 @@ export default function ProductCard({
     image, 
     tag, 
     tagColor = "yellow", 
-    href, 
     salesCount,
-    isAffiliator,
-    commissionPercent = 25,
-    packages = []
 }: ProductCardProps) {
 
-    // Calculate commission range
-    let commissionRange = "";
-    if (isAffiliator && packages && packages.length > 0) {
-        const commissions = packages.map(pkg => {
-            const sellPrice = parseInt(pkg.price.replace(/\D/g, "")) || 0;
-            const costPrice = pkg.cost_price || 0;
-            const profit = Math.max(0, sellPrice - costPrice);
-            return Math.floor(profit * (commissionPercent / 100));
-        }).filter(c => c > 0);
-
-        if (commissions.length > 0) {
-            const minComm = Math.min(...commissions);
-            const maxComm = Math.max(...commissions);
-            if (minComm === maxComm) {
-                commissionRange = `Rp ${minComm.toLocaleString("id-ID")}`;
-            } else {
-                commissionRange = `Rp ${minComm.toLocaleString("id-ID")} - ${maxComm.toLocaleString("id-ID")}`;
-            }
-        }
-    }
-
     return (
-        <Link href={href} className="group relative block bg-white rounded-[2.5rem] p-6 transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)] hover:-translate-y-1 flex flex-col items-center text-center h-full border border-slate-50 overflow-hidden">
+        <div className="group relative block bg-white rounded-[2.5rem] p-6 transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)] hover:-translate-y-1 flex flex-col items-center text-center h-full border border-slate-50 overflow-hidden">
 
             {/* Blurred Background Glow */}
             {image && (
@@ -76,7 +47,7 @@ export default function ProductCard({
 
             {/* Icon Container with Glow */}
             <div className="relative mb-6 mt-4 z-10 w-full flex justify-center">
-                <div className="w-32 h-32 rounded-[2rem] bg-white p-2 shadow-xl shadow-slate-100/50 relative">
+                <div className="w-32 h-32 rounded-[2rem] bg-white p-1.5 shadow-xl shadow-slate-100/50 relative">
                     <div className="w-full h-full rounded-[1.6rem] overflow-hidden bg-slate-900 flex items-center justify-center relative">
                         {image ? (
                             <img src={image} alt={title} className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110" />
@@ -95,26 +66,18 @@ export default function ProductCard({
             <div className="w-full mt-auto flex flex-col items-start text-left pl-2">
                 <h3 className="text-lg font-black text-slate-800 line-clamp-1 mb-1 group-hover:text-blue-600 transition-colors">{title}</h3>
 
-                {commissionRange ? (
-                    <div className="bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-1 mb-2">
-                        <p className="text-[9px] font-black text-emerald-600 uppercase tracking-tighter">Profit Komisi:</p>
-                        <p className="text-[11px] font-bold text-emerald-700">{commissionRange}</p>
-                    </div>
-                ) : (
-                    <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase mb-1">MULAI DARI</p>
-                )}
+                <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase mb-1">MULAI DARI</p>
 
                 <div className="w-full flex items-center justify-between">
                     <span className="text-blue-600 font-black text-xl tracking-tight">{price}</span>
 
                     <div className="flex items-center gap-2">
-                         <span className="text-[10px] font-black text-slate-300 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">DETAIL</span>
                          <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200 group-hover:scale-110 group-hover:bg-blue-500 transition-all duration-300">
                             <ArrowUpRight className="h-4 w-4 stroke-[3]" />
                         </div>
                     </div>
                 </div>
             </div>
-        </Link>
+        </div>
     );
 }

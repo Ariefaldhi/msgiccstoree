@@ -201,11 +201,7 @@ export default function Home() {
                   image={product.image_url}
                   tag={product.tag}
                   tagColor={product.tagColor}
-                  href={`/products/${product.id}`}
                   salesCount={salesCounts[product.title] || 0}
-                  isAffiliator={isAffiliator}
-                  commissionPercent={commissionPercent}
-                  packages={product.packages}
                 />
               </div>
             ))}
@@ -227,6 +223,8 @@ export default function Home() {
         activePromos={activePromos}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        isAffiliator={isAffiliator}
+        commissionPercent={commissionPercent}
       />
     </div>
   );

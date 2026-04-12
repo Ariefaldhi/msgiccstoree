@@ -34,9 +34,19 @@ interface ProductModalProps {
     isOpen: boolean;
     onClose: () => void;
     isResellerContext?: boolean;
+    isAffiliator?: boolean;
+    commissionPercent?: number;
 }
 
-export default function ProductModal({ product, activePromos, isOpen, onClose, isResellerContext = false }: ProductModalProps) {
+export default function ProductModal({ 
+    product, 
+    activePromos, 
+    isOpen, 
+    onClose, 
+    isResellerContext = false,
+    isAffiliator = false,
+    commissionPercent = 25
+}: ProductModalProps) {
     const [step, setStep] = useState<"selection" | "payment" | "success" | "cooldown">("selection");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [agreed, setAgreed] = useState(false);
@@ -336,8 +346,16 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                                 )}
                             </div>
                         </div>
-                        <div className="mb-2">
-                            <h2 className="text-2xl font-black text-slate-900 leading-none mb-2">{product.title}</h2>
+                        <div className="flex flex-col gap-1.5 mb-2">
+                            <h2 className="text-2xl font-black text-slate-900 leading-none">{product.title}</h2>
+                            <Link 
+                                href={`/products/${product.id}`}
+                                className="text-[10px] font-black text-blue-600 hover:text-blue-700 flex items-center gap-1 group/link w-fit"
+                            >
+                                LIHAT SELENGKAPNYA 
+                                <ArrowRight className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform" />
+                            </Link>
+                        </div>
                             <div className="flex flex-wrap gap-2">
                                 <span className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">APP</span>
                                 {product.tag && (
@@ -563,9 +581,26 @@ export default function ProductModal({ product, activePromos, isOpen, onClose, i
                                                     return <span>{pkg.price}</span>;
                                                 })()}
                                             </div>
-                                            <div className="text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100 flex items-center gap-1.5">
-                                                <ShieldCheck className="w-3 h-3 text-blue-400" />
-                                                Terjual {salesCounts[pkg.name] || 0}
+                                            <div className="flex flex-col items-end gap-1">
+                                                <div className="text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100 flex items-center gap-1.5">
+                                                    <ShieldCheck className="w-3 h-3 text-blue-400" />
+                                                    Terjual {salesCounts[pkg.name] || 0}
+                                                </div>
+                                                {isAffiliator && (
+                                                    <div className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 animate-in fade-in zoom-in duration-300">
+                                                        {(profitRaw => {
+                                                            const comm = Math.floor(profitRaw * (commissionPercent / 100));
+                                                            return comm > 0 ? `+ Komisi Rp ${comm.toLocaleString("id-ID")}` : "0 Komisi";
+                                                        })((() => {
+                                                            const fs = !isResellerContext && activePromos?.find(f => f.package_id === pkg.id);
+                                                            const rawPrice = parseInt(pkg.price.replace(/\D/g, "")) || 0;
+                                                            let sellPrice = rawPrice;
+                                                            if (isResellerContext && pkg.reseller_price) sellPrice = pkg.reseller_price;
+                                                            else if (fs) sellPrice = Math.round(rawPrice * (1 - fs.discount_percent / 100));
+                                                            return Math.max(0, sellPrice - (pkg.cost_price || 0));
+                                                        })())}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 
