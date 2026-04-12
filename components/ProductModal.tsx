@@ -346,16 +346,8 @@ export default function ProductModal({
                                 )}
                             </div>
                         </div>
-                        <div className="flex flex-col gap-1.5 mb-2">
+                        <div className="flex flex-col gap-2.5 mb-2">
                             <h2 className="text-2xl font-black text-slate-900 leading-none">{product.title}</h2>
-                            <Link 
-                                href={`/products/${product.id}`}
-                                className="text-[10px] font-black text-blue-600 hover:text-blue-700 flex items-center gap-1 group/link w-fit"
-                            >
-                                LIHAT SELENGKAPNYA 
-                                <ArrowRight className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform" />
-                            </Link>
-                        </div>
                             <div className="flex flex-wrap gap-2">
                                 <span className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">APP</span>
                                 {product.tag && (
@@ -374,6 +366,13 @@ export default function ProductModal({
                                     </span>
                                 )}
                             </div>
+                            <Link 
+                                href={`/products/${product.id}`}
+                                className="text-[10px] font-black text-blue-600 hover:text-blue-700 flex items-center gap-1 group/link w-fit"
+                            >
+                                LIHAT SELENGKAPNYA 
+                                <ArrowRight className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform" />
+                            </Link>
                         </div>
                     </div>
                 </div>
