@@ -12,6 +12,8 @@ export default function AdminTestimonies() {
     // Form State
     const [imageUrl, setImageUrl] = useState("");
     const [caption, setCaption] = useState("");
+    const [productSlug, setProductSlug] = useState("");
+    const [products, setProducts] = useState<any[]>([]);
     const [showForm, setShowForm] = useState(false);
 
     const supabase = createClient();
@@ -24,6 +26,11 @@ export default function AdminTestimonies() {
         setLoading(true);
         const { data } = await supabase.from("testimonies").select("*").order("created_at", { ascending: false });
         if (data) setTestimonies(data);
+        
+        // Fetch products for slug dropdown
+        const { data: prods } = await supabase.from("products").select("title");
+        if (prods) setProducts(prods);
+        
         setLoading(false);
     }
 
@@ -32,13 +39,18 @@ export default function AdminTestimonies() {
         if (!imageUrl) return alert("URL Gambar wajib diisi!");
 
         setIsSaving(true);
-        const { error } = await supabase.from("testimonies").insert([{ image_url: imageUrl, caption }]);
+        const { error } = await supabase.from("testimonies").insert([{ 
+            image_url: imageUrl, 
+            caption,
+            product_slug: productSlug 
+        }]);
         
         if (error) {
             alert("Error: " + error.message);
         } else {
             setImageUrl("");
             setCaption("");
+            setProductSlug("");
             setShowForm(false);
             fetchTestimonies();
         }
@@ -126,8 +138,22 @@ export default function AdminTestimonies() {
                                     placeholder="Contoh: 'Testimoni Netflix Murah'" 
                                     value={caption}
                                     onChange={(e) => setCaption(e.target.value)}
-                                    className="w-full h-32 px-5 py-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 resize-none"
+                                    className="w-full h-20 px-5 py-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 resize-none"
                                 />
+                                
+                                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Pilih Produk (Slug)</label>
+                                <select 
+                                    value={productSlug}
+                                    onChange={(e) => setProductSlug(e.target.value)}
+                                    className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
+                                >
+                                    <option value="">Umum (Tanpa Produk)</option>
+                                    {products.map(p => (
+                                        <option key={p.title} value={p.title.toLowerCase().replace(/\s+/g, '-')}>
+                                            {p.title}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 
@@ -168,10 +194,15 @@ export default function AdminTestimonies() {
                                     </button>
                                 </div>
                             </div>
-                            <div className="p-4">
-                                <p className="text-xs font-medium text-slate-500 line-clamp-2 italic">
+                            <div className="p-4 border-t border-slate-50 bg-slate-50/50 flex justify-between items-center">
+                                <p className="text-xs font-medium text-slate-500 line-clamp-1 italic">
                                     {item.caption || "No caption"}
                                 </p>
+                                {item.product_slug && (
+                                    <span className="text-[9px] font-black bg-blue-100 text-blue-600 px-2 py-0.5 rounded-md uppercase">
+                                        {item.product_slug}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     ))}

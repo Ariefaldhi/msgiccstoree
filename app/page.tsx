@@ -38,6 +38,8 @@ export default function Home() {
   const [activePromos, setActivePromos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
+  const [isAffiliator, setIsAffiliator] = useState(false);
+  const [commissionPercent, setCommissionPercent] = useState(25);
 
   const supabase = createClient();
 
@@ -94,6 +96,21 @@ export default function Home() {
         });
 
         setActivePromos(validSales);
+      }
+
+      // Fetch User & Affiliate Status
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase.from("profiles").select("is_affiliator, role").eq("id", user.id).single();
+        if (profile?.is_affiliator || profile?.role === 'admin') {
+          setIsAffiliator(true);
+        }
+      }
+
+      // Fetch Store Settings for Commission
+      const { data: settings } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
+      if (settings?.affiliate_commission_percent) {
+        setCommissionPercent(settings.affiliate_commission_percent);
       }
 
       setLoading(false);
@@ -184,8 +201,11 @@ export default function Home() {
                   image={product.image_url}
                   tag={product.tag}
                   tagColor={product.tagColor}
-                  href="#" // Prevent navigation, handle with onClick
+                  href={`/products/${product.id}`}
                   salesCount={salesCounts[product.title] || 0}
+                  isAffiliator={isAffiliator}
+                  commissionPercent={commissionPercent}
+                  packages={product.packages}
                 />
               </div>
             ))}

@@ -21,6 +21,7 @@ interface Product {
     tag: string;
     tag_color: "yellow" | "red" | "blue" | "purple";
     image_url?: string;
+    description?: string;
     terms_conditions?: string;
     packages?: Package[];
 }
@@ -53,13 +54,13 @@ export default function AdminProducts() {
 
     // Forms
     const [productForm, setProductForm] = useState({
-        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", terms_conditions: ""
+        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", description: "", terms_conditions: ""
     });
     const [editForm, setEditForm] = useState<{
         category_id: string; title: string; price: string;
-        tag: string; tag_color: "yellow" | "red" | "blue" | "purple"; image_url: string; terms_conditions: string;
+        tag: string; tag_color: "yellow" | "red" | "blue" | "purple"; image_url: string; description: string; terms_conditions: string;
     }>({
-        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", terms_conditions: ""
+        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", description: "", terms_conditions: ""
     });
     const [packageForm, setPackageForm] = useState<{
         name: string; price: string; cost_price: string; reseller_price: string; duration: string; type: string; is_available: boolean; features: string[];
@@ -143,7 +144,7 @@ export default function AdminProducts() {
         if (!error && data) {
             setProducts([data[0], ...products]);
             setIsProductModalOpen(false);
-            setProductForm({ category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", terms_conditions: "" });
+            setProductForm({ category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", description: "", terms_conditions: "" });
             setImageFile(null);
             setImagePreview(null);
             router.refresh();
@@ -173,6 +174,7 @@ export default function AdminProducts() {
             tag: product.tag || "",
             tag_color: product.tag_color || "yellow",
             image_url: product.image_url || "",
+            description: product.description || "",
             terms_conditions: product.terms_conditions || "",
         });
         setIsEditModalOpen(true);
@@ -496,6 +498,12 @@ export default function AdminProducts() {
                             </div>
 
                             <div>
+                                <label className="label-admin">Description</label>
+                                <textarea className="input-admin min-h-[100px]" placeholder="Deskripsi lengkap produk..."
+                                    value={productForm.description} onChange={e => setProductForm({ ...productForm, description: e.target.value })}></textarea>
+                            </div>
+
+                            <div>
                                 <label className="label-admin">Terms & Conditions (Optional)</label>
                                 <textarea className="input-admin min-h-[100px]" placeholder="Syarat dan ketentuan untuk produk ini..."
                                     value={productForm.terms_conditions} onChange={e => setProductForm({ ...productForm, terms_conditions: e.target.value })}></textarea>
@@ -608,6 +616,11 @@ export default function AdminProducts() {
                                 {editForm.image_url && (
                                     <img src={editForm.image_url} className="mt-2 w-16 h-16 rounded-xl object-cover border border-slate-200" alt="preview" />
                                 )}
+                            </div>
+                            <div>
+                                <label className="label-admin">Description</label>
+                                <textarea className="input-admin min-h-[100px]" placeholder="Deskripsi lengkap produk..."
+                                    value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })}></textarea>
                             </div>
                             <div>
                                 <label className="label-admin">Terms & Conditions (Optional)</label>

@@ -71,8 +71,13 @@ export default function AdminReviews() {
                                 "{rev.comment}"
                             </p>
 
-                            <div className="flex items-center justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                <span>{new Date(rev.created_at).toLocaleDateString('id-ID')}</span>
+                            <div className="flex items-center justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest mt-auto">
+                                <div className="flex flex-col gap-1">
+                                    <span>{new Date(rev.created_at).toLocaleDateString('id-ID')}</span>
+                                    {rev.product_name && (
+                                        <span className="text-[8px] text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded w-fit">{rev.product_name}</span>
+                                    )}
+                                </div>
                                 <span className={cn(
                                     "px-2 py-0.5 rounded-full",
                                     rev.rating >= 4 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
