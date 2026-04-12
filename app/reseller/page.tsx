@@ -220,7 +220,6 @@ export default function ResellerPage() {
                 image={product.image_url}
                 tag="CABANG VIP"
                 tagColor="indigo"
-                href="#"
               />
             </div>
           ))}
