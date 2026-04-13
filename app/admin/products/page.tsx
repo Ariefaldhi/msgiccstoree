@@ -531,19 +531,19 @@ export default function AdminProducts() {
                                 <label className="label-admin">Product Title</label>
                                 <input required type="text" className="input-admin" placeholder="e.g. Netflix Premium"
                                     value={productForm.title} onChange={e => setProductForm({ ...productForm, title: e.target.value })} />
-                            </div>                                <div>
-                                    <label className="label-admin">Starting Price</label>
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
-                                        <input 
-                                            required 
-                                            type="text" 
-                                            className="input-admin pl-10" 
-                                            placeholder="e.g. 25.000"
-                                            value={productForm.price.includes("Rp") ? productForm.price.replace("Rp ", "") : formatToIDR(productForm.price)} 
-                                            onChange={e => setProductForm({ ...productForm, price: formatToIDR(e.target.value) })} 
-                                        />
-                                    </div>
+                            </div>
+                            <div>
+                                <label className="label-admin">Starting Price</label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                                    <input 
+                                        required 
+                                        type="text" 
+                                        className="input-admin pl-10" 
+                                        placeholder="e.g. 25.000"
+                                        value={productForm.price.includes("Rp") ? productForm.price.replace("Rp ", "") : formatToIDR(productForm.price)} 
+                                        onChange={e => setProductForm({ ...productForm, price: formatToIDR(e.target.value) })} 
+                                    />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -608,7 +608,8 @@ export default function AdminProducts() {
                                 <label className="label-admin">Product Title</label>
                                 <input required type="text" className="input-admin" placeholder="e.g. Netflix Premium"
                                     value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })} />
-                            </div>                             <div>
+                            </div>
+                            <div>
                                 <label className="label-admin">Starting Price</label>
                                 <div className="relative">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
@@ -685,7 +686,8 @@ export default function AdminProducts() {
                                 <label className="label-admin">Package Name</label>
                                 <input required type="text" className="input-admin" placeholder="e.g. 1 Bulan Sharing"
                                     value={packageForm.name} onChange={e => setPackageForm({ ...packageForm, name: e.target.value })} />
-                            </div>                             <div className="grid grid-cols-2 gap-4">
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="label-admin">Sell Price</label>
                                     <div className="relative">
