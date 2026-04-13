@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { 
     Loader2, Star, CheckCircle2, ShieldCheck, 
     ArrowLeft, ShoppingBag, Info, MessageSquare, 
-    Users, Clock, Zap, Share2
+    Users, Clock, Zap, Share2, X
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -49,6 +49,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     
     // Modal State for Ordering
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
     
     const supabase = createClient();
 
@@ -155,8 +156,49 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8">
                     
+                    {/* Right Column: Packages & Share - PRIORITY ON MOBILE */}
+                    <div className="order-first lg:order-last space-y-8">
+                        
+                        {/* Summary & Order Button */}
+                        <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-blue-100 sticky top-28 overflow-hidden relative">
+                             {/* Decorative Background for CTA */}
+                             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                             
+                             <h4 className="text-sm font-black text-blue-600 uppercase tracking-widest mb-4">Pesan Sekarang</h4>
+                             <p className="text-slate-500 text-sm font-medium mb-8">Pilih paket yang sesuai dengan kebutuhan Anda dan lakukan pemesanan melalui sistem konfirmasi WhatsApp kami.</p>
+                             
+                             <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-500/20 active:scale-95 group"
+                             >
+                                <ShoppingBag className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                                LIHAT PAKET & ORDER
+                             </button>
+
+                             <div className="mt-8 pt-8 border-t border-slate-100 flex flex-col gap-4">
+                                 <div className="hidden md:flex items-center gap-4 text-xs font-bold text-slate-400">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center"><ShieldCheck className="w-4 h-4 text-blue-400" /></div>
+                                    Garansi Full Proteksi
+                                 </div>
+                                 <div className="flex items-center gap-4 text-xs font-bold text-slate-400">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center"><Zap className="w-4 h-4 text-amber-400" /></div>
+                                    Proses Kilat 5-15 Menit
+                                 </div>
+                             </div>
+                        </div>
+
+                        {/* Share Section */}
+                        <ShareButtons 
+                            url={shareUrl} 
+                            affiliateUrl={affiliateShareUrl} 
+                            title={`Nonton @${product.title} murah mulai dari ${product.price} hanya di MsgiccStore!`} 
+                            isAffiliator={isAffiliator}
+                        />
+
+                    </div>
+
                     {/* Left Column: Product Info & Banner */}
                     <div className="lg:col-span-2 space-y-8">
                         
@@ -231,8 +273,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                             {testimonies.length > 0 ? (
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                                     {testimonies.map((test, i) => (
-                                        <div key={i} className="aspect-square rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer">
+                                        <div 
+                                            key={i} 
+                                            onClick={() => setSelectedImage(test.image_url)}
+                                            className="aspect-square rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer bg-slate-100 group relative"
+                                        >
                                             <img src={test.image_url} alt="Testimony" className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <Zap className="w-6 h-6 text-white drop-shadow-lg" />
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -273,47 +322,31 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                         </div>
 
                     </div>
-
-                    {/* Right Column: Packages & Share */}
-                    <div className="space-y-8">
-                        
-                        {/* Summary & Order Button */}
-                        <div className="bg-slate-900 text-white rounded-[2.5rem] p-8 shadow-2xl sticky top-28">
-                             <h4 className="text-sm font-black text-blue-400 uppercase tracking-widest mb-4">Pesan Sekarang</h4>
-                             <p className="text-white/60 text-sm font-medium mb-8">Pilih paket yang sesuai dengan kebutuhan Anda dan lakukan pemesanan melalui sistem konfirmasi WhatsApp kami.</p>
-                             
-                             <button
-                                onClick={() => setIsModalOpen(true)}
-                                className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-500/20 active:scale-95 group"
-                             >
-                                <ShoppingBag className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                                LIHAT PAKET & ORDER
-                             </button>
-
-                             <div className="mt-8 pt-8 border-t border-white/10 flex flex-col gap-4">
-                                 <div className="flex items-center gap-4 text-xs font-bold text-white/50">
-                                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><ShieldCheck className="w-4 h-4" /></div>
-                                    Garansi Full Proteksi
-                                 </div>
-                                 <div className="flex items-center gap-4 text-xs font-bold text-white/50">
-                                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><Zap className="w-4 h-4" /></div>
-                                    Proses Kilat 5-15 Menit
-                                 </div>
-                             </div>
-                        </div>
-
-                        {/* Share Section */}
-                        <ShareButtons 
-                            url={shareUrl} 
-                            affiliateUrl={affiliateShareUrl} 
-                            title={`Nonton @${product.title} murah mulai dari ${product.price} hanya di MsgiccStore!`} 
-                            isAffiliator={isAffiliator}
-                        />
-
-                    </div>
                 </div>
 
             </main>
+
+            {/* Fullscreen Image Preview */}
+            {selectedImage && (
+                <div 
+                    className="fixed inset-0 z-[20000] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <div className="relative max-w-5xl w-full h-full flex items-center justify-center">
+                        <img 
+                            src={selectedImage} 
+                            alt="Full Preview" 
+                            className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300"
+                        />
+                        <button 
+                            onClick={() => setSelectedImage(null)}
+                            className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all backdrop-blur-md"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Reuse ProductModal for order flow */}
             <ProductModal 
