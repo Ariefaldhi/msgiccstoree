@@ -78,7 +78,7 @@ export default function AdminOrders() {
             const profit = orderForm.sell_price - orderForm.cost_price;
             if (profit > 0) {
                 const autoCommission = Math.floor(profit * (globalCommissionPercent / 100));
-                setOrderForm(prev => ({ ...prev, commission: autoCommission }));
+                setOrderForm((prev: any) => ({ ...prev, commission: autoCommission }));
             }
         }
     }, [orderForm.sell_price, orderForm.cost_price, orderForm.affiliator_id, isModalOpen]);
