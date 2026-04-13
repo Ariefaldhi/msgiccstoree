@@ -372,8 +372,13 @@ export default function AdminOrders() {
                                             {order.affiliator_id ? (
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Jatah Afiliator</span>
+                                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                                        <span className="text-xs font-bold text-slate-900 truncate max-w-[120px]" title={affiliators.find(a => a.id === order.affiliator_id)?.full_name || 'Afiliator'}>
+                                                            {affiliators.find(a => a.id === order.affiliator_id)?.full_name || 'Afiliator'}
+                                                        </span>
+                                                        <span className="text-[9px] text-slate-400 font-mono">({affiliators.find(a => a.id === order.affiliator_id)?.affiliate_code || '???'})</span>
+                                                    </div>
                                                     <span className="text-sm font-black text-slate-900 leading-tight">Rp {(Math.floor(order.profit * (globalCommissionPercent / 100))).toLocaleString("id-ID")}</span>
-                                                    <span className="text-[9px] text-slate-400 font-bold bg-slate-100 px-1 py-0.5 rounded mt-1 inline-block w-fit">MODAL: {globalCommissionPercent}%</span>
                                                 </div>
                                             ) : (
                                                 <span className="text-xs text-slate-300 font-bold italic">Tanpa Ref</span>
@@ -656,7 +661,10 @@ export default function AdminOrders() {
                                         <div className="bg-white/50 border border-purple-100 rounded-2xl p-4 flex items-center justify-between animate-in slide-in-from-left-2 transition-all">
                                             <div className="flex flex-col">
                                                 <span className="text-[10px] font-black text-purple-300 uppercase tracking-widest">Afiliator Terpilih</span>
-                                                <span className="text-[11px] font-mono text-slate-400 mt-1">{orderForm.affiliator_id}</span>
+                                                <span className="text-sm font-black text-purple-700 mt-1">
+                                                    {affiliators.find(a => a.id === orderForm.affiliator_id)?.full_name || "Unknown"}
+                                                </span>
+                                                <span className="text-[9px] font-mono text-slate-400 mt-0.5">{orderForm.affiliator_id}</span>
                                             </div>
                                             <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
                                                 <CheckCircle2 className="w-6 h-6" />

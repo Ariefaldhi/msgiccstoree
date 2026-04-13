@@ -90,9 +90,14 @@ export default function ProductModal({
             if (savedRef) {
                 try {
                     const parsed = JSON.parse(savedRef);
-                    setActiveRefCode(parsed.code || parsed.CODE || null);
+                    let code = parsed.code || parsed.CODE || "";
+                    // Basic cleanup: if it's a URL, extract the ref part
+                    if (code.includes("?ref=")) {
+                        code = code.split("?ref=")[1].split("&")[0];
+                    }
+                    setActiveRefCode(code || null);
                 } catch (e) {
-                    setActiveRefCode(savedRef);
+                    setActiveRefCode(savedRef.includes("?ref=") ? savedRef.split("?ref=")[1].split("&")[0] : savedRef);
                 }
             } else {
                 setActiveRefCode(null);
