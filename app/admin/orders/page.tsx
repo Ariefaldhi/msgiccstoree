@@ -22,6 +22,12 @@ interface Order {
     created_at: string;
 }
 
+const formatToIDR = (val: string | number) => {
+    const num = typeof val === 'string' ? val.replace(/\D/g, '') : val.toString();
+    if (!num) return "";
+    return Number(num).toLocaleString('id-ID');
+};
+
 export default function AdminOrders() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
@@ -34,9 +40,9 @@ export default function AdminOrders() {
     const [affiliators, setAffiliators] = useState<any[]>([]);
     const [affSearch, setAffSearch] = useState("");
     const [showAffSuggestions, setShowAffSuggestions] = useState(false);
-    const [orderForm, setOrderForm] = useState({
+    const [orderForm, setOrderForm] = useState<any>({
         customer_name: "", wa_number: "", product_id: "", package_id: "", status: "Pesanan Selesai", created_at: "",
-        affiliator_id: "", commission: 0, sell_price: 0, cost_price: 0
+        affiliator_id: "", commission: "0", sell_price: "0", cost_price: "0"
     });
     const [globalCommissionPercent, setGlobalCommissionPercent] = useState(25);
 
@@ -103,9 +109,17 @@ export default function AdminOrders() {
                     percent: currentPercent,
                     commission: commissionToPay,
                     ownerNet: order.profit - commissionToPay,
-                    affiliatorId: order.affiliator_id
+                    affiliatorId: order.affiliator_id,
+                    affiliatorName: "Memuat..."
                 });
                 setIsPayoutModalOpen(true);
+
+                // Fetch name asynchronously
+                supabase.from("profiles").select("full_name").eq("id", order.affiliator_id).single().then(({ data }) => {
+                    if (data?.full_name) {
+                        setPayoutData((prev: any) => ({ ...prev, affiliatorName: data.full_name }));
+                    }
+                });
                 setUpdatingId(null);
                 return;
             } else if (newStatus !== "Pesanan Selesai" && order?.status === "Pesanan Selesai" && order?.affiliator_id) {
@@ -159,12 +173,12 @@ export default function AdminOrders() {
             package_id: selectedPackage.id,
             product_name: selectedProduct.title,
             package_name: selectedPackage.name,
-            sell_price: orderForm.sell_price,
-            cost_price: orderForm.cost_price,
-            profit: orderForm.sell_price - orderForm.cost_price,
+            sell_price: parseInt(orderForm.sell_price.toString().replace(/\D/g, '')) || 0,
+            cost_price: parseInt(orderForm.cost_price.toString().replace(/\D/g, '')) || 0,
+            profit: (parseInt(orderForm.sell_price.toString().replace(/\D/g, '')) || 0) - (parseInt(orderForm.cost_price.toString().replace(/\D/g, '')) || 0),
             status: orderForm.status,
             affiliator_id: orderForm.affiliator_id || null,
-            commission: orderForm.commission || 0,
+            commission: parseInt(orderForm.commission.toString().replace(/\D/g, '')) || 0,
             created_at: new Date(orderForm.created_at).toISOString()
         };
 
@@ -492,13 +506,13 @@ export default function AdminOrders() {
                                 <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                                     <div>
                                         <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Harga Jual (Rp)</label>
-                                        <input required type="number" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-900" 
-                                            value={orderForm.sell_price} onChange={e => setOrderForm({...orderForm, sell_price: parseInt(e.target.value) || 0})} />
+                                        <input required type="text" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-900" 
+                                            value={formatToIDR(orderForm.sell_price)} onChange={e => setOrderForm({...orderForm, sell_price: formatToIDR(e.target.value)})} />
                                     </div>
                                     <div>
                                         <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Harga Modal (Rp)</label>
-                                        <input required type="number" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-900" 
-                                            value={orderForm.cost_price} onChange={e => setOrderForm({...orderForm, cost_price: parseInt(e.target.value) || 0})} />
+                                        <input required type="text" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-900" 
+                                            value={formatToIDR(orderForm.cost_price)} onChange={e => setOrderForm({...orderForm, cost_price: formatToIDR(e.target.value)})} />
                                     </div>
                                 </div>
                             )}
@@ -588,19 +602,19 @@ export default function AdminOrders() {
                                     <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">Jumlah Komisi (Rp)</label>
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-purple-400">Rp</span>
-                                        <input type="number" className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 pl-8 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500" 
-                                            value={orderForm.commission} onChange={e => setOrderForm({...orderForm, commission: parseInt(e.target.value) || 0})} />
+                                        <input type="text" className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 pl-8 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                                            value={formatToIDR(orderForm.commission)} onChange={e => setOrderForm({...orderForm, commission: formatToIDR(e.target.value)})} />
                                     </div>
                                     
                                     {/* Breakdown display */}
                                     <div className="mt-3 space-y-1 pt-3 border-t border-purple-100">
                                         <div className="flex justify-between text-[10px] font-bold">
                                             <span className="text-slate-400 uppercase">Jatah Afiliator:</span>
-                                            <span className="text-purple-600">Rp {orderForm.commission.toLocaleString('id-ID')} ({globalCommissionPercent}%)</span>
+                                            <span className="text-purple-600">Rp {parseInt(orderForm.commission.toString().replace(/\D/g, '') || '0').toLocaleString('id-ID')} ({globalCommissionPercent}%)</span>
                                         </div>
                                         <div className="flex justify-between text-[10px] font-bold">
                                             <span className="text-slate-400 uppercase">Laba Bersih Anda:</span>
-                                            <span className="text-emerald-600">Rp {( (orderForm.sell_price - orderForm.cost_price) - orderForm.commission ).toLocaleString('id-ID')} ({100 - globalCommissionPercent}%)</span>
+                                            <span className="text-emerald-600">Rp {( (parseInt(orderForm.sell_price.toString().replace(/\D/g, '')) || 0) - (parseInt(orderForm.cost_price.toString().replace(/\D/g, '')) || 0) - (parseInt(orderForm.commission.toString().replace(/\D/g, '')) || 0) ).toLocaleString('id-ID')} ({100 - globalCommissionPercent}%)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -628,25 +642,30 @@ export default function AdminOrders() {
                             Sistem akan menambahkan jatah laba ke saldo afiliator secara otomatis.
                         </p>
 
-                        <div className="space-y-3 bg-slate-50 p-5 rounded-3xl border border-slate-100 mb-8">
-                            <div className="flex justify-between items-center text-xs font-bold">
-                                <span className="text-slate-400 uppercase tracking-widest">Total Profit</span>
-                                <span className="text-slate-900">Rp {payoutData.profit.toLocaleString()}</span>
+                            <div className="flex justify-between items-center text-xs font-bold bg-purple-50 p-3 rounded-2xl border border-purple-100/50">
+                                <span className="text-purple-400 uppercase tracking-widest">Penerima</span>
+                                <span className="text-purple-700">{payoutData.affiliatorName || "Sistem"}</span>
                             </div>
-                            <div className="flex justify-between items-center text-xs font-bold">
-                                <span className="text-slate-400 uppercase tracking-widest">Persentase</span>
-                                <span className="text-slate-900">{payoutData.percent}%</span>
+
+                            <div className="space-y-3 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                                <div className="flex justify-between items-center text-xs font-bold">
+                                    <span className="text-slate-400 uppercase tracking-widest">Total Profit</span>
+                                    <span className="text-slate-900">Rp {payoutData.profit.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-xs font-bold">
+                                    <span className="text-slate-400 uppercase tracking-widest">Persentase</span>
+                                    <span className="text-slate-900">{payoutData.percent}%</span>
+                                </div>
+                                <div className="h-px bg-slate-100 my-2" />
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Jatah Afiliator</span>
+                                    <span className="text-lg font-black text-purple-600">Rp {payoutData.commission.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Net Owner (Anda)</span>
+                                    <span className="text-sm font-black text-emerald-600">Rp {payoutData.ownerNet.toLocaleString()}</span>
+                                </div>
                             </div>
-                            <div className="h-px bg-slate-200 my-2" />
-                            <div className="flex justify-between items-center">
-                                <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Jatah Afiliator</span>
-                                <span className="text-lg font-black text-purple-600">Rp {payoutData.commission.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Net Owner (Anda)</span>
-                                <span className="text-sm font-black text-emerald-600">Rp {payoutData.ownerNet.toLocaleString()}</span>
-                            </div>
-                        </div>
 
                         <div className="flex flex-col gap-3">
                             <button 

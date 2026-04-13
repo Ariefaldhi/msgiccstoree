@@ -12,7 +12,8 @@ import {
     LogIn, 
     ChevronRight,
     ShieldCheck,
-    Megaphone
+    Megaphone,
+    LayoutDashboard
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -80,7 +81,14 @@ export default function MorePage() {
             icon: <Megaphone className="w-6 h-6 text-pink-500" />,
             href: "/afiliator",
             reqAuth: true
-        }
+        },
+        ...(profile?.role === 'admin' ? [{
+            title: "Admin Dashboard",
+            description: "Kelola seluruh sistem & pesanan",
+            icon: <LayoutDashboard className="w-6 h-6 text-slate-900" />,
+            href: "/admin",
+            reqAuth: true
+        }] : [])
     ];
 
     return (

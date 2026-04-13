@@ -86,7 +86,17 @@ export default function ProductModal({
             fetchSalesCounts();
             checkUser();
             // Fetch affiliate ref from localStorage
-            setActiveRefCode(localStorage.getItem("msgicc_affiliate_ref"));
+            const savedRef = localStorage.getItem("msgicc_affiliate_ref");
+            if (savedRef) {
+                try {
+                    const parsed = JSON.parse(savedRef);
+                    setActiveRefCode(parsed.code || parsed.CODE || null);
+                } catch (e) {
+                    setActiveRefCode(savedRef);
+                }
+            } else {
+                setActiveRefCode(null);
+            }
             // Fetch admin WhatsApp number
             supabase.from("store_settings").select("whatsapp_number").eq("id", 1).single().then(({ data }) => {
                 if (data?.whatsapp_number) setAdminPhone(data.whatsapp_number);
@@ -362,7 +372,7 @@ export default function ProductModal({
                                 )}
                                 {activeRefCode && (
                                     <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                                        Referal: {activeRefCode}
+                                        REF CODE: {activeRefCode}
                                     </span>
                                 )}
                             </div>

@@ -39,6 +39,12 @@ interface Package {
     reseller_price?: number;
 }
 
+const formatToIDR = (val: string | number) => {
+    const num = typeof val === 'string' ? val.replace(/\D/g, '') : val.toString();
+    if (!num) return "";
+    return Number(num).toLocaleString('id-ID');
+};
+
 export default function AdminProducts() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -525,11 +531,20 @@ export default function AdminProducts() {
                                 <label className="label-admin">Product Title</label>
                                 <input required type="text" className="input-admin" placeholder="e.g. Netflix Premium"
                                     value={productForm.title} onChange={e => setProductForm({ ...productForm, title: e.target.value })} />
-                            </div>
-                            <div>
-                                <label className="label-admin">Starting Price</label>
-                                <input required type="text" className="input-admin" placeholder="e.g. 25000"
-                                    value={productForm.price} onChange={e => setProductForm({ ...productForm, price: e.target.value })} />
+                            </div>                                <div>
+                                    <label className="label-admin">Starting Price</label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                                        <input 
+                                            required 
+                                            type="text" 
+                                            className="input-admin pl-10" 
+                                            placeholder="e.g. 25.000"
+                                            value={productForm.price.includes("Rp") ? productForm.price.replace("Rp ", "") : formatToIDR(productForm.price)} 
+                                            onChange={e => setProductForm({ ...productForm, price: formatToIDR(e.target.value) })} 
+                                        />
+                                    </div>
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -539,14 +554,20 @@ export default function AdminProducts() {
                                 </div>
                                 <div>
                                     <label className="label-admin">Tag Color</label>
-                                    <select className="input-admin" value={productForm.tag_color} onChange={e => setProductForm({ ...productForm, tag_color: e.target.value as any })}>
-                                        <option value="yellow">Yellow</option>
-                                        <option value="red">Red</option>
-                                        <option value="blue">Blue</option>
-                                        <option value="purple">Purple</option>
-                                    </select>
+                                    <div className="relative">
+                                        <select className="input-admin appearance-none" value={productForm.tag_color} onChange={e => setProductForm({ ...productForm, tag_color: e.target.value as any })}>
+                                            <option value="yellow">Yellow</option>
+                                            <option value="red">Red</option>
+                                            <option value="blue">Blue</option>
+                                            <option value="purple">Purple</option>
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
 
                             <button type="submit" disabled={isSubmitting} className="btn-admin-submit mt-4">
                                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Product"}
@@ -587,11 +608,19 @@ export default function AdminProducts() {
                                 <label className="label-admin">Product Title</label>
                                 <input required type="text" className="input-admin" placeholder="e.g. Netflix Premium"
                                     value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })} />
-                            </div>
-                            <div>
+                            </div>                             <div>
                                 <label className="label-admin">Starting Price</label>
-                                <input required type="text" className="input-admin" placeholder="e.g. 25000 atau Rp 25.000"
-                                    value={editForm.price} onChange={e => setEditForm({ ...editForm, price: e.target.value })} />
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                                    <input 
+                                        required 
+                                        type="text" 
+                                        className="input-admin pl-10" 
+                                        placeholder="e.g. 25.000"
+                                        value={editForm.price.includes("Rp") ? editForm.price.replace("Rp ", "") : formatToIDR(editForm.price)} 
+                                        onChange={e => setEditForm({ ...editForm, price: formatToIDR(e.target.value) })} 
+                                    />
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -602,13 +631,14 @@ export default function AdminProducts() {
                                 <div>
                                     <label className="label-admin">Tag Color</label>
                                     <select className="input-admin" value={editForm.tag_color} onChange={e => setEditForm({ ...editForm, tag_color: e.target.value as any })}>
-                                        <option value="yellow">Yellow</option>
-                                        <option value="red">Red</option>
-                                        <option value="blue">Blue</option>
-                                        <option value="purple">Purple</option>
+                                        <option value="yellow">Yellow (Standard)</option>
+                                        <option value="red">Red (Hot)</option>
+                                        <option value="blue">Blue (New)</option>
+                                        <option value="purple">Purple (Elite)</option>
                                     </select>
                                 </div>
                             </div>
+
                             <div>
                                 <label className="label-admin">Image URL (Optional)</label>
                                 <input type="text" className="input-admin" placeholder="https://..."
@@ -655,24 +685,51 @@ export default function AdminProducts() {
                                 <label className="label-admin">Package Name</label>
                                 <input required type="text" className="input-admin" placeholder="e.g. 1 Bulan Sharing"
                                     value={packageForm.name} onChange={e => setPackageForm({ ...packageForm, name: e.target.value })} />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            </div>                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="label-admin">Sell Price</label>
-                                    <input required type="text" className="input-admin" placeholder="e.g. 29000"
-                                        value={packageForm.price} onChange={e => setPackageForm({ ...packageForm, price: e.target.value })} />
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                                        <input 
+                                            required 
+                                            type="text" 
+                                            className="input-admin pl-10" 
+                                            placeholder="0"
+                                            value={formatToIDR(packageForm.price)} 
+                                            onChange={e => setPackageForm({ ...packageForm, price: formatToIDR(e.target.value) })} 
+                                        />
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="label-admin">Cost Price (Modal)</label>
-                                    <input required type="text" className="input-admin" placeholder="e.g. 25000"
-                                        value={packageForm.cost_price} onChange={e => setPackageForm({ ...packageForm, cost_price: e.target.value })} />
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                                        <input 
+                                            required 
+                                            type="text" 
+                                            className="input-admin pl-10" 
+                                            placeholder="0"
+                                            value={formatToIDR(packageForm.cost_price)} 
+                                            onChange={e => setPackageForm({ ...packageForm, cost_price: formatToIDR(e.target.value) })} 
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <div>
                                 <label className="label-admin">Reseller Price</label>
-                                <input required type="text" className="input-admin" placeholder="e.g. 27000"
-                                    value={packageForm.reseller_price} onChange={e => setPackageForm({ ...packageForm, reseller_price: e.target.value })} />
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                                    <input 
+                                        required 
+                                        type="text" 
+                                        className="input-admin pl-10" 
+                                        placeholder="0"
+                                        value={formatToIDR(packageForm.reseller_price)} 
+                                        onChange={e => setPackageForm({ ...packageForm, reseller_price: formatToIDR(e.target.value) })} 
+                                    />
+                                </div>
                             </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="label-admin">Duration</label>

@@ -68,10 +68,11 @@ export default function AuthButton() {
             {profile?.role === 'admin' && (
                 <Link
                     href="/admin"
-                    className="hidden md:flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_theme(colors.blue.800)] hover:shadow-[0_3px_0_theme(colors.blue.800)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-blue-600"
+                    className="flex items-center gap-2 bg-blue-600 text-white px-4 md:px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm shadow-[0_4px_0_theme(colors.blue.800)] md:shadow-[0_6px_0_theme(colors.blue.800)] hover:shadow-[0_2px_0_theme(colors.blue.800)] md:hover:shadow-[0_3px_0_theme(colors.blue.800)] hover:translate-y-[2px] md:hover:translate-y-[3px] active:shadow-none active:translate-y-[4px] md:active:translate-y-[6px] transition-all border-2 border-blue-600"
                 >
                     <LayoutDashboard className="w-4 h-4" />
-                    <span>Dashboard</span>
+                    <span className="hidden sm:inline">Dashboard</span>
+                    <span className="sm:hidden text-[10px]">ADMIN</span>
                 </Link>
             )}
             <button
