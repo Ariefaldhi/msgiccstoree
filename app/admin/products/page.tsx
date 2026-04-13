@@ -471,13 +471,12 @@ export default function AdminProducts() {
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
-
-                        <form onSubmit={handleCreateProduct} className="space-y-4">
-                            <div>
-                                <label className="label-admin">Product Logo</label>
-                                <div className="flex items-center gap-4">
+                        <form onSubmit={handleCreateProduct} className="space-y-6">
+                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-4">Product Appearance</label>
+                                <div className="flex items-center gap-6">
                                     {imagePreview ? (
-                                        <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 group">
+                                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-white shadow-md group">
                                             <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                                             <button
                                                 type="button"
@@ -491,88 +490,136 @@ export default function AdminProducts() {
                                         <button
                                             type="button"
                                             onClick={() => setShowCropper(true)}
-                                            className="w-20 h-20 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 hover:border-blue-500 hover:text-blue-500 transition-all bg-slate-50"
+                                            className="w-24 h-24 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 hover:border-blue-500 hover:text-blue-500 transition-all bg-white hover:bg-blue-50 group"
                                         >
-                                            <Plus className="w-6 h-6" />
+                                            <Plus className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                                            <span className="text-[8px] font-black mt-1 uppercase tracking-tighter">Upload</span>
                                         </button>
                                     )}
-                                    <div className="text-xs text-slate-400">
-                                        <p>Upload clean product logo.</p>
-                                        <p>Square ratio recommended.</p>
+                                    <div className="flex-1">
+                                        <h4 className="text-xs font-black text-slate-900 uppercase tracking-tight">Product Logo</h4>
+                                        <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">Gunakan gambar square (1:1) dengan resolusi tinggi untuk hasil terbaik.</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="label-admin">Description</label>
-                                <textarea className="input-admin min-h-[100px]" placeholder="Deskripsi lengkap produk..."
-                                    value={productForm.description} onChange={e => setProductForm({ ...productForm, description: e.target.value })}></textarea>
-                            </div>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Kategori Produk</label>
+                                    <div className="relative">
+                                        <select
+                                            required
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
+                                            value={productForm.category_id}
+                                            onChange={e => setProductForm({ ...productForm, category_id: e.target.value })}
+                                        >
+                                            <option value="">Pilih Kategori</option>
+                                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            <div>
-                                <label className="label-admin">Terms & Conditions (Optional)</label>
-                                <textarea className="input-admin min-h-[100px]" placeholder="Syarat dan ketentuan untuk produk ini..."
-                                    value={productForm.terms_conditions} onChange={e => setProductForm({ ...productForm, terms_conditions: e.target.value })}></textarea>
-                            </div>
-
-                            <div>
-                                <label className="label-admin">Category</label>
-                                <select
-                                    required
-                                    className="input-admin"
-                                    value={productForm.category_id}
-                                    onChange={e => setProductForm({ ...productForm, category_id: e.target.value })}
-                                >
-                                    <option value="">Select Category</option>
-                                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="label-admin">Product Title</label>
-                                <input required type="text" className="input-admin" placeholder="e.g. Netflix Premium"
-                                    value={productForm.title} onChange={e => setProductForm({ ...productForm, title: e.target.value })} />
-                            </div>
-                            <div>
-                                <label className="label-admin">Starting Price</label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Judul Layanan</label>
                                     <input 
                                         required 
                                         type="text" 
-                                        className="input-admin pl-10" 
-                                        placeholder="e.g. 25.000"
-                                        value={productForm.price.includes("Rp") ? productForm.price.replace("Rp ", "") : formatToIDR(productForm.price)} 
-                                        onChange={e => setProductForm({ ...productForm, price: formatToIDR(e.target.value) })} 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                        placeholder="Contoh: Netflix Premium 4K"
+                                        value={productForm.title} 
+                                        onChange={e => setProductForm({ ...productForm, title: e.target.value })} 
                                     />
                                 </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="label-admin">Tag (Optional)</label>
-                                    <input type="text" className="input-admin" placeholder="e.g. PROMO"
-                                        value={productForm.tag} onChange={e => setProductForm({ ...productForm, tag: e.target.value })} />
-                                </div>
-                                <div>
-                                    <label className="label-admin">Tag Color</label>
-                                    <div className="relative">
-                                        <select className="input-admin appearance-none" value={productForm.tag_color} onChange={e => setProductForm({ ...productForm, tag_color: e.target.value as any })}>
-                                            <option value="yellow">Yellow</option>
-                                            <option value="red">Red</option>
-                                            <option value="blue">Blue</option>
-                                            <option value="purple">Purple</option>
-                                        </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                            <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Mulai Dari</label>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">Rp</span>
+                                            <input 
+                                                required 
+                                                type="text" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                                placeholder="0"
+                                                value={productForm.price.includes("Rp") ? productForm.price.replace("Rp ", "") : formatToIDR(productForm.price)} 
+                                                onChange={e => setProductForm({ ...productForm, price: formatToIDR(e.target.value) })} 
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Tag (Opsional)</label>
+                                            <input 
+                                                type="text" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px]" 
+                                                placeholder="PROMO"
+                                                value={productForm.tag} 
+                                                onChange={e => setProductForm({ ...productForm, tag: e.target.value })} 
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Warna Tag</label>
+                                            <div className="relative">
+                                                <select 
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px] appearance-none cursor-pointer" 
+                                                    value={productForm.tag_color} 
+                                                    onChange={e => setProductForm({ ...productForm, tag_color: e.target.value as any })}
+                                                >
+                                                    <option value="yellow">Kuning</option>
+                                                    <option value="red">Merah</option>
+                                                    <option value="blue">Biru</option>
+                                                    <option value="purple">Ungu</option>
+                                                </select>
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                                    <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
+                            <div className="space-y-4 pt-2">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Deskripsi Produk</label>
+                                    <textarea 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm min-h-[120px] resize-none" 
+                                        placeholder="Tuliskan deskripsi lengkap mengenai produk ini..."
+                                        value={productForm.description} 
+                                        onChange={e => setProductForm({ ...productForm, description: e.target.value })}
+                                    ></textarea>
+                                </div>
 
-                            <button type="submit" disabled={isSubmitting} className="btn-admin-submit mt-4">
-                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Product"}
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Syarat & Ketentuan (Opsional)</label>
+                                    <textarea 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm min-h-[100px] resize-none" 
+                                        placeholder="Syarat, garansi, atau kebijakan lainnya..."
+                                        value={productForm.terms_conditions} 
+                                        onChange={e => setProductForm({ ...productForm, terms_conditions: e.target.value })}
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            <button 
+                                type="submit" 
+                                disabled={isSubmitting} 
+                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-900/20 flex items-center justify-center gap-3 disabled:opacity-50 group active:scale-[0.98]"
+                            >
+                                {isSubmitting ? (
+                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                ) : (
+                                    <>
+                                        <span>Konfirmasi & Tambah Produk</span>
+                                        <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                                    </>
+                                )}
                             </button>
                         </form>
+
                     </div>
                 </div>
             )}
@@ -590,79 +637,142 @@ export default function AdminProducts() {
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
-
-                        <form onSubmit={handleUpdateProduct} className="space-y-4">
-                            <div>
-                                <label className="label-admin">Category</label>
-                                <select
-                                    required
-                                    className="input-admin"
-                                    value={editForm.category_id}
-                                    onChange={e => setEditForm({ ...editForm, category_id: e.target.value })}
-                                >
-                                    <option value="">Select Category</option>
-                                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="label-admin">Product Title</label>
-                                <input required type="text" className="input-admin" placeholder="e.g. Netflix Premium"
-                                    value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })} />
-                            </div>
-                            <div>
-                                <label className="label-admin">Starting Price</label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                        <form onSubmit={handleUpdateProduct} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Kategori Produk</label>
+                                    <div className="relative">
+                                        <select
+                                            required
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
+                                            value={editForm.category_id}
+                                            onChange={e => setEditForm({ ...editForm, category_id: e.target.value })}
+                                        >
+                                            <option value="">Pilih Kategori</option>
+                                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Judul Layanan</label>
                                     <input 
                                         required 
                                         type="text" 
-                                        className="input-admin pl-10" 
-                                        placeholder="e.g. 25.000"
-                                        value={editForm.price.includes("Rp") ? editForm.price.replace("Rp ", "") : formatToIDR(editForm.price)} 
-                                        onChange={e => setEditForm({ ...editForm, price: formatToIDR(e.target.value) })} 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                        placeholder="Contoh: Netflix Premium 4K"
+                                        value={editForm.title} 
+                                        onChange={e => setEditForm({ ...editForm, title: e.target.value })} 
                                     />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="label-admin">Tag (Optional)</label>
-                                    <input type="text" className="input-admin" placeholder="e.g. PROMO"
-                                        value={editForm.tag} onChange={e => setEditForm({ ...editForm, tag: e.target.value })} />
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Mulai Dari</label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">Rp</span>
+                                        <input 
+                                            required 
+                                            type="text" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                            placeholder="0"
+                                            value={editForm.price.includes("Rp") ? editForm.price.replace("Rp ", "") : formatToIDR(editForm.price)} 
+                                            onChange={e => setEditForm({ ...editForm, price: formatToIDR(e.target.value) })} 
+                                        />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="label-admin">Tag Color</label>
-                                    <select className="input-admin" value={editForm.tag_color} onChange={e => setEditForm({ ...editForm, tag_color: e.target.value as any })}>
-                                        <option value="yellow">Yellow (Standard)</option>
-                                        <option value="red">Red (Hot)</option>
-                                        <option value="blue">Blue (New)</option>
-                                        <option value="purple">Purple (Elite)</option>
-                                    </select>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Tag (Opsional)</label>
+                                        <input 
+                                            type="text" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px]" 
+                                            placeholder="PROMO"
+                                            value={editForm.tag} 
+                                            onChange={e => setEditForm({ ...editForm, tag: e.target.value })} 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Warna Tag</label>
+                                        <div className="relative">
+                                            <select 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px] appearance-none cursor-pointer" 
+                                                value={editForm.tag_color} 
+                                                onChange={e => setEditForm({ ...editForm, tag_color: e.target.value as any })}
+                                            >
+                                                <option value="yellow">Kuning</option>
+                                                <option value="red">Merah</option>
+                                                <option value="blue">Biru</option>
+                                                <option value="purple">Ungu</option>
+                                            </select>
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="label-admin">Image URL (Optional)</label>
-                                <input type="text" className="input-admin" placeholder="https://..."
-                                    value={editForm.image_url} onChange={e => setEditForm({ ...editForm, image_url: e.target.value })} />
-                                {editForm.image_url && (
-                                    <img src={editForm.image_url} className="mt-2 w-16 h-16 rounded-xl object-cover border border-slate-200" alt="preview" />
+                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-4">URL Gambar Produk</label>
+                                <div className="flex items-center gap-4 group">
+                                    <div className="flex-1">
+                                        <input 
+                                            type="text" 
+                                            className="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
+                                            placeholder="https://example.com/image.jpg"
+                                            value={editForm.image_url} 
+                                            onChange={e => setEditForm({ ...editForm, image_url: e.target.value })} 
+                                        />
+                                    </div>
+                                    {editForm.image_url && (
+                                        <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-white shadow-sm shrink-0">
+                                            <img src={editForm.image_url} className="w-full h-full object-cover" alt="preview" />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="space-y-4 pt-2">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Deskripsi Produk</label>
+                                    <textarea 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm min-h-[120px] resize-none" 
+                                        placeholder="Deskripsi lengkap produk..."
+                                        value={editForm.description} 
+                                        onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                                    ></textarea>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Syarat & Ketentuan (Opsional)</label>
+                                    <textarea 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm min-h-[100px] resize-none" 
+                                        placeholder="Syarat, garansi, atau kebijakan lainnya..."
+                                        value={editForm.terms_conditions} 
+                                        onChange={e => setEditForm({ ...editForm, terms_conditions: e.target.value })}
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            <button 
+                                type="submit" 
+                                disabled={isSubmitting} 
+                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-900/20 flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98]"
+                            >
+                                {isSubmitting ? (
+                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                ) : (
+                                    <>
+                                        <Save className="w-5 h-5" />
+                                        <span>Simpan Perubahan Produk</span>
+                                    </>
                                 )}
-                            </div>
-                            <div>
-                                <label className="label-admin">Description</label>
-                                <textarea className="input-admin min-h-[100px]" placeholder="Deskripsi lengkap produk..."
-                                    value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })}></textarea>
-                            </div>
-                            <div>
-                                <label className="label-admin">Terms & Conditions (Optional)</label>
-                                <textarea className="input-admin min-h-[100px]" placeholder="Syarat dan ketentuan untuk produk ini..."
-                                    value={editForm.terms_conditions} onChange={e => setEditForm({ ...editForm, terms_conditions: e.target.value })}></textarea>
-                            </div>
-
-                            <button type="submit" disabled={isSubmitting} className="btn-admin-submit mt-4">
-                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save className="w-4 h-4" /> Save Changes</>}
                             </button>
                         </form>
+
                     </div>
                 </div>
             )}
@@ -680,22 +790,28 @@ export default function AdminProducts() {
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
-
-                        <form onSubmit={handleCreatePackage} className="space-y-4">
+                        <form onSubmit={handleCreatePackage} className="space-y-6">
                             <div>
-                                <label className="label-admin">Package Name</label>
-                                <input required type="text" className="input-admin" placeholder="e.g. 1 Bulan Sharing"
-                                    value={packageForm.name} onChange={e => setPackageForm({ ...packageForm, name: e.target.value })} />
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Nama Paket</label>
+                                <input 
+                                    required 
+                                    type="text" 
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                    placeholder="Contoh: 1 Bulan Sharing"
+                                    value={packageForm.name} 
+                                    onChange={e => setPackageForm({ ...packageForm, name: e.target.value })} 
+                                />
                             </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="label-admin">Sell Price</label>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Jual</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">Rp</span>
                                         <input 
                                             required 
                                             type="text" 
-                                            className="input-admin pl-10" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
                                             placeholder="0"
                                             value={formatToIDR(packageForm.price)} 
                                             onChange={e => setPackageForm({ ...packageForm, price: formatToIDR(e.target.value) })} 
@@ -703,13 +819,13 @@ export default function AdminProducts() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="label-admin">Cost Price (Modal)</label>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Modal</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">Rp</span>
                                         <input 
                                             required 
                                             type="text" 
-                                            className="input-admin pl-10" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
                                             placeholder="0"
                                             value={formatToIDR(packageForm.cost_price)} 
                                             onChange={e => setPackageForm({ ...packageForm, cost_price: formatToIDR(e.target.value) })} 
@@ -717,50 +833,65 @@ export default function AdminProducts() {
                                     </div>
                                 </div>
                             </div>
-                            <div>
-                                <label className="label-admin">Reseller Price</label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
-                                    <input 
-                                        required 
-                                        type="text" 
-                                        className="input-admin pl-10" 
-                                        placeholder="0"
-                                        value={formatToIDR(packageForm.reseller_price)} 
-                                        onChange={e => setPackageForm({ ...packageForm, reseller_price: formatToIDR(e.target.value) })} 
-                                    />
-                                </div>
-                            </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="label-admin">Duration</label>
-                                    <input required type="text" className="input-admin" placeholder="e.g. 30 Hari"
-                                        value={packageForm.duration} onChange={e => setPackageForm({ ...packageForm, duration: e.target.value })} />
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Reseller</label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">Rp</span>
+                                        <input 
+                                            required 
+                                            type="text" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                            placeholder="0"
+                                            value={formatToIDR(packageForm.reseller_price)} 
+                                            onChange={e => setPackageForm({ ...packageForm, reseller_price: formatToIDR(e.target.value) })} 
+                                        />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className="label-admin">Type</label>
-                                    <input required type="text" className="input-admin" placeholder="e.g. PRIVAT"
-                                        value={packageForm.type} onChange={e => setPackageForm({ ...packageForm, type: e.target.value })} />
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Durasi / Tipe</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input 
+                                            required 
+                                            type="text" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px]" 
+                                            placeholder="30 Hari"
+                                            value={packageForm.duration} 
+                                            onChange={e => setPackageForm({ ...packageForm, duration: e.target.value })} 
+                                        />
+                                        <input 
+                                            required 
+                                            type="text" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px]" 
+                                            placeholder="Sharing"
+                                            value={packageForm.type} 
+                                            onChange={e => setPackageForm({ ...packageForm, type: e.target.value })} 
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+
+                            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                                 <label className="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" className="sr-only peer" checked={packageForm.is_available} 
+                                    <input 
+                                        type="checkbox" 
+                                        className="sr-only peer" 
+                                        checked={packageForm.is_available} 
                                         onChange={e => setPackageForm({ ...packageForm, is_available: e.target.checked })} />
                                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                 </label>
-                                <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Package Available</span>
+                                <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">Paket Tersedia (ON/OFF)</span>
                             </div>
 
                             {/* Features Input */}
-                            <div>
-                                <label className="label-admin">Features (Unlimited)</label>
-                                <div className="flex gap-2 mb-2">
+                            <div className="space-y-4">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider ml-1">Fitur & Keunggulan</label>
+                                <div className="flex gap-2">
                                     <input
                                         type="text"
-                                        className="input-admin"
-                                        placeholder="Add a feature (e.g. Garansi 7 Hari)"
+                                        className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm"
+                                        placeholder="Tambah fitur (Contoh: Garansi Full)"
                                         id="feature-input"
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
@@ -783,49 +914,49 @@ export default function AdminProducts() {
                                                 input.value = "";
                                             }
                                         }}
-                                        className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 rounded-xl font-bold transition-colors"
+                                        className="bg-blue-50 hover:bg-blue-100 text-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center transition-colors shrink-0 border border-blue-100"
                                     >
-                                        <Plus className="w-5 h-5" />
+                                        <Plus className="w-6 h-6" />
                                     </button>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="grid grid-cols-1 gap-2">
                                     {packageForm.features.map((feat, idx) => (
-                                        <div key={idx} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                                        <div key={idx} className="flex items-center justify-between bg-white border border-slate-100 rounded-xl px-4 py-3 shadow-sm group">
                                             <span className="text-xs font-bold text-slate-700">{feat}</span>
                                             <button
                                                 type="button"
                                                 onClick={() => setPackageForm(prev => ({ ...prev, features: prev.features.filter((_, i) => i !== idx) }))}
-                                                className="text-slate-400 hover:text-red-500 transition-colors"
+                                                className="text-slate-300 hover:text-red-500 transition-colors"
                                             >
-                                                <X className="w-4 h-4" />
+                                                <X className="w-5 h-5" />
                                             </button>
                                         </div>
                                     ))}
                                     {packageForm.features.length === 0 && (
-                                        <p className="text-xs text-slate-400 italic">No features added. Press Enter to add.</p>
+                                        <p className="text-[10px] text-slate-400 italic text-center py-2">Belum ada fitur ditambahkan. Tekan Enter untuk menambah.</p>
                                     )}
                                 </div>
                             </div>
 
-                            <button type="submit" disabled={isSubmitting} className="btn-admin-submit mt-4">
-                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : editingPackage ? "Save Package" : "Add Package"}
+                            <button 
+                                type="submit" 
+                                disabled={isSubmitting} 
+                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-900/20 flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98]"
+                            >
+                                {isSubmitting ? (
+                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                ) : (
+                                    <>
+                                        <span>{editingPackage ? "Simpan Perubahan Paket" : "Tambah Paket Ke Produk"}</span>
+                                        {!editingPackage && <Plus className="w-5 h-5" />}
+                                    </>
+                                )}
                             </button>
                         </form>
                     </div>
                 </div>
             )}
 
-            <style jsx>{`
-        .label-admin {
-            @apply block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2;
-        }
-        .input-admin {
-            @apply w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all;
-        }
-        .btn-admin-submit {
-            @apply w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2;
-        }
-      `}</style>
 
             {showCropper && (
                 <ImageCropper

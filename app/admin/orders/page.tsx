@@ -456,147 +456,213 @@ export default function AdminOrders() {
                             </button>
                         </div>
 
-                        <form onSubmit={handleSaveOrder} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Pemesan</label>
-                                <input required type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. Arief" 
-                                    value={orderForm.customer_name} onChange={e => setOrderForm({...orderForm, customer_name: e.target.value})} />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">No WA</label>
-                                <input required type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. 085720..." 
-                                    value={orderForm.wa_number} onChange={e => setOrderForm({...orderForm, wa_number: e.target.value})} />
+                        <form onSubmit={handleSaveOrder} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Nama Pemesan</label>
+                                    <input 
+                                        required 
+                                        type="text" 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                        placeholder="e.g. Arief" 
+                                        value={orderForm.customer_name} 
+                                        onChange={e => setOrderForm({...orderForm, customer_name: e.target.value})} 
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">No WhatsApp</label>
+                                    <input 
+                                        required 
+                                        type="text" 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                        placeholder="e.g. 085720..." 
+                                        value={orderForm.wa_number} 
+                                        onChange={e => setOrderForm({...orderForm, wa_number: e.target.value})} 
+                                    />
+                                </div>
                             </div>
                             
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Produk</label>
-                                <select required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={orderForm.product_id} onChange={e => setOrderForm({...orderForm, product_id: e.target.value, package_id: ""})}
-                                >
-                                    <option value="">-- Pilih Produk --</option>
-                                    {products.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                                </select>
-                            </div>
-
-                            {orderForm.product_id && (
+                            <div className="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Paket</label>
-                                    <select required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        value={orderForm.package_id} 
-                                        onChange={e => {
-                                            const pkgId = e.target.value;
-                                            const pkg = products.find(p => p.id === orderForm.product_id)?.packages?.find((p: any) => p.id === pkgId);
-                                            setOrderForm({
-                                                ...orderForm, 
-                                                package_id: pkgId,
-                                                sell_price: pkg ? (parseInt(pkg.price.replace(/\D/g, "")) || 0) : 0,
-                                                cost_price: pkg ? (pkg.cost_price || 0) : 0
-                                            });
-                                        }}
-                                    >
-                                        <option value="">-- Pilih Paket --</option>
-                                        {products.find(p => p.id === orderForm.product_id)?.packages?.map((pkg: any) => (
-                                            <option key={pkg.id} value={pkg.id}>{pkg.name} - {pkg.price}</option>
-                                        ))}
-                                    </select>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Layanan Produk</label>
+                                    <div className="relative">
+                                        <select 
+                                            required 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
+                                            value={orderForm.product_id} 
+                                            onChange={e => setOrderForm({...orderForm, product_id: e.target.value, package_id: ""})}
+                                        >
+                                            <option value="">-- Pilih Produk --</option>
+                                            {products.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
+
+                                {orderForm.product_id && (
+                                    <div className="animate-in slide-in-from-top-2 duration-300">
+                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Paket Item</label>
+                                        <div className="relative">
+                                            <select 
+                                                required 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
+                                                value={orderForm.package_id} 
+                                                onChange={e => {
+                                                    const pkgId = e.target.value;
+                                                    const pkg = products.find(p => p.id === orderForm.product_id)?.packages?.find((p: any) => p.id === pkgId);
+                                                    setOrderForm({
+                                                        ...orderForm, 
+                                                        package_id: pkgId,
+                                                        sell_price: pkg ? (parseInt(pkg.price.replace(/\D/g, "")) || 0) : 0,
+                                                        cost_price: pkg ? (pkg.cost_price || 0) : 0
+                                                    });
+                                                }}
+                                            >
+                                                <option value="">-- Pilih Paket --</option>
+                                                {products.find(p => p.id === orderForm.product_id)?.packages?.map((pkg: any) => (
+                                                    <option key={pkg.id} value={pkg.id}>{pkg.name} - {pkg.price}</option>
+                                                ))}
+                                            </select>
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                                <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
                             {orderForm.package_id && (
-                                <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                <div className="grid grid-cols-2 gap-4 bg-blue-50/50 p-5 rounded-3xl border border-blue-100 animate-in zoom-in-95 duration-300">
                                     <div>
-                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Harga Jual (Rp)</label>
-                                        <input required type="text" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-900" 
-                                            value={formatToIDR(orderForm.sell_price)} onChange={e => setOrderForm({...orderForm, sell_price: formatToIDR(e.target.value)})} />
+                                        <label className="block text-[10px] font-black text-blue-500 uppercase tracking-wider mb-2 ml-1">Harga Jual (Rp)</label>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-blue-300">Rp</span>
+                                            <input required type="text" className="w-full bg-white border border-blue-200 rounded-xl pl-10 pr-4 py-2.5 text-xs font-black text-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-500/20" 
+                                                value={formatToIDR(orderForm.sell_price)} onChange={e => setOrderForm({...orderForm, sell_price: formatToIDR(e.target.value)})} />
+                                        </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Harga Modal (Rp)</label>
-                                        <input required type="text" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-900" 
-                                            value={formatToIDR(orderForm.cost_price)} onChange={e => setOrderForm({...orderForm, cost_price: formatToIDR(e.target.value)})} />
+                                        <label className="block text-[10px] font-black text-blue-500 uppercase tracking-wider mb-2 ml-1">Modal (Rp)</label>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-blue-300">Rp</span>
+                                            <input required type="text" className="w-full bg-white border border-blue-200 rounded-xl pl-10 pr-4 py-2.5 text-xs font-black text-slate-600 focus:outline-none focus:ring-4 focus:ring-blue-500/20" 
+                                                value={formatToIDR(orderForm.cost_price)} onChange={e => setOrderForm({...orderForm, cost_price: formatToIDR(e.target.value)})} />
+                                        </div>
                                     </div>
                                 </div>
                             )}
-                            
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal & Waktu Pesanan</label>
-                                <input required type="datetime-local" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                    value={orderForm.created_at} onChange={e => setOrderForm({...orderForm, created_at: e.target.value})} />
-                            </div>
 
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
-                                <select required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={orderForm.status} onChange={e => setOrderForm({...orderForm, status: e.target.value})}
-                                >
-                                    <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
-                                    <option value="Sedang Diproses">Sedang Diproses</option>
-                                    <option value="Pesanan Selesai">Pesanan Selesai</option>
-                                    <option value="Dibatalkan">Dibatalkan</option>
-                                </select>
-                            </div>
-
-                            <hr className="border-slate-100 my-4" />
-
-                            <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100 space-y-4">
-                                <h3 className="text-xs font-black text-purple-600 uppercase tracking-widest flex items-center gap-2">
-                                    <Megaphone className="w-4 h-4" /> Informasi Afiliasi
-                                </h3>
-                                <div className="relative">
-                                    <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">Cari Afiliator (Nama/Kode)</label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Waktu Transaksi</label>
+                                    <input 
+                                        required 
+                                        type="datetime-local" 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                        value={orderForm.created_at} 
+                                        onChange={e => setOrderForm({...orderForm, created_at: e.target.value})} 
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Status Pesanan</label>
                                     <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-purple-300" />
-                                        <input 
-                                            type="text" 
-                                            className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 pl-8 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500" 
-                                            placeholder="Ketik nama atau kode referral..." 
-                                            value={affSearch}
-                                            onFocus={() => setShowAffSuggestions(true)}
-                                            onChange={e => {
-                                                setAffSearch(e.target.value);
-                                                setShowAffSuggestions(true);
-                                            }}
-                                        />
+                                        <select 
+                                            required 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
+                                            value={orderForm.status} 
+                                            onChange={e => setOrderForm({...orderForm, status: e.target.value})}
+                                        >
+                                            <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
+                                            <option value="Sedang Diproses">Sedang Diproses</option>
+                                            <option value="Pesanan Selesai">Pesanan Selesai</option>
+                                            <option value="Dibatalkan">Dibatalkan</option>
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                        </div>
                                     </div>
-                                    
-                                    {showAffSuggestions && affSearch && (
-                                        <div className="absolute z-[10001] left-0 right-0 mt-1 bg-white border border-slate-100 rounded-xl shadow-xl max-h-40 overflow-y-auto overflow-x-hidden">
-                                            {affiliators.filter(a => 
-                                                a.full_name?.toLowerCase().includes(affSearch.toLowerCase()) || 
-                                                a.affiliate_code?.toLowerCase().includes(affSearch.toLowerCase())
-                                            ).map(aff => (
-                                                <button
-                                                    key={aff.id}
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setOrderForm({ ...orderForm, affiliator_id: aff.id });
-                                                        setAffSearch(aff.full_name);
-                                                        setShowAffSuggestions(false);
-                                                    }}
-                                                    className="w-full text-left px-4 py-2.5 hover:bg-purple-50 transition-colors border-b border-slate-50 last:border-0"
-                                                >
-                                                    <div className="text-[10px] font-black text-slate-900">{aff.full_name}</div>
-                                                    <div className="text-[9px] text-purple-500 font-bold uppercase">{aff.affiliate_code}</div>
-                                                </button>
-                                            ))}
-                                            {affiliators.filter(a => 
-                                                a.full_name?.toLowerCase().includes(affSearch.toLowerCase()) || 
-                                                a.affiliate_code?.toLowerCase().includes(affSearch.toLowerCase())
-                                            ).length === 0 && (
-                                                <div className="p-3 text-[10px] text-slate-400 italic text-center">Tidak ditemukan</div>
-                                            )}
+                                </div>
+                            </div>
+
+                            <div className="bg-purple-50 p-6 rounded-3xl border border-purple-100 space-y-5">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-widest flex items-center gap-2">
+                                        <Megaphone className="w-4 h-4" /> Informasi Afiliator
+                                    </h3>
+                                    {orderForm.affiliator_id && (
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { setOrderForm({...orderForm, affiliator_id: ""}); setAffSearch(""); }}
+                                            className="text-[9px] font-black text-red-400 uppercase tracking-tighter hover:text-red-600 transition-colors"
+                                        >
+                                            Hapus
+                                        </button>
+                                    )}
+                                </div>
+                                
+                                <div className="space-y-4">
+                                    <div className="relative">
+                                        <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2 ml-1">Cari Nama/Kode Referral</label>
+                                        <div className="relative group">
+                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300 group-focus-within:text-purple-500 transition-colors" />
+                                            <input 
+                                                type="text" 
+                                                className="w-full bg-white border border-purple-200 rounded-2xl px-4 py-3.5 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all" 
+                                                placeholder="Ketik nama atau kode referral..." 
+                                                value={affSearch}
+                                                onFocus={() => setShowAffSuggestions(true)}
+                                                onChange={e => {
+                                                    setAffSearch(e.target.value);
+                                                    setShowAffSuggestions(true);
+                                                }}
+                                            />
+                                        </div>
+                                        
+                                        {showAffSuggestions && affSearch && (
+                                            <div className="absolute z-[10001] left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl max-h-52 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2">
+                                                <div className="overflow-y-auto">
+                                                    {affiliators.filter(a => 
+                                                        a.full_name?.toLowerCase().includes(affSearch.toLowerCase()) || 
+                                                        a.affiliate_code?.toLowerCase().includes(affSearch.toLowerCase())
+                                                    ).map(aff => (
+                                                        <button
+                                                            key={aff.id}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setOrderForm({ ...orderForm, affiliator_id: aff.id });
+                                                                setAffSearch(aff.full_name);
+                                                                setShowAffSuggestions(false);
+                                                            }}
+                                                            className="w-full text-left px-5 py-4 hover:bg-purple-50 transition-all border-b border-slate-50 last:border-0 flex flex-col"
+                                                        >
+                                                            <span className="text-sm font-black text-slate-900 tracking-tight">{aff.full_name}</span>
+                                                            <span className="text-[10px] text-purple-500 font-black uppercase tracking-widest mt-0.5">{aff.affiliate_code}</span>
+                                                        </button>
+                                                    ))}
+                                                    {affiliators.filter(a => 
+                                                        a.full_name?.toLowerCase().includes(affSearch.toLowerCase()) || 
+                                                        a.affiliate_code?.toLowerCase().includes(affSearch.toLowerCase())
+                                                    ).length === 0 && (
+                                                        <div className="p-6 text-xs text-slate-400 italic text-center font-medium">Data tidak ditemukan</div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {orderForm.affiliator_id && (
+                                        <div className="bg-white/50 border border-purple-100 rounded-2xl p-4 flex items-center justify-between animate-in slide-in-from-left-2 transition-all">
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] font-black text-purple-300 uppercase tracking-widest">Afiliator Terpilih</span>
+                                                <span className="text-[11px] font-mono text-slate-400 mt-1">{orderForm.affiliator_id}</span>
+                                            </div>
+                                            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                                                <CheckCircle2 className="w-6 h-6" />
+                                            </div>
                                         </div>
                                     )}
-
-                                    <div className="mt-4">
-                                        <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">ID Afiliator (UUID)</label>
-                                        <input 
-                                            type="text" 
-                                            className="w-full bg-slate-50 border border-purple-100 rounded-xl px-4 py-2 text-[10px] font-mono text-slate-400 focus:outline-none" 
-                                            placeholder="Otomatis terisi..." 
-                                            readOnly
-                                            value={orderForm.affiliator_id} 
-                                        />
-                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">Jumlah Komisi (Rp)</label>
