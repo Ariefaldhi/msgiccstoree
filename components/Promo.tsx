@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Zap, Clock } from "lucide-react";
+import { Zap, Clock, Share2, Loader2 } from "lucide-react";
+import html2canvas from "html2canvas";
 
 interface PromoItem {
     id: string;
@@ -113,6 +114,7 @@ function PromoCard({ item, onOpen }: { item: PromoItem; onOpen: () => void }) {
 export default function Promo({ onOpenProduct }: PromoProps) {
     const [items, setItems] = useState<PromoItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isSharing, setIsSharing] = useState(false);
     const supabase = createClient();
 
     useEffect(() => {
@@ -155,6 +157,35 @@ export default function Promo({ onOpenProduct }: PromoProps) {
 
     if (loading || items.length === 0) return null;
 
+    const handleShareAll = async () => {
+        setIsSharing(true);
+        try {
+            const container = document.getElementById('twibbon-container-all');
+            if (container) {
+                container.style.display = 'flex';
+                await new Promise(r => setTimeout(r, 500));
+
+                const canvas = await html2canvas(container, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: null,
+                    allowTaint: true,
+                });
+                
+                container.style.display = 'none';
+
+                const link = document.createElement("a");
+                link.download = `Semua-Promo.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            }
+        } catch (error) {
+            console.error("Error generating share image", error);
+            alert("Gagal membuat gambar share.");
+        }
+        setIsSharing(false);
+    };
+
     return (
         <section className="py-12 bg-white relative overflow-hidden">
             <div className="container mx-auto px-4 relative z-10">
@@ -168,9 +199,19 @@ export default function Promo({ onOpenProduct }: PromoProps) {
                             <p className="text-slate-500 font-medium">Jangan lewatkan penawaran terbatas ini.</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold">
-                        <Clock className="w-3.5 h-3.5" />
-                        Berakhir Segera
+                    <div className="flex flex-col md:flex-row items-end md:items-center gap-3">
+                        <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold">
+                            <Clock className="w-3.5 h-3.5" />
+                            Berakhir Segera
+                        </div>
+                        <button 
+                            onClick={handleShareAll}
+                            disabled={isSharing}
+                            className="bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 border border-blue-100"
+                        >
+                            {isSharing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Share2 className="w-3.5 h-3.5" />}
+                            Share Semua
+                        </button>
                     </div>
                 </div>
 
@@ -183,6 +224,61 @@ export default function Promo({ onOpenProduct }: PromoProps) {
                             onOpen={() => onOpenProduct(item.package.product)}
                         />
                     ))}
+                </div>
+            </div>
+
+            {/* Hidden Twibbon Container (1080x1920 layout) for ALL promos */}
+            <div 
+                id="twibbon-container-all"
+                className="fixed top-[9999px] left-[9999px] w-[1080px] h-[1920px] flex flex-col items-center overflow-hidden"
+                style={{ display: 'none' }}
+            >
+                {/* Twibbon Background */}
+                <img src="/twibbon-promo.png" alt="Twibbon" className="absolute inset-0 w-full h-full object-cover z-10 pointer-events-none" crossOrigin="anonymous" />
+                
+                {/* Promos Grid over Twibbon */}
+                <div className="absolute top-[520px] left-[90px] w-[900px] h-[850px] z-20 flex flex-col justify-center">
+                    <div className="flex flex-col gap-6 w-full">
+                        {items.slice(0, 2).map(item => {
+                            const rawPrice = parseInt(item.package.price.replace(/\D/g, ""), 10) || 0;
+                            const discounted = Math.round(rawPrice * (1 - item.discount_percent / 100));
+                            const discountedFormatted = `Rp ${discounted.toLocaleString("id-ID")}`;
+                            return (
+                                <div key={item.id} className="bg-white rounded-[3rem] p-8 shadow-2xl flex items-center gap-8 relative border-4 border-slate-50">
+                                    <div className="absolute top-6 right-6 bg-blue-500 text-white text-3xl font-black px-6 pt-1 pb-4 rounded-2xl shadow-lg flex items-center justify-center">
+                                        <span className="relative -top-2">-{item.discount_percent}%</span>
+                                    </div>
+                                    <div className="w-[260px] h-[260px] shrink-0 rounded-[2.5rem] overflow-hidden bg-slate-100 shadow-inner border border-slate-200">
+                                        {item.package.product.image_url ? (
+                                            <img src={item.package.product.image_url} alt={item.package.product.title} className="w-full h-full object-cover" crossOrigin="anonymous" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-8xl font-black text-slate-300">
+                                                {item.package.product.title.charAt(0)}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col text-left justify-start flex-1 min-w-0 pr-4 h-[260px] py-1">
+                                        <h3 className="font-black text-[42px] text-slate-900 w-full mb-1 leading-tight">{item.package.product.title}</h3>
+                                        <p className="text-2xl text-slate-500 font-bold mb-3 w-full leading-tight">{item.package.name}</p>
+                                        <div className="flex flex-col mt-auto bg-red-50 pt-4 pb-8 px-6 rounded-[2rem] border border-red-100 justify-start">
+                                            <div className="relative inline-block w-fit mb-1">
+                                                <p className="text-2xl text-slate-400 leading-none">{item.package.price}</p>
+                                                <div className="absolute top-[80%] left-0 w-full h-[2px] bg-slate-400 -translate-y-1/2"></div>
+                                            </div>
+                                            <p className="text-5xl font-black text-[#ff2d55] relative -top-1">{discountedFormatted}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    {items.length > 2 && (
+                        <div className="text-center mt-8">
+                            <span className="bg-slate-900 text-white text-3xl font-black px-10 py-4 rounded-full shadow-xl inline-block border-4 border-white">
+                                + {items.length - 2} Promo Lainnya di Website!
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
         </section>
