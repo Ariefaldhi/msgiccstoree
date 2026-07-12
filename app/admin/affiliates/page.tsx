@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Megaphone, Users, Wallet, History, Search, ArrowRight, TrendingUp, DollarSign } from "lucide-react";
+import { useAdminCurrency } from "@/components/admin/AdminCurrencyProvider";
 import Link from "next/link";
 
 export default function AffiliateManagement() {
+    const { formatCurrency } = useAdminCurrency();
     const [stats, setStats] = useState({
         totalBalance: 0,
         totalCommissionPaid: 0,
@@ -141,7 +143,7 @@ export default function AffiliateManagement() {
                         </div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
                         <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                            {typeof stat.value === 'number' && stat.label.includes('Total') && !stat.label.includes('Komisi') ? stat.value.toLocaleString() : `Rp ${stat.value.toLocaleString()}`}
+                            {stat.label === 'Affiliator Aktif' || stat.label === 'Total Referral' ? stat.value.toLocaleString() : formatCurrency(stat.value)}
                         </h3>
                     </div>
                 ))}
@@ -199,7 +201,7 @@ export default function AffiliateManagement() {
                                                         {aff.affiliate_code || '-'}
                                                     </span>
                                                 </td>
-                                                <td className="p-4 font-black text-slate-900">Rp {aff.balance?.toLocaleString() || '0'}</td>
+                                                <td className="p-4 font-black text-slate-900">{formatCurrency(aff.balance)}</td>
                                                 <td className="p-4">
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-bold text-slate-700">{aff.totalOrders}</span>
@@ -207,7 +209,7 @@ export default function AffiliateManagement() {
                                                     </div>
                                                 </td>
                                                 <td className="p-4 text-right font-black text-emerald-600">
-                                                    Rp {aff.totalEarned.toLocaleString()}
+                                                    {formatCurrency(aff.totalEarned)}
                                                 </td>
                                             </tr>
                                         ))}
@@ -237,7 +239,7 @@ export default function AffiliateManagement() {
                                         <div className="grid grid-cols-2 gap-4 mb-4">
                                             <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100">
                                                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Saldo</p>
-                                                <p className="font-black text-slate-900 text-sm">Rp {aff.balance?.toLocaleString() || '0'}</p>
+                                                <p className="font-black text-slate-900 text-sm">{formatCurrency(aff.balance)}</p>
                                             </div>
                                             <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100">
                                                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Ref</p>
@@ -247,7 +249,7 @@ export default function AffiliateManagement() {
 
                                         <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Penghasilan</p>
-                                            <p className="font-black text-emerald-600">Rp {aff.totalEarned.toLocaleString()}</p>
+                                            <p className="font-black text-emerald-600">{formatCurrency(aff.totalEarned)}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -277,7 +279,7 @@ export default function AffiliateManagement() {
                                             <h4 className="font-bold text-slate-900 text-sm line-clamp-1">{order.product_name}</h4>
                                         </div>
                                         <div className="bg-white px-2 py-1 rounded-lg border border-slate-100 font-black text-[10px] text-purple-600">
-                                            + Rp {order.commission?.toLocaleString() || '0'}
+                                            + {formatCurrency(order.commission)}
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2 mt-2">

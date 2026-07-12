@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, RefreshCw, CheckCircle2, Clock, XCircle, ShoppingBag, Plus, Edit, Trash2, X, Save, Megaphone, Search } from "lucide-react";
+import { ShoppingBag, Search, Plus, Loader2, Megaphone, X, Save, Edit, Trash2, RefreshCw } from "lucide-react";
+import { useAdminCurrency } from "@/components/admin/AdminCurrencyProvider";
 import { toLocalISOString } from "@/lib/utils";
 
 interface Order {
@@ -29,6 +30,7 @@ const formatToIDR = (val: string | number) => {
 };
 
 export default function AdminOrders() {
+    const { isUSD, formatCurrency } = useAdminCurrency();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -75,7 +77,9 @@ export default function AdminOrders() {
     // Auto-calculate commission in modal
     useEffect(() => {
         if (isModalOpen && orderForm.affiliator_id) {
-            const profit = orderForm.sell_price - orderForm.cost_price;
+            const sellPrice = parseInt(orderForm.sell_price.toString().replace(/\D/g, '')) || 0;
+            const costPrice = parseInt(orderForm.cost_price.toString().replace(/\D/g, '')) || 0;
+            const profit = sellPrice - costPrice;
             if (profit > 0) {
                 const autoCommission = Math.floor(profit * (globalCommissionPercent / 100));
                 setOrderForm((prev: any) => ({ ...prev, commission: autoCommission }));
@@ -95,12 +99,10 @@ export default function AdminOrders() {
         if (!error) {
             // Automatic Balance Adjustment for Affiliators
             if (newStatus === "Pesanan Selesai" && order?.status !== "Pesanan Selesai" && order?.affiliator_id) {
-                // FRESH FETCH: Get settings directly from DB
                 const { data: st } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
                 const currentPercent = st?.affiliate_commission_percent ?? 25;
                 const commissionToPay = Math.floor(order.profit * (currentPercent / 100));
                 
-                // Open Custom Modal instead of window.confirm
                 setPayoutData({
                     id,
                     newStatus,
@@ -114,7 +116,6 @@ export default function AdminOrders() {
                 });
                 setIsPayoutModalOpen(true);
 
-                // Fetch name asynchronously
                 supabase.from("profiles").select("full_name").eq("id", order.affiliator_id).single().then(({ data }) => {
                     if (data?.full_name) {
                         setPayoutData((prev: any) => ({ ...prev, affiliatorName: data.full_name }));
@@ -123,7 +124,6 @@ export default function AdminOrders() {
                 setUpdatingId(null);
                 return;
             } else if (newStatus !== "Pesanan Selesai" && order?.status === "Pesanan Selesai" && order?.affiliator_id) {
-                // Refund / Rollback commission if status is changed back
                 const { data: st } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
                 const currentPercent = st?.affiliate_commission_percent ?? 25;
                 const commissionToRefund = Math.floor(order.profit * (currentPercent / 100));
@@ -163,9 +163,6 @@ export default function AdminOrders() {
             setIsSubmitting(false);
             return;
         }
-
-        const rawPrice = parseInt(selectedPackage.price.replace(/\D/g, "")) || 0;
-        const profitRaw = rawPrice - selectedPackage.cost_price;
 
         const payload: any = {
             customer_name: orderForm.customer_name,
@@ -211,7 +208,6 @@ export default function AdminOrders() {
     const openModal = (order?: Order) => {
         if (order) {
             setEditingOrder(order);
-            // find product_id from products array via package_id or name
             let prodId = "";
             let pkgId = "";
             for (const prod of products) {
@@ -323,7 +319,6 @@ export default function AdminOrders() {
                 </div>
             ) : (
                 <div className="bg-white md:bg-white rounded-3xl md:border border-slate-100 shadow-sm overflow-hidden">
-                    {/* Desktop View */}
                     <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -350,7 +345,6 @@ export default function AdminOrders() {
                                             <div className="flex flex-col text-[10px]">
                                                 <span className="text-sm font-bold text-slate-900">{order.customer_name}</span>
                                                 <span className="font-medium text-slate-500 mt-0.5 whitespace-nowrap leading-tight">{order.wa_number}</span>
-                                                {order.email && <span className="text-blue-500 font-bold truncate lowercase max-w-[150px]">{order.email}</span>}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -361,10 +355,10 @@ export default function AdminOrders() {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-sm font-black text-blue-600">Rp {order.sell_price.toLocaleString("id-ID")}</span>
-                                                <div className="flex flex-col items-end gap-1 mt-1">
-                                                    <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-1.5 rounded" title="Total Profit: Jual - Modal">Profit: Rp {order.profit.toLocaleString("id-ID")}</span>
-                                                    <span className="text-xs font-black text-green-500 bg-green-50 px-1.5 rounded" title="Diterima Owner: Profit - Jatah Afiliator">Net Owner: Rp {(order.profit - (Math.floor(order.profit * (globalCommissionPercent / 100)))).toLocaleString("id-ID")}</span>
+                                                <span className="text-sm font-black text-blue-600">{formatCurrency(order.sell_price)}</span>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-1.5 rounded" title="Total Profit: Jual - Modal">Profit: {formatCurrency(order.profit)}</span>
+                                                    <span className="text-xs font-black text-green-500 bg-green-50 px-1.5 rounded" title="Diterima Owner: Profit - Jatah Afiliator">Net Owner: {formatCurrency(order.profit - (Math.floor(order.profit * (globalCommissionPercent / 100))))}</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -376,9 +370,8 @@ export default function AdminOrders() {
                                                         <span className="text-xs font-bold text-slate-900 truncate max-w-[120px]" title={affiliators.find(a => a.id === order.affiliator_id)?.full_name || 'Afiliator'}>
                                                             {affiliators.find(a => a.id === order.affiliator_id)?.full_name || 'Afiliator'}
                                                         </span>
-                                                        <span className="text-[9px] text-slate-400 font-mono">({affiliators.find(a => a.id === order.affiliator_id)?.affiliate_code || '???'})</span>
                                                     </div>
-                                                    <span className="text-sm font-black text-slate-900 leading-tight">Rp {(Math.floor(order.profit * (globalCommissionPercent / 100))).toLocaleString("id-ID")}</span>
+                                                    <span className="text-sm font-black text-slate-900 leading-tight">{formatCurrency(Math.floor(order.profit * (globalCommissionPercent / 100)))}</span>
                                                 </div>
                                             ) : (
                                                 <span className="text-xs text-slate-300 font-bold italic">Tanpa Ref</span>
@@ -402,7 +395,6 @@ export default function AdminOrders() {
                         </table>
                     </div>
 
-                    {/* Mobile View */}
                     <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
                         {orders.map((order) => (
                             <div key={order.id} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden active:scale-[0.98] transition-all">
@@ -427,11 +419,11 @@ export default function AdminOrders() {
                                     <div className="flex justify-between items-end">
                                         <div>
                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Harga Jual</p>
-                                            <p className="font-black text-blue-600">Rp {order.sell_price.toLocaleString("id-ID")}</p>
+                                            <p className="font-black text-blue-600">{formatCurrency(order.sell_price)}</p>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Profit</p>
-                                            <p className="font-bold text-slate-900 text-sm">Rp {order.profit.toLocaleString("id-ID")}</p>
+                                        <div className="bg-slate-100 p-2 rounded-xl text-center">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Profit (Gross)</p>
+                                            <p className="font-bold text-slate-900 text-sm">{formatCurrency(order.profit)}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -465,75 +457,30 @@ export default function AdminOrders() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Nama Pemesan</label>
-                                    <input 
-                                        required 
-                                        type="text" 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
-                                        placeholder="e.g. Arief" 
-                                        value={orderForm.customer_name} 
-                                        onChange={e => setOrderForm({...orderForm, customer_name: e.target.value})} 
-                                    />
+                                    <input required type="text" className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" value={orderForm.customer_name} onChange={e => setOrderForm({...orderForm, customer_name: e.target.value})} />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">No WhatsApp</label>
-                                    <input 
-                                        required 
-                                        type="text" 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
-                                        placeholder="e.g. 085720..." 
-                                        value={orderForm.wa_number} 
-                                        onChange={e => setOrderForm({...orderForm, wa_number: e.target.value})} 
-                                    />
+                                    <input required type="text" className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" value={orderForm.wa_number} onChange={e => setOrderForm({...orderForm, wa_number: e.target.value})} />
                                 </div>
                             </div>
                             
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Layanan Produk</label>
-                                    <div className="relative">
-                                        <select 
-                                            required 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
-                                            value={orderForm.product_id} 
-                                            onChange={e => setOrderForm({...orderForm, product_id: e.target.value, package_id: ""})}
-                                        >
-                                            <option value="">-- Pilih Produk --</option>
-                                            {products.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                                        </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                            <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-                                        </div>
-                                    </div>
+                                    <select required className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer" value={orderForm.product_id} onChange={e => setOrderForm({...orderForm, product_id: e.target.value, package_id: ""})}>
+                                        <option value="">-- Pilih Produk --</option>
+                                        {products.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+                                    </select>
                                 </div>
 
                                 {orderForm.product_id && (
                                     <div className="animate-in slide-in-from-top-2 duration-300">
                                         <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Paket Item</label>
-                                        <div className="relative">
-                                            <select 
-                                                required 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
-                                                value={orderForm.package_id} 
-                                                onChange={e => {
-                                                    const pkgId = e.target.value;
-                                                    const pkg = products.find(p => p.id === orderForm.product_id)?.packages?.find((p: any) => p.id === pkgId);
-                                                    setOrderForm({
-                                                        ...orderForm, 
-                                                        package_id: pkgId,
-                                                        sell_price: pkg ? (parseInt(pkg.price.replace(/\D/g, "")) || 0) : 0,
-                                                        cost_price: pkg ? (pkg.cost_price || 0) : 0
-                                                    });
-                                                }}
-                                            >
-                                                <option value="">-- Pilih Paket --</option>
-                                                {products.find(p => p.id === orderForm.product_id)?.packages?.map((pkg: any) => (
-                                                    <option key={pkg.id} value={pkg.id}>{pkg.name} - {pkg.price}</option>
-                                                ))}
-                                            </select>
-                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                                <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-                                            </div>
-                                        </div>
+                                        <select required className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer" value={orderForm.package_id} onChange={e => { const pkgId = e.target.value; const pkg = products.find(p => p.id === orderForm.product_id)?.packages?.find((p: any) => p.id === pkgId); setOrderForm({ ...orderForm, package_id: pkgId, sell_price: pkg ? (parseInt(pkg.price.replace(/\D/g, "")) || 0) : 0, cost_price: pkg ? (pkg.cost_price || 0) : 0 }); }}>
+                                            <option value="">-- Pilih Paket --</option>
+                                            {products.find(p => p.id === orderForm.product_id)?.packages?.map((pkg: any) => <option key={pkg.id} value={pkg.id}>{pkg.name} - {pkg.price}</option>)}
+                                        </select>
                                     </div>
                                 )}
                             </div>
@@ -542,18 +489,16 @@ export default function AdminOrders() {
                                 <div className="grid grid-cols-2 gap-4 bg-blue-50/50 p-5 rounded-3xl border border-blue-100 animate-in zoom-in-95 duration-300">
                                     <div>
                                         <label className="block text-[10px] font-black text-blue-500 uppercase tracking-wider mb-2 ml-1">Harga Jual (Rp)</label>
-                                        <div className="relative">
+                                        <div className="relative group">
                                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-blue-300">Rp</span>
-                                            <input required type="text" className="w-full bg-white border border-blue-200 rounded-xl pl-10 pr-4 py-2.5 text-xs font-black text-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-500/20" 
-                                                value={formatToIDR(orderForm.sell_price)} onChange={e => setOrderForm({...orderForm, sell_price: formatToIDR(e.target.value)})} />
+                                            <input required type="text" className="w-full bg-white border border-blue-200 rounded-xl pl-10 pr-4 py-2.5 text-xs font-black text-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-500/20" value={formatToIDR(orderForm.sell_price)} onChange={e => setOrderForm({...orderForm, sell_price: formatToIDR(e.target.value)})} />
                                         </div>
                                     </div>
                                     <div>
                                         <label className="block text-[10px] font-black text-blue-500 uppercase tracking-wider mb-2 ml-1">Modal (Rp)</label>
-                                        <div className="relative">
+                                        <div className="relative group">
                                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-blue-300">Rp</span>
-                                            <input required type="text" className="w-full bg-white border border-blue-200 rounded-xl pl-10 pr-4 py-2.5 text-xs font-black text-slate-600 focus:outline-none focus:ring-4 focus:ring-blue-500/20" 
-                                                value={formatToIDR(orderForm.cost_price)} onChange={e => setOrderForm({...orderForm, cost_price: formatToIDR(e.target.value)})} />
+                                            <input required type="text" className="w-full bg-white border border-blue-200 rounded-xl pl-10 pr-4 py-2.5 text-xs font-black text-slate-600 focus:outline-none focus:ring-4 focus:ring-blue-500/20" value={formatToIDR(orderForm.cost_price)} onChange={e => setOrderForm({...orderForm, cost_price: formatToIDR(e.target.value)})} />
                                         </div>
                                     </div>
                                 </div>
@@ -562,32 +507,16 @@ export default function AdminOrders() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Waktu Transaksi</label>
-                                    <input 
-                                        required 
-                                        type="datetime-local" 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
-                                        value={orderForm.created_at} 
-                                        onChange={e => setOrderForm({...orderForm, created_at: e.target.value})} 
-                                    />
+                                    <input required type="datetime-local" className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" value={orderForm.created_at} onChange={e => setOrderForm({...orderForm, created_at: e.target.value})} />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Status Pesanan</label>
-                                    <div className="relative">
-                                        <select 
-                                            required 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
-                                            value={orderForm.status} 
-                                            onChange={e => setOrderForm({...orderForm, status: e.target.value})}
-                                        >
-                                            <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
-                                            <option value="Sedang Diproses">Sedang Diproses</option>
-                                            <option value="Pesanan Selesai">Pesanan Selesai</option>
-                                            <option value="Dibatalkan">Dibatalkan</option>
-                                        </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                            <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-                                        </div>
-                                    </div>
+                                    <select required className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer" value={orderForm.status} onChange={e => setOrderForm({...orderForm, status: e.target.value})}>
+                                        <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
+                                        <option value="Sedang Diproses">Sedang Diproses</option>
+                                        <option value="Pesanan Selesai">Pesanan Selesai</option>
+                                        <option value="Dibatalkan">Dibatalkan</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -596,106 +525,43 @@ export default function AdminOrders() {
                                     <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-widest flex items-center gap-2">
                                         <Megaphone className="w-4 h-4" /> Informasi Afiliator
                                     </h3>
-                                    {orderForm.affiliator_id && (
-                                        <button 
-                                            type="button" 
-                                            onClick={() => { setOrderForm({...orderForm, affiliator_id: ""}); setAffSearch(""); }}
-                                            className="text-[9px] font-black text-red-400 uppercase tracking-tighter hover:text-red-600 transition-colors"
-                                        >
-                                            Hapus
-                                        </button>
-                                    )}
+                                    {orderForm.affiliator_id && <button type="button" onClick={() => { setOrderForm({...orderForm, affiliator_id: ""}); setAffSearch(""); }} className="text-[9px] font-black text-red-400 uppercase tracking-tighter hover:text-red-600 transition-colors">Hapus</button>}
                                 </div>
-                                
                                 <div className="space-y-4">
                                     <div className="relative">
                                         <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2 ml-1">Cari Nama/Kode Referral</label>
                                         <div className="relative group">
-                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300 group-focus-within:text-purple-500 transition-colors" />
-                                            <input 
-                                                type="text" 
-                                                className="w-full bg-white border border-purple-200 rounded-2xl px-4 py-3.5 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all" 
-                                                placeholder="Ketik nama atau kode referral..." 
-                                                value={affSearch}
-                                                onFocus={() => setShowAffSuggestions(true)}
-                                                onChange={e => {
-                                                    setAffSearch(e.target.value);
-                                                    setShowAffSuggestions(true);
-                                                }}
-                                            />
+                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
+                                            <input type="text" className="w-full bg-white border border-purple-200 rounded-2xl px-4 py-3.5 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all" placeholder="Ketik nama atau kode..." value={affSearch} onFocus={() => setShowAffSuggestions(true)} onChange={e => { setAffSearch(e.target.value); setShowAffSuggestions(true); }} />
                                         </div>
-                                        
                                         {showAffSuggestions && affSearch && (
-                                            <div className="absolute z-[10001] left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl max-h-52 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2">
-                                                <div className="overflow-y-auto">
-                                                    {affiliators.filter(a => 
-                                                        a.full_name?.toLowerCase().includes(affSearch.toLowerCase()) || 
-                                                        a.affiliate_code?.toLowerCase().includes(affSearch.toLowerCase())
-                                                    ).map(aff => (
-                                                        <button
-                                                            key={aff.id}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setOrderForm({ ...orderForm, affiliator_id: aff.id });
-                                                                setAffSearch(aff.full_name);
-                                                                setShowAffSuggestions(false);
-                                                            }}
-                                                            className="w-full text-left px-5 py-4 hover:bg-purple-50 transition-all border-b border-slate-50 last:border-0 flex flex-col"
-                                                        >
-                                                            <span className="text-sm font-black text-slate-900 tracking-tight">{aff.full_name}</span>
-                                                            <span className="text-[10px] text-purple-500 font-black uppercase tracking-widest mt-0.5">{aff.affiliate_code}</span>
-                                                        </button>
-                                                    ))}
-                                                    {affiliators.filter(a => 
-                                                        a.full_name?.toLowerCase().includes(affSearch.toLowerCase()) || 
-                                                        a.affiliate_code?.toLowerCase().includes(affSearch.toLowerCase())
-                                                    ).length === 0 && (
-                                                        <div className="p-6 text-xs text-slate-400 italic text-center font-medium">Data tidak ditemukan</div>
-                                                    )}
-                                                </div>
+                                            <div className="absolute z-[10001] left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl max-h-52 overflow-y-auto">
+                                                {affiliators.filter(a => a.full_name?.toLowerCase().includes(affSearch.toLowerCase()) || a.affiliate_code?.toLowerCase().includes(affSearch.toLowerCase())).map(aff => (
+                                                    <button key={aff.id} type="button" onClick={() => { setOrderForm({ ...orderForm, affiliator_id: aff.id }); setAffSearch(aff.full_name); setShowAffSuggestions(false); }} className="w-full text-left px-5 py-4 hover:bg-purple-50 border-b border-slate-50 text-sm font-black text-slate-900">{aff.full_name}</button>
+                                                ))}
                                             </div>
                                         )}
                                     </div>
-
-                                    {orderForm.affiliator_id && (
-                                        <div className="bg-white/50 border border-purple-100 rounded-2xl p-4 flex items-center justify-between animate-in slide-in-from-left-2 transition-all">
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] font-black text-purple-300 uppercase tracking-widest">Afiliator Terpilih</span>
-                                                <span className="text-sm font-black text-purple-700 mt-1">
-                                                    {affiliators.find(a => a.id === orderForm.affiliator_id)?.full_name || "Unknown"}
-                                                </span>
-                                                <span className="text-[9px] font-mono text-slate-400 mt-0.5">{orderForm.affiliator_id}</span>
-                                            </div>
-                                            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-                                                <CheckCircle2 className="w-6 h-6" />
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2">Jumlah Komisi (Rp)</label>
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-purple-400">Rp</span>
-                                        <input type="text" className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 pl-8 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500" 
-                                            value={formatToIDR(orderForm.commission)} onChange={e => setOrderForm({...orderForm, commission: formatToIDR(e.target.value)})} />
+                                        <input type="text" className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 pl-8 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500" value={formatToIDR(orderForm.commission)} onChange={e => setOrderForm({...orderForm, commission: formatToIDR(e.target.value)})} />
                                     </div>
-                                    
-                                    {/* Breakdown display */}
                                     <div className="mt-3 space-y-1 pt-3 border-t border-purple-100">
-                                        <div className="flex justify-between text-[10px] font-bold">
-                                            <span className="text-slate-400 uppercase">Jatah Afiliator:</span>
-                                            <span className="text-purple-600">Rp {parseInt(orderForm.commission.toString().replace(/\D/g, '') || '0').toLocaleString('id-ID')} ({globalCommissionPercent}%)</span>
+                                        <div className="flex justify-between items-center text-xs font-bold">
+                                            <span className="text-purple-400">Jatah Afiliator:</span>
+                                            <span className="text-purple-600">{formatCurrency(parseInt(orderForm.commission.toString().replace(/\D/g, '') || '0'))} ({globalCommissionPercent}%)</span>
                                         </div>
-                                        <div className="flex justify-between text-[10px] font-bold">
-                                            <span className="text-slate-400 uppercase">Laba Bersih Anda:</span>
-                                            <span className="text-emerald-600">Rp {( (parseInt(orderForm.sell_price.toString().replace(/\D/g, '')) || 0) - (parseInt(orderForm.cost_price.toString().replace(/\D/g, '')) || 0) - (parseInt(orderForm.commission.toString().replace(/\D/g, '')) || 0) ).toLocaleString('id-ID')} ({100 - globalCommissionPercent}%)</span>
+                                        <div className="flex justify-between items-center text-xs font-bold">
+                                            <span className="text-slate-400">Net Owner (Anda):</span>
+                                            <span className="text-emerald-600">{formatCurrency( (parseInt(orderForm.sell_price.toString().replace(/\D/g, '')) || 0) - (parseInt(orderForm.cost_price.toString().replace(/\D/g, '')) || 0) - (parseInt(orderForm.commission.toString().replace(/\D/g, '')) || 0) )} ({100 - globalCommissionPercent}%)</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-
-                            <button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-blue-900/20">
+                            <button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 mt-4 shadow-lg">
                                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin"/> : <><Save className="w-5 h-5"/> {editingOrder ? "Simpan Perubahan" : "Simpan Pesanan"}</>}
                             </button>
                         </form>
@@ -703,47 +569,34 @@ export default function AdminOrders() {
                 </div>
             )}
 
-            {/* Payout Confirmation Modal */}
             {isPayoutModalOpen && payoutData && (
                 <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
                     <div className="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl border border-white/20 animate-in zoom-in-95 duration-300">
                         <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6">
                             <Megaphone className="w-8 h-8 text-blue-600" />
                         </div>
-                        
                         <h2 className="text-xl font-black text-slate-900 mb-2">Konfirmasi Komisi</h2>
-                        <p className="text-sm text-slate-500 font-medium mb-6">
-                            Sistem akan menambahkan jatah laba ke saldo afiliator secara otomatis.
-                        </p>
-
-                            <div className="flex justify-between items-center text-xs font-bold bg-purple-50 p-3 rounded-2xl border border-purple-100/50">
-                                <span className="text-purple-400 uppercase tracking-widest">Penerima</span>
-                                <span className="text-purple-700">{payoutData.affiliatorName || "Sistem"}</span>
+                        <div className="space-y-3 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm mb-6">
+                            <div className="flex justify-between items-center text-xs font-bold">
+                                <span className="text-slate-400 uppercase tracking-widest">Total Profit</span>
+                                <span className="text-slate-900">{formatCurrency(payoutData.profit)}</span>
                             </div>
-
-                            <div className="space-y-3 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
-                                <div className="flex justify-between items-center text-xs font-bold">
-                                    <span className="text-slate-400 uppercase tracking-widest">Total Profit</span>
-                                    <span className="text-slate-900">Rp {payoutData.profit.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-xs font-bold">
-                                    <span className="text-slate-400 uppercase tracking-widest">Persentase</span>
-                                    <span className="text-slate-900">{payoutData.percent}%</span>
-                                </div>
-                                <div className="h-px bg-slate-100 my-2" />
-                                <div className="flex justify-between items-center">
-                                    <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Jatah Afiliator</span>
-                                    <span className="text-lg font-black text-purple-600">Rp {payoutData.commission.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Net Owner (Anda)</span>
-                                    <span className="text-sm font-black text-emerald-600">Rp {payoutData.ownerNet.toLocaleString()}</span>
-                                </div>
+                            <div className="flex justify-between items-center text-xs font-bold">
+                                <span className="text-slate-400 uppercase tracking-widest">Persentase</span>
+                                <span className="text-slate-900">{payoutData.percent}%</span>
                             </div>
-
-                        <div className="flex flex-col gap-3">
-                            <button 
-                                onClick={async () => {
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100 flex flex-col justify-center">
+                                <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Jatah Afiliator</span>
+                                <span className="text-lg font-black text-purple-600">{formatCurrency(payoutData.commission)}</span>
+                            </div>
+                            <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 flex flex-col justify-center">
+                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Bersih Owner</span>
+                                <span className="text-sm font-black text-emerald-600">{formatCurrency(payoutData.ownerNet)}</span>
+                            </div>
+                        </div>
+                        <button onClick={async () => {
                                     setIsSubmitting(true);
                                     const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", payoutData.affiliatorId).single();
                                     if (prof && !fetchErr) {

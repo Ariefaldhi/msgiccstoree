@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, TrendingUp, TrendingDown, DollarSign, ShoppingBag, PieChart, Users, Package, ArrowUpRight, ArrowDownRight, Wallet } from "lucide-react";
+import { useAdminCurrency } from "@/components/admin/AdminCurrencyProvider";
 import Link from "next/link";
 import DashboardChart, { TopProductsChart } from "@/components/admin/DashboardChart";
 
 export default function AdminDashboard() {
+    const { formatCurrency } = useAdminCurrency();
     const [stats, setStats] = useState({
         revenue: 0,
         cost: 0,
@@ -143,7 +145,7 @@ export default function AdminDashboard() {
                                 </div>
                                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
                                 <div className="flex items-end justify-between">
-                                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Rp {stat.value.toLocaleString('id-ID')}</h3>
+                                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">{formatCurrency(stat.value)}</h3>
                                     <div className={`flex items-center gap-0.5 text-[10px] font-black px-2 py-1 rounded-full ${stat.trend.startsWith('+') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
                                         {stat.trend.startsWith('+') ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                                         {stat.trend}
@@ -261,12 +263,12 @@ export default function AdminDashboard() {
                                                     <span className="text-xs font-bold text-slate-500 uppercase">Trx</span>
                                                 </div>
                                             </td>
-                                            <td className="p-6 font-black text-slate-900">Rp {day.revenue.toLocaleString('id-ID')}</td>
-                                            <td className="p-6 font-bold text-rose-500">Rp {day.cost.toLocaleString('id-ID')}</td>
-                                            <td className="p-6 font-bold text-purple-600">Rp {day.commission.toLocaleString('id-ID')}</td>
+                                            <td className="p-6 font-black text-slate-900">{formatCurrency(day.revenue)}</td>
+                                            <td className="p-6 font-bold text-rose-500">{formatCurrency(day.cost)}</td>
+                                            <td className="p-6 font-bold text-purple-600">{formatCurrency(day.commission)}</td>
                                             <td className="p-6">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-black text-emerald-600 text-base">Rp {day.profit.toLocaleString('id-ID')}</span>
+                                                    <span className="font-black text-emerald-600 text-base">{formatCurrency(day.profit)}</span>
                                                     <span className="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-black">
                                                         {day.revenue > 0 ? ((day.profit / day.revenue) * 100).toFixed(0) : 0}%
                                                     </span>
@@ -289,25 +291,23 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-3 mb-4">
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Revenue</p>
-                                            <p className="font-black text-slate-900 text-xs">Rp {day.revenue.toLocaleString('id-ID')}</p>
+                                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-center">
+                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Pemasukan</span>
+                                            <p className="font-black text-slate-900 text-xs">{formatCurrency(day.revenue)}</p>
                                         </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Modal (Cost)</p>
-                                            <p className="font-black text-rose-500 text-xs">Rp {day.cost.toLocaleString('id-ID')}</p>
+                                        <div className="p-3 bg-rose-50 rounded-xl border border-rose-100 flex flex-col justify-center">
+                                            <span className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mb-1">Modal</span>
+                                            <p className="font-black text-rose-500 text-xs">{formatCurrency(day.cost)}</p>
                                         </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Komisi</p>
-                                            <p className="font-black text-purple-600 text-xs">Rp {day.commission.toLocaleString('id-ID')}</p>
+                                        <div className="p-3 bg-purple-50 rounded-xl border border-purple-100 flex flex-col justify-center">
+                                            <span className="text-[10px] text-purple-500 font-bold uppercase tracking-widest mb-1">Komisi</span>
+                                            <p className="font-black text-purple-600 text-xs">{formatCurrency(day.commission)}</p>
                                         </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Profit</p>
-                                            <div className="flex items-center gap-1">
-                                                <p className="font-black text-emerald-600 text-xs">Rp {day.profit.toLocaleString('id-ID')}</p>
-                                                <span className="text-[8px] bg-emerald-50 text-emerald-600 px-1 py-0.5 rounded-md font-black">
-                                                    {day.revenue > 0 ? ((day.profit / day.revenue) * 100).toFixed(0) : 0}%
-                                                </span>
+                                        <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex flex-col justify-center">
+                                            <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mb-1">Profit</span>
+                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                                <TrendingUp className="w-3 h-3 text-emerald-500" />
+                                                <p className="font-black text-emerald-600 text-xs">{formatCurrency(day.profit)}</p>
                                             </div>
                                         </div>
                                     </div>

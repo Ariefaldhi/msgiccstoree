@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, Wallet, CheckCircle2, XCircle, Clock, User, ArrowLeft } from "lucide-react";
+import { Loader2, Wallet, CheckCircle2, XCircle, Clock, User, ArrowLeft, History as HistoryIcon } from "lucide-react";
 import Link from "next/link";
+import { useAdminCurrency } from "@/components/admin/AdminCurrencyProvider";
 
 export default function AdminWithdrawals() {
+    const { formatCurrency } = useAdminCurrency();
     const [withdrawals, setWithdrawals] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [processingId, setProcessingId] = useState<string | null>(null);
@@ -38,8 +40,8 @@ export default function AdminWithdrawals() {
 
     const handleAction = async (id: string, status: 'APPROVED' | 'REJECTED', userId: string, amount: number) => {
         const confirmMsg = status === 'APPROVED' 
-            ? `Setujui penarikan Rp ${amount.toLocaleString()}? Saldo user akan otomatis berkurang.` 
-            : `Tolak penarikan ini?`;
+            ? `Setujui penarikan ${formatCurrency(amount)}? Saldo user akan otomatis berkurang.` 
+            : `Tolak penarikan ${formatCurrency(amount)}?`;
             
         if (!window.confirm(confirmMsg)) return;
 
@@ -156,7 +158,7 @@ export default function AdminWithdrawals() {
                                         </div>
                                         <div className="text-right">
                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Jumlah Tarik</p>
-                                            <p className="text-2xl font-black text-blue-600">Rp {wd.amount.toLocaleString()}</p>
+                                            <p className="text-2xl font-black text-blue-600">{formatCurrency(wd.amount)}</p>
                                         </div>
                                     </div>
 
@@ -172,7 +174,7 @@ export default function AdminWithdrawals() {
                                         <div className="h-px bg-slate-200 my-4" />
                                         <div className="flex justify-between items-center">
                                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saldo Saat Ini:</span>
-                                            <span className="text-xs font-black text-slate-900">Rp {wd.profiles?.balance?.toLocaleString() || '0'}</span>
+                                            <span className="text-xs font-black text-slate-900">{formatCurrency(wd.profiles?.balance)}</span>
                                         </div>
                                     </div>
 
@@ -233,7 +235,7 @@ export default function AdminWithdrawals() {
                                             <div className="font-bold text-slate-900">{wd.profiles?.full_name}</div>
                                             <div className="text-[10px] font-medium text-slate-400">{wd.profiles?.email}</div>
                                         </td>
-                                        <td className="p-4 font-black text-slate-900">Rp {wd.amount.toLocaleString()}</td>
+                                        <td className="p-4 font-black text-slate-900">{formatCurrency(wd.amount)}</td>
                                         <td className="p-4 font-medium text-slate-600">{wd.payment_method}</td>
                                         <td className="p-4 text-slate-400 font-mono text-xs">{new Date(wd.created_at).toLocaleDateString('id-ID')}</td>
                                         <td className="p-4 text-center">
@@ -272,7 +274,7 @@ export default function AdminWithdrawals() {
                                 <div className="flex justify-between items-end">
                                     <div>
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Jumlah Cair</p>
-                                        <p className="font-black text-blue-600">Rp {wd.amount.toLocaleString()}</p>
+                                        <p className="font-black text-blue-600">{formatCurrency(wd.amount)}</p>
                                     </div>
                                     <div className="text-right">
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metode</p>

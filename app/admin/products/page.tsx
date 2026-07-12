@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, Trash2, Loader2, Save, X, Edit, Package as PackageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAdminCurrency } from "@/components/admin/AdminCurrencyProvider";
 
 import ImageCropper from "@/components/admin/ImageCropper";
 
@@ -46,6 +47,7 @@ const formatToIDR = (val: string | number) => {
 };
 
 export default function AdminProducts() {
+    const { isUSD, formatCurrency } = useAdminCurrency();
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
@@ -354,7 +356,7 @@ export default function AdminProducts() {
                                             </span>
                                         </div>
                                         <h3 className="text-xl font-black text-slate-900">{product.title}</h3>
-                                        <p className="text-blue-600 font-bold">{product.price}</p>
+                                        <p className="text-blue-600 font-bold">{formatCurrency(product.price)}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
@@ -398,7 +400,8 @@ export default function AdminProducts() {
                                         <div key={pkg.id} className="border border-slate-100 rounded-xl p-3 flex justify-between items-center bg-slate-50/30 hover:bg-slate-50 transition-colors">
                                             <div>
                                                 <p className="font-bold text-sm text-slate-900">{pkg.name}</p>
-                                                <p className="text-xs text-blue-600 font-bold">{pkg.price} <span className="text-slate-400 font-normal">• {pkg.duration}</span></p>
+                                                <p className="text-xs text-blue-600 font-bold">{formatCurrency(pkg.price)} <span className="text-slate-400 font-normal">• {pkg.duration}</span></p>
+                                                <p className="text-xs text-rose-500 font-bold">Modal: {formatCurrency(pkg.cost_price)}</p>
                                                 <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wide">{pkg.type}</p>
                                             </div>
                                             <div className="flex items-center gap-3">

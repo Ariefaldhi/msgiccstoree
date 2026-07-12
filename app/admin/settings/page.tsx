@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Save, Store, Image as ImageIcon } from "lucide-react";
+import { useAdminCurrency } from "@/components/admin/AdminCurrencyProvider";
 
 export default function AdminSettings() {
+    const { formatCurrency } = useAdminCurrency();
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [settings, setSettings] = useState({
@@ -158,16 +160,16 @@ export default function AdminSettings() {
                                 </button>
                                 <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Simulasi Pembagian Profit:</p>
                                 <div className="flex justify-between text-xs font-bold text-slate-600">
-                                    <span>Jika Profit Rp 10.000, maka:</span>
+                                    <span>Jika Profit {formatCurrency(10000)}, maka:</span>
                                 </div>
-                                <div className="mt-2 space-y-1">
-                                    <div className="flex justify-between text-xs">
-                                        <span className="text-slate-500">Afiliator ({settings.affiliate_commission_percent}%):</span>
-                                        <span className="text-purple-600 font-black">Rp {(10000 * settings.affiliate_commission_percent / 100).toLocaleString('id-ID')}</span>
+                                <div className="space-y-2 mt-3 p-3 bg-white rounded-xl border border-slate-100 shadow-sm text-[10px] md:text-xs font-bold">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-slate-500 uppercase tracking-widest">Jatah Afiliator</span>
+                                        <span className="text-purple-600 font-black">{formatCurrency(10000 * settings.affiliate_commission_percent / 100)}</span>
                                     </div>
-                                    <div className="flex justify-between text-xs">
-                                        <span className="text-slate-500">Anda / Owner ({100 - settings.affiliate_commission_percent}%):</span>
-                                        <span className="text-emerald-600 font-black">Rp {(10000 * (100 - settings.affiliate_commission_percent) / 100).toLocaleString('id-ID')}</span>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-slate-500 uppercase tracking-widest">Net Owner</span>
+                                        <span className="text-emerald-600 font-black">{formatCurrency(10000 * (100 - settings.affiliate_commission_percent) / 100)}</span>
                                     </div>
                                 </div>
                             </div>

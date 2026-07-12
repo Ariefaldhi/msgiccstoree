@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, Trash2, Loader2, X, Zap, Calendar } from "lucide-react";
 import { toLocalISOString } from "@/lib/utils";
+import { useAdminCurrency } from "@/components/admin/AdminCurrencyProvider";
 
 interface Package {
     id: string;
@@ -26,6 +27,7 @@ interface PromoRow {
 }
 
 export default function AdminPromo() {
+    const { formatCurrency } = useAdminCurrency();
     const [packages, setPackages] = useState<Package[]>([]);
     const [flashSales, setFlashSales] = useState<PromoRow[]>([]);
     const [loading, setLoading] = useState(true);
@@ -155,8 +157,8 @@ export default function AdminPromo() {
                                     <p className="font-black text-slate-900 truncate text-sm md:text-base">{item.package.product.title} - {item.package.name}</p>
                                     <div className="flex items-center gap-3 mt-1 flex-wrap">
                                         <span className="text-[10px] bg-red-50 text-[#ff2d55] font-black px-1.5 py-0.5 rounded-md">-{item.discount_percent}%</span>
-                                        <span className="text-[10px] text-slate-400 line-through">{item.package.price}</span>
-                                        <span className="text-xs font-black text-[#ff2d55]">Rp {discounted.toLocaleString("id-ID")}</span>
+                                        <span className="text-[10px] text-slate-400 line-through">{formatCurrency(item.package.price)}</span>
+                                        <span className="text-xs font-black text-[#ff2d55]">{formatCurrency(discounted)}</span>
                                     </div>
                                     <p className="text-[9px] text-slate-400 mt-1 font-bold">⏱ Sisa: {timeLeft(item.end_time)}</p>
                                 </div>

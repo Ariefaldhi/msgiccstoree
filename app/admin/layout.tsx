@@ -8,6 +8,8 @@ import { LayoutDashboard, Package, Tags, Settings, LogOut, ShoppingBag, Zap, Use
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { AdminCurrencyProvider } from "@/components/admin/AdminCurrencyProvider";
+import { CurrencyToggle } from "@/components/admin/CurrencyToggle";
 
 export default function AdminLayout({
     children,
@@ -43,6 +45,7 @@ export default function AdminLayout({
     ];
 
     return (
+        <AdminCurrencyProvider>
         <div className="min-h-screen bg-slate-50 flex">
             {/* Sidebar */}
             <aside className="w-64 bg-white border-r border-slate-200 fixed h-full hidden md:flex flex-col z-50">
@@ -75,6 +78,7 @@ export default function AdminLayout({
                 </nav>
 
                 <div className="p-4 border-t border-slate-100">
+                    <CurrencyToggle />
                     <button
                         onClick={handleLogout}
                         className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 w-full transition-all"
@@ -158,6 +162,7 @@ export default function AdminLayout({
                         <Link href="/admin/settings" className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-xs text-slate-700 active:scale-95 transition-all col-span-2">
                             <Settings className="w-4 h-4 text-slate-500" /> Settings
                         </Link>
+                        <CurrencyToggle mobile={true} />
                         <button 
                             onClick={handleLogout}
                             className="flex items-center gap-3 p-4 rounded-2xl bg-red-50 border border-red-100 font-bold text-xs text-red-600 active:scale-95 transition-all col-span-2"
@@ -168,6 +173,7 @@ export default function AdminLayout({
                 )}
             </div>
         </div>
+        </AdminCurrencyProvider>
     );
 }
 
