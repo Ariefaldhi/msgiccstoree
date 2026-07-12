@@ -596,20 +596,21 @@ export default function AdminOrders() {
                                 <span className="text-sm font-black text-emerald-600">{formatCurrency(payoutData.ownerNet)}</span>
                             </div>
                         </div>
-                        <button onClick={async () => {
-                                    setIsSubmitting(true);
-                                    const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", payoutData.affiliatorId).single();
-                                    if (prof && !fetchErr) {
-                                        await supabase.from("profiles").update({ balance: (prof.balance || 0) + payoutData.commission }).eq("id", payoutData.affiliatorId);
-                                    }
-                                    setIsPayoutModalOpen(false);
-                                    setIsSubmitting(false);
-                                    setOrders(orders.map(o => o.id === payoutData.id ? { ...o, status: payoutData.newStatus } : o));
-                                }}
-                                disabled={isSubmitting}
-                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2"
-                            >
-                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Konfirmasi & Selesai"}
+                        <div className="flex flex-col gap-3">
+                            <button onClick={async () => {
+                                        setIsSubmitting(true);
+                                        const { data: prof, error: fetchErr } = await supabase.from("profiles").select("balance").eq("id", payoutData.affiliatorId).single();
+                                        if (prof && !fetchErr) {
+                                            await supabase.from("profiles").update({ balance: (prof.balance || 0) + payoutData.commission }).eq("id", payoutData.affiliatorId);
+                                        }
+                                        setIsPayoutModalOpen(false);
+                                        setIsSubmitting(false);
+                                        setOrders(orders.map(o => o.id === payoutData.id ? { ...o, status: payoutData.newStatus } : o));
+                                    }}
+                                    disabled={isSubmitting}
+                                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2"
+                                >
+                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Konfirmasi & Selesai"}
                             </button>
                             <button 
                                 onClick={() => {
