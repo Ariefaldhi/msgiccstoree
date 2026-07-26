@@ -5,6 +5,7 @@ import Promo from "@/components/Promo";
 import CategoryFilter from "@/components/CategoryFilter";
 import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
+import LiveSalesNotification from "@/components/LiveSalesNotification";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2 } from "lucide-react";
 
@@ -226,6 +227,8 @@ export default function Home() {
         isAffiliator={isAffiliator}
         commissionPercent={commissionPercent}
       />
+      
+      <LiveSalesNotification />
     </div>
   );
 }

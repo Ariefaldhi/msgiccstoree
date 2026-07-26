@@ -11,6 +11,7 @@ interface PromoItem {
     label: string;
     end_time: string;
     max_orders: number;
+    displayStock?: number;
     package: {
         id: string;
         name: string;
@@ -99,6 +100,19 @@ function PromoCard({ item, onOpen }: { item: PromoItem; onOpen: () => void }) {
                 <p className="text-base font-black text-[#ff2d55]">{discountedFormatted}</p>
             </div>
 
+            {/* Scarcity Indicator */}
+            {item.displayStock !== undefined && (
+                <div className="mb-3">
+                    <div className="flex justify-between items-center text-[10px] font-black text-slate-500 mb-1">
+                        <span>Sisa kuota promo:</span>
+                        <span className="text-[#ff2d55]">{item.displayStock}</span>
+                    </div>
+                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                        <div className="bg-[#ff2d55] h-full rounded-full" style={{ width: `${Math.max(5, (item.displayStock / 10) * 100)}%` }}></div>
+                    </div>
+                </div>
+            )}
+
             {/* Countdown */}
             <div className="flex items-center gap-1.5">
                 <CountdownUnit value={h} label="Jam" />
@@ -147,8 +161,21 @@ export default function Promo({ onOpenProduct }: PromoProps) {
 
                     return count < sale.max_orders;
                 });
+                const mappedSales = validSales.map(sale => {
+                    let displayStock = 0;
+                    if (sale.max_orders > 0) {
+                        const count = orders?.filter(o => o.package_name === sale.package.name && o.product_name === sale.package.product.title).length || 0;
+                        displayStock = Math.max(1, sale.max_orders - count);
+                    } else {
+                        // Generate deterministic random 1-5 for FOMO if no max_orders set
+                        let seed = 0;
+                        for(let i = 0; i < sale.id.length; i++) seed += sale.id.charCodeAt(i);
+                        displayStock = (seed % 5) + 1;
+                    }
+                    return { ...sale, displayStock };
+                });
 
-                setItems(validSales as any);
+                setItems(mappedSales as any);
             }
             setLoading(false);
         }
