@@ -80,7 +80,7 @@ export default function AdminWithdrawals() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+            <div className="flex items-center justify-center p-12 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-sm">
                 <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
             </div>
         );
@@ -90,45 +90,39 @@ export default function AdminWithdrawals() {
     const historyWds = withdrawals.filter(w => w.status !== 'PENDING');
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] pb-20">
-            {/* Header */}
-            <div className="bg-white border-b border-slate-200 sticky top-0 z-30">
-                <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link href="/admin" className="p-2 hover:bg-slate-100 rounded-xl transition-all">
-                            <ArrowLeft className="w-5 h-5 text-slate-500" />
-                        </Link>
-                        <div>
-                            <h1 className="text-xl font-black text-slate-900 tracking-tight">Manajemen Penarikan</h1>
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Affiliate Payouts</p>
-                        </div>
-                    </div>
+        <div className="space-y-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-2">
+                        <Wallet className="w-6 h-6 text-blue-600" />
+                        Manajemen Penarikan
+                    </h1>
+                    <p className="text-slate-500 mt-1 text-xs font-bold uppercase tracking-widest text-[10px]">Affiliate Payouts</p>
                 </div>
             </div>
 
-            <main className="max-w-7xl mx-auto px-4 py-8">
-                
+            <div className="space-y-8">
                 {/* Statistics */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div className="bg-white/60 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/60 shadow-sm transition-all hover:bg-white/80">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center">
                                 <Clock className="w-6 h-6 text-amber-500" />
                             </div>
                             <div>
                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Menunggu</p>
-                                <p className="text-2xl font-black text-slate-900">{pendingWds.length}</p>
+                                <p className="text-xs font-black text-slate-900">{pendingWds.length}</p>
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <div className="bg-white/60 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/60 shadow-sm transition-all hover:bg-white/80">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center">
                                 <CheckCircle2 className="w-6 h-6 text-emerald-500" />
                             </div>
                             <div>
                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Disetujui</p>
-                                <p className="text-2xl font-black text-slate-900">
+                                <p className="text-xs font-black text-slate-900">
                                     {withdrawals.filter(w => w.status === 'APPROVED').length}
                                 </p>
                             </div>
@@ -138,17 +132,17 @@ export default function AdminWithdrawals() {
 
                 {/* Pending Requests */}
                 <div className="mb-10">
-                    <h2 className="text-lg font-black text-slate-900 mb-6 flex items-center gap-3">
+                    <h2 className="text-xs font-black text-slate-900 mb-6 flex items-center gap-3">
                         <Clock className="w-5 h-5 text-amber-500" /> Permintaan Pending
                     </h2>
                     
                     {pendingWds.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {pendingWds.map((wd) => (
-                                <div key={wd.id} className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-md relative overflow-hidden group hover:shadow-xl transition-all">
+                                <div key={wd.id} className="bg-white/60 backdrop-blur-3xl rounded-[2.5rem] p-8 border border-white/60 shadow-sm relative overflow-hidden group hover:shadow-md hover:bg-white/80 transition-all">
                                     <div className="flex items-start justify-between mb-6">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center text-white font-black text-xl uppercase shadow-lg">
+                                            <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center text-white font-black text-sm uppercase shadow-lg">
                                                 {wd.profiles?.full_name?.charAt(0) || 'U'}
                                             </div>
                                             <div>
@@ -158,20 +152,20 @@ export default function AdminWithdrawals() {
                                         </div>
                                         <div className="text-right">
                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Jumlah Tarik</p>
-                                            <p className="text-2xl font-black text-blue-600">{formatCurrency(wd.amount)}</p>
+                                            <p className="text-xs font-black text-blue-600">{formatCurrency(wd.amount)}</p>
                                         </div>
                                     </div>
 
-                                    <div className="bg-slate-50 rounded-3xl p-5 mb-8 border border-slate-100">
+                                    <div className="bg-white/50 backdrop-blur-md rounded-3xl p-5 mb-8 border border-white/60 shadow-sm">
                                         <div className="flex justify-between items-center mb-3">
                                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metode:</span>
                                             <span className="text-xs font-bold text-slate-900 bg-white px-3 py-1 rounded-full shadow-sm">{wd.payment_method}</span>
                                         </div>
                                         <div className="space-y-1">
                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rincian Rekening:</p>
-                                            <p className="text-sm font-bold text-slate-700 whitespace-pre-wrap">{wd.account_details}</p>
+                                            <p className="text-xs font-bold text-slate-700 whitespace-pre-wrap">{wd.account_details}</p>
                                         </div>
-                                        <div className="h-px bg-slate-200 my-4" />
+                                        <div className="h-px bg-white/60 my-4" />
                                         <div className="flex justify-between items-center">
                                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saldo Saat Ini:</span>
                                             <span className="text-xs font-black text-slate-900">{formatCurrency(wd.profiles?.balance)}</span>
@@ -199,8 +193,8 @@ export default function AdminWithdrawals() {
                             ))}
                         </div>
                     ) : (
-                        <div className="bg-white rounded-[2rem] p-16 text-center border border-slate-100">
-                            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <div className="bg-white/40 backdrop-blur-xl rounded-[2rem] p-16 text-center border border-white/60 shadow-sm">
+                            <div className="w-16 h-16 bg-white/50 border border-white/60 shadow-sm rounded-2xl flex items-center justify-center mx-auto mb-4">
                                 <Clock className="w-8 h-8 text-slate-200" />
                             </div>
                             <p className="font-bold text-slate-400">Tidak ada permintaan penarikan tertunda.</p>
@@ -209,8 +203,8 @@ export default function AdminWithdrawals() {
                 </div>
 
                 {/* History */}
-                <div className="bg-white md:bg-white rounded-[2rem] md:border border-slate-100 shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div className="bg-white/60 backdrop-blur-3xl rounded-[2rem] border border-white/60 shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-white/60 flex items-center justify-between bg-white/40">
                         <h2 className="font-bold text-slate-900 flex items-center gap-3">
                             <HistoryIcon className="w-5 h-5 text-slate-400" /> Riwayat Penarikan
                         </h2>
@@ -218,27 +212,27 @@ export default function AdminWithdrawals() {
 
                     {/* Desktop History View */}
                     <div className="hidden md:block overflow-x-auto">
-                        <table className="w-full text-left text-sm whitespace-nowrap">
+                        <table className="w-full text-left text-xs whitespace-nowrap">
                             <thead>
-                                <tr className="bg-slate-50 border-b border-slate-100">
-                                    <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Affiliator</th>
-                                    <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Jumlah</th>
-                                    <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Metode</th>
-                                    <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal</th>
-                                    <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                                <tr className="bg-white/40 border-b border-white/60">
+                                    <th className="p-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">Affiliator</th>
+                                    <th className="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Jumlah</th>
+                                    <th className="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Metode</th>
+                                    <th className="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal</th>
+                                    <th className="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-white/60">
                                 {historyWds.map((wd) => (
-                                    <tr key={wd.id} className="hover:bg-slate-50/50 transition-colors">
-                                        <td className="p-4">
+                                    <tr key={wd.id} className="hover:bg-white/80 transition-colors">
+                                        <td className="p-2">
                                             <div className="font-bold text-slate-900">{wd.profiles?.full_name}</div>
                                             <div className="text-[10px] font-medium text-slate-400">{wd.profiles?.email}</div>
                                         </td>
-                                        <td className="p-4 font-black text-slate-900">{formatCurrency(wd.amount)}</td>
-                                        <td className="p-4 font-medium text-slate-600">{wd.payment_method}</td>
-                                        <td className="p-4 text-slate-400 font-mono text-xs">{new Date(wd.created_at).toLocaleDateString('id-ID')}</td>
-                                        <td className="p-4 text-center">
+                                        <td className="p-2 font-black text-slate-900">{formatCurrency(wd.amount)}</td>
+                                        <td className="p-2 font-medium text-slate-600">{wd.payment_method}</td>
+                                        <td className="p-2 text-slate-400 font-mono text-xs">{new Date(wd.created_at).toLocaleDateString('id-ID')}</td>
+                                        <td className="p-2 text-center">
                                             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
                                                 wd.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
                                             }`}>
@@ -257,9 +251,9 @@ export default function AdminWithdrawals() {
                     </div>
 
                     {/* Mobile History View */}
-                    <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
+                    <div className="md:hidden space-y-4 p-4 bg-transparent">
                         {historyWds.length > 0 ? historyWds.map((wd) => (
-                            <div key={wd.id} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+                            <div key={wd.id} className="bg-white/60 backdrop-blur-3xl rounded-[2rem] p-5 border border-white/60 shadow-sm">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex flex-col">
                                         <h3 className="font-bold text-slate-900">{wd.profiles?.full_name}</h3>
@@ -281,7 +275,7 @@ export default function AdminWithdrawals() {
                                         <p className="font-bold text-slate-900 text-xs">{wd.payment_method}</p>
                                     </div>
                                 </div>
-                                <div className="mt-3 pt-3 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                <div className="mt-3 pt-3 border-t border-white/60 flex justify-between items-center text-[10px] text-slate-500 font-bold uppercase tracking-widest">
                                     <span>TDR: {new Date(wd.created_at).toLocaleDateString('id-ID')}</span>
                                     <span className="font-mono">{wd.id.split('-')[0]}</span>
                                 </div>
@@ -293,7 +287,7 @@ export default function AdminWithdrawals() {
                         )}
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
     );
 }

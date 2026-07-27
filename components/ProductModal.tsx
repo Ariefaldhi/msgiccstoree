@@ -11,9 +11,10 @@ interface Package {
     cost_price: number;
     duration: string;
     type: string;
-    is_available?: boolean;
+    is_available: boolean;
     features?: string[];
     reseller_price?: number;
+    terms_and_conditions?: string;
 }
 
 interface Product {
@@ -269,8 +270,11 @@ export default function ProductModal({
         localStorage.setItem("msgicc_order_cooldown", Date.now().toString());
         setCooldownSeconds(60);
 
+        // Get active T&C
+        const currentTnc = selectedPackage?.terms_and_conditions || product.terms_conditions || "Pesanan akan diproses melalui WhatsApp. Pastikan nomor WhatsApp Anda aktif dan data yang dimasukkan sudah benar.";
+
         // Kirim via API Fonnte
-        const customerMessage = `Halo Kak ${customerName},\n\nTerima kasih telah melakukan pesanan di *MsgiccStore*!\n\n*Detail Pesanan:*\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n💰 Total: ${finalPriceDisplay}\n⏳ Durasi: ${selectedPackage.duration}\n\n_Mohon tunggu sebentar ya kak, Admin kami sedang menyiapkan detail pesanan Anda. Admin akan segera membalas pesan ini untuk memberikan *Info Pembayaran* dan *Instruksi Selanjutnya*._\n\n📌 *Harap tidak spam pesan agar antrian Anda tetap terjaga.*\n\nTerima kasih atas kesabarannya! 🙏`;
+        const customerMessage = `Halo Kak ${customerName},\n\nTerima kasih telah melakukan pesanan di *MsgiccStore*!\n\n*Detail Pesanan:*\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n💰 Total: ${finalPriceDisplay}\n⏳ Durasi: ${selectedPackage.duration}\n\n*Syarat & Ketentuan:*\n_${currentTnc}_\n\n_Mohon tunggu sebentar ya kak, Admin kami sedang menyiapkan detail pesanan Anda. Admin akan segera membalas pesan ini untuk memberikan *Info Pembayaran* dan *Instruksi Selanjutnya*._\n\n📌 *Harap tidak spam pesan agar antrian Anda tetap terjaga.*\n\nTerima kasih atas kesabarannya! 🙏`;
         
         // Construct Group Message
         let affiliatorName = "-";
@@ -319,52 +323,57 @@ export default function ProductModal({
                 onClick={onClose}
             ></div>
 
-            <div className="relative w-full max-w-lg transform rounded-[2.5rem] bg-white shadow-2xl transition-all animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-hidden flex flex-col">
-
-                {/* Header Section with Gradient/Blur */}
-                <div className="relative h-32 bg-slate-100 overflow-hidden shrink-0">
-                    {/* Blurred Banner Image - Soft, Diffused Look */}
+            <div className="relative w-full max-w-lg md:max-w-3xl transform rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-hidden flex flex-col border border-white/50">
+                
+                {/* Full Modal Blurred Background (Glassmorphism Base) */}
+                <div className="absolute inset-0 z-0 pointer-events-none">
                     {product.image_url ? (
                         <>
                             <div
-                                className="absolute inset-0 bg-cover bg-center blur-[60px] scale-150 opacity-60 saturate-150"
+                                className="absolute inset-0 bg-cover bg-center blur-[80px] scale-150 opacity-40 saturate-200"
                                 style={{ backgroundImage: `url(${product.image_url})` }}
                             />
-                            {/* Extra overlay to ensure it's not too dark */}
-                            <div className="absolute inset-0 bg-white/40 mix-blend-overlay"></div>
+                            {/* Frosted Glass Overlay - Made more opaque for readability */}
+                            <div className="absolute inset-0 bg-white/85 backdrop-blur-3xl"></div>
                         </>
                     ) : (
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-300/40 to-purple-300/40 blur-3xl opacity-70"></div>
+                        <>
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-300/40 to-purple-300/40 blur-3xl opacity-60"></div>
+                            <div className="absolute inset-0 bg-white/70 backdrop-blur-2xl"></div>
+                        </>
                     )}
-
-                    {/* Gradient Overlay for better blend with content */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent"></div>
-
-                    {/* Close Button */}
-                    <button
-                        onClick={onClose}
-                        className="absolute right-5 top-5 p-2 rounded-full bg-white/40 hover:bg-white backdrop-blur-md transition-all z-20 text-slate-600 shadow-sm border border-white/20"
-                    >
-                        <X className="h-5 w-5" />
-                    </button>
                 </div>
+
+                {/* Modal Content Wrapper */}
+                <div className="relative z-10 flex flex-col h-full w-full overflow-hidden">
+                    
+                    {/* Header Section (Just Close Button & Soft Gradient) */}
+                    <div className="relative h-32 shrink-0">
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none"></div>
+                        <button
+                            onClick={onClose}
+                            className="absolute right-5 top-5 p-2 rounded-full bg-white/30 hover:bg-white/50 backdrop-blur-xl transition-all z-20 text-slate-700 shadow-sm border border-white/40"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    </div>
 
                 {/* Overlapping Icon & Title */}
                 <div className="px-6 -mt-16 relative z-10 mb-4 shrink-0">
                     <div className="flex items-end gap-5">
-                        <div className="w-28 h-28 rounded-[2rem] bg-white p-1.5 shadow-2xl">
-                            <div className="w-full h-full rounded-[1.6rem] overflow-hidden bg-slate-900 flex items-center justify-center">
+                        <div className="w-28 h-28 rounded-[2rem] bg-white/40 backdrop-blur-xl border border-white/50 p-1.5 shadow-2xl">
+                            <div className="w-full h-full rounded-[1.6rem] overflow-hidden bg-slate-900/10 flex items-center justify-center">
                                 {product.image_url ? (
-                                    <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                                    <img src={product.image_url} alt={product.title} className="w-full h-full object-cover rounded-[1.6rem] shadow-inner" />
                                 ) : (
                                     <span className="text-4xl font-black text-white">{product.title.charAt(0)}</span>
                                 )}
                             </div>
                         </div>
                         <div className="flex flex-col gap-2.5 mb-2">
-                            <h2 className="text-2xl font-black text-slate-900 leading-none">{product.title}</h2>
+                            <h2 className="text-xl font-black text-slate-900 leading-none">{product.title}</h2>
                             <div className="flex flex-wrap gap-2">
-                                <span className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">APP</span>
+                                <span className="px-3 py-1 rounded-full bg-slate-100/50 backdrop-blur-sm text-[10px] font-bold text-slate-600 uppercase tracking-wider">APP</span>
                                 {product.tag && (
                                     <span className={cn(
                                         "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
@@ -405,7 +414,7 @@ export default function ProductModal({
                         </button>
                     )}
 
-                    <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">
+                    <h3 className="text-xs font-bold text-slate-600 mb-4 uppercase tracking-widest">
                         {step === "selection" ? "Pilih Paket Layanan" : step === "cooldown" ? "Akses Dibatasi" : "Konfirmasi Pesanan"}
                     </h3>
 
@@ -421,15 +430,15 @@ export default function ProductModal({
                                 </div>
                             </div>
                             
-                            <h3 className="text-2xl font-black text-slate-900 mb-4">Waduh, Tunggu Sebentar!</h3>
-                            <div className="bg-red-50 border border-red-100 rounded-2xl p-4 mb-8">
+                            <h3 className="text-xl font-black text-slate-900 mb-4">Waduh, Tunggu Sebentar!</h3>
+                            <div className="bg-red-50/80 border border-red-100 rounded-2xl p-4 mb-8">
                                 <p className="text-sm text-red-700 font-bold mb-2">
                                     Kamu masih memiliki transaksi yang baru dilakukan.
                                 </p>
                                 <p className="text-xs text-red-500 font-medium leading-relaxed">
                                     Untuk keamanan dan kenyamanan, silakan order kembali dalam:
                                 </p>
-                                <div className="text-3xl font-black text-red-600 mt-2">
+                                <div className="text-2xl font-black text-red-600 mt-2">
                                     {remainingMinutes} Menit
                                 </div>
                             </div>
@@ -470,7 +479,7 @@ export default function ProductModal({
                                 )}
                             </div>
                             
-                            <h3 className="text-2xl font-black text-slate-900 mb-3">
+                            <h3 className="text-xl font-black text-slate-900 mb-3">
                                 {automationStatus === "sending" ? "Menunggu Pesan Masuk..." : 
                                  automationStatus === "success" ? "Pesanan Terkonfirmasi!" : 
                                  "Pesan Belum Masuk?"}
@@ -522,7 +531,7 @@ export default function ProductModal({
                             </div>
                         </div>
                     ) : step === "selection" ? (
-                        <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[...(product.packages || [])]
                                 .sort((a, b) => {
                                     // 1. Availability first
@@ -540,17 +549,17 @@ export default function ProductModal({
                                 <div
                                     key={idx}
                                     className={cn(
-                                        "group border rounded-[2rem] p-5 bg-white shadow-sm transition-all relative overflow-hidden",
+                                        "group border rounded-[2rem] p-5 md:p-4 bg-white/50 backdrop-blur-md shadow-sm transition-all relative overflow-hidden flex flex-col",
                                         (pkg.is_available === false) 
                                             ? "opacity-60 grayscale-[0.5] border-slate-200 cursor-not-allowed" 
-                                            : "hover:shadow-lg hover:border-blue-200 border-slate-100"
+                                            : "hover:shadow-lg hover:border-blue-200 border-white/60"
                                     )}
                                 >
-                                    <div className="flex flex-col gap-4">
+                                    <div className="flex flex-col gap-4 flex-1">
 
                                         {/* Header */}
                                         <div className="flex justify-between items-start">
-                                            <h4 className="font-bold text-base text-slate-900 w-2/3">{product.title} {pkg.name}</h4>
+                                            <h4 className="font-bold text-base md:text-sm text-slate-900 w-2/3">{product.title} {pkg.name}</h4>
                                             {/* Order Button in Reference Style */}
                                             <button
                                                 onClick={() => pkg.is_available !== false && handleSelectPackage(pkg)}
@@ -568,7 +577,7 @@ export default function ProductModal({
 
                                         {/* Price & Sales Count */}
                                         <div className="flex justify-between items-end">
-                                            <div className="text-2xl font-black text-blue-600 flex items-center gap-3 flex-wrap">
+                                            <div className="text-xl font-black text-blue-600 flex items-center gap-3 flex-wrap">
                                                 {(() => {
                                                     const fs = !isResellerContext && activePromos?.find(f => f.package_id === pkg.id);
                                                     const rawPrice = parseInt(pkg.price.replace(/\D/g, "")) || 0;
@@ -577,7 +586,7 @@ export default function ProductModal({
                                                         return (
                                                             <>
                                                                 <span>Rp {pkg.reseller_price.toLocaleString("id-ID")}</span>
-                                                                <span className="text-xs font-bold text-slate-400 line-through">{pkg.price}</span>
+                                                                <span className="text-xs font-bold text-slate-500 line-through">{pkg.price}</span>
                                                             </>
                                                         );
                                                     }
@@ -587,7 +596,7 @@ export default function ProductModal({
                                                         return (
                                                             <>
                                                                 <span>Rp {discounted.toLocaleString("id-ID")}</span>
-                                                                <span className="text-xs font-bold text-slate-400 line-through">{pkg.price}</span>
+                                                                <span className="text-xs font-bold text-slate-500 line-through">{pkg.price}</span>
                                                                 <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-md">-{fs.discount_percent}%</span>
                                                             </>
                                                         );
@@ -596,8 +605,8 @@ export default function ProductModal({
                                                 })()}
                                             </div>
                                             <div className="flex flex-col items-end gap-1">
-                                                <div className="text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100 flex items-center gap-1.5">
-                                                    <ShieldCheck className="w-3 h-3 text-blue-400" />
+                                                <div className="text-[10px] font-bold text-slate-500 bg-white/60 px-3 py-1 rounded-full border border-white/50 flex items-center gap-1.5">
+                                                    <ShieldCheck className="w-3 h-3 text-blue-500" />
                                                     Terjual {salesCounts[pkg.name] || 0}
                                                 </div>
                                                 {isAffiliator && (
@@ -619,29 +628,29 @@ export default function ProductModal({
                                         </div>
 
                                         {/* Features List (Reference Style) */}
-                                        <div className="space-y-2 pt-2 border-t border-dashed border-slate-100">
+                                        <div className="space-y-1.5 pt-2 border-t border-dashed border-slate-200 mt-auto">
                                             {pkg.features && pkg.features.length > 0 ? (
                                                 pkg.features.map((feature, i) => (
-                                                    <div key={i} className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                                    <div key={i} className="flex items-center gap-2 text-xs font-bold text-slate-700">
                                                         <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                                                         <span>{feature}</span>
                                                     </div>
                                                 ))
                                             ) : (
                                                 <>
-                                                    <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
                                                         <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                                                         <span>Garansi {pkg.duration}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
                                                         <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                                                         <span>Type: {pkg.type}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
                                                         <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                                                         <span>Support All Device</span>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
                                                         <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                                                         <span>Proses Cepat & Aman</span>
                                                     </div>
@@ -661,9 +670,9 @@ export default function ProductModal({
                         <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-6">
 
                             {/* Selected Package Summary */}
-                            <div className="border border-blue-100 rounded-[2rem] p-6 bg-blue-50/30">
-                                <h4 className="font-bold text-lg text-slate-900 mb-1">{selectedPackage?.name}</h4>
-                                <div className="text-3xl font-black text-blue-600 mb-4 flex items-center gap-3 flex-wrap">
+                            <div className="border border-white/60 rounded-[2rem] p-6 bg-white/50 backdrop-blur-md shadow-sm">
+                                <h4 className="font-bold text-base text-slate-900 mb-1">{selectedPackage?.name}</h4>
+                                <div className="text-2xl font-black text-blue-600 mb-4 flex items-center gap-3 flex-wrap">
                                     {(() => {
                                         const fs = !isResellerContext && selectedPackage && activePromos?.find(f => f.package_id === selectedPackage.id);
                                         const rawPrice = parseInt(selectedPackage?.price?.replace(/\D/g, "") || "0");
@@ -789,7 +798,7 @@ export default function ProductModal({
                                 <div className="flex-1">
                                     <span className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Setuju dengan Syarat & Ketentuan</span>
                                     <div className="mt-2 text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed max-h-32 overflow-y-auto custom-scrollbar italic font-medium whitespace-pre-wrap">
-                                        {product.terms_conditions || "Pesanan akan diproses melalui WhatsApp. Pastikan nomor WhatsApp Anda aktif dan data yang dimasukkan sudah benar."}
+                                        {selectedPackage?.terms_and_conditions || product.terms_conditions || "Pesanan akan diproses melalui WhatsApp. Pastikan nomor WhatsApp Anda aktif dan data yang dimasukkan sudah benar."}
                                     </div>
                                 </div>
                             </label>
@@ -822,6 +831,7 @@ export default function ProductModal({
                         </div>
                     )}
                 </div>
+                </div> {/* End Modal Content Wrapper */}
             </div>
         </div>
     );

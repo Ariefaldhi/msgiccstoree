@@ -74,7 +74,7 @@ function PromoCard({ item, onOpen }: { item: PromoItem; onOpen: () => void }) {
     return (
         <div
             onClick={onOpen}
-            className="group relative bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden"
+            className="group relative bg-white/30 backdrop-blur-2xl border border-white/40 rounded-[1.25rem] p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 hover:bg-white/50 transition-all duration-300 cursor-pointer overflow-hidden"
         >
             {/* Discount Badge */}
             <div className="absolute top-3 right-3 bg-blue-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow">
@@ -214,27 +214,27 @@ export default function Promo({ onOpenProduct }: PromoProps) {
     };
 
     return (
-        <section className="py-12 bg-white relative overflow-hidden">
-            <div className="container mx-auto px-4 relative z-10">
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-200 animate-pulse">
-                            <Zap className="w-6 h-6 text-white" />
+        <section className="py-4 md:py-6 bg-white/40 backdrop-blur-3xl border border-white/60 rounded-3xl md:rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] relative overflow-hidden">
+            <div className="px-4 sm:px-8 relative z-10">
+                <div className="flex items-center justify-between mb-4 md:mb-6">
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <div className="w-8 h-8 md:w-12 md:h-12 bg-red-600 rounded-lg md:rounded-2xl flex items-center justify-center shadow-lg shadow-red-200 animate-pulse shrink-0">
+                            <Zap className="w-4 h-4 md:w-6 md:h-6 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Promo Spesial</h2>
-                            <p className="text-slate-500 font-medium">Jangan lewatkan penawaran terbatas ini.</p>
+                            <h2 className="text-base md:text-2xl font-black text-slate-900 tracking-tight leading-none">Promo Spesial</h2>
+                            <p className="hidden md:block text-slate-500 text-xs font-medium mt-0.5">Jangan lewatkan penawaran terbatas ini.</p>
                         </div>
                     </div>
-                    <div className="flex flex-col md:flex-row items-end md:items-center gap-3">
-                        <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold">
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <div className="hidden sm:flex items-center gap-1.5 text-slate-400 text-xs font-bold">
                             <Clock className="w-3.5 h-3.5" />
                             Berakhir Segera
                         </div>
                         <button 
                             onClick={handleShareAll}
                             disabled={isSharing}
-                            className="bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 border border-blue-100"
+                            className="bg-blue-50 hover:bg-blue-100 text-blue-600 px-2 py-1 md:px-3 md:py-1.5 rounded-md md:rounded-lg text-[10px] md:text-xs font-bold transition-colors flex items-center gap-1 md:gap-2 border border-blue-100 whitespace-nowrap"
                         >
                             {isSharing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Share2 className="w-3.5 h-3.5" />}
                             Share Semua

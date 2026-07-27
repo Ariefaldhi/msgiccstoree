@@ -88,35 +88,35 @@ export default function AdminTestimonies() {
 
     return (
         <div className="space-y-8 pb-20">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-white/40">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                        <Star className="w-8 h-8 text-amber-500" />
+                    <h1 className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-3">
+                        <Star className="w-6 h-6 text-amber-500" />
                         Kelola Testimoni
                     </h1>
-                    <p className="text-slate-500 font-medium">Unggah bukti kepuasan pelanggan.</p>
+                    <p className="text-slate-500 font-medium mt-1 text-xs">Unggah bukti kepuasan pelanggan.</p>
                 </div>
                 <button 
                     onClick={() => setShowForm(!showForm)}
-                    className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold shadow-xl shadow-blue-200 hover:bg-blue-500 transition-all"
+                    className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-white/60 backdrop-blur-md border border-white/60 text-slate-700 rounded-2xl font-bold shadow-sm hover:bg-white/80 transition-all"
                 >
                     {showForm ? "Batal" : <><Plus className="w-5 h-5" /> Tambah Testimoni</>}
                 </button>
             </div>
 
             {showForm && (
-                <div className="bg-white p-8 rounded-[2.5rem] border border-blue-100 shadow-xl shadow-blue-50 animate-in zoom-in-95 duration-300">
+                <div className="bg-white/60 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/60 shadow-sm animate-in zoom-in-95 duration-300">
                     <form onSubmit={handleSave} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-4">
-                                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Unggah Foto / Paste URL</label>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Unggah Foto / Paste URL</label>
                                 <div className="flex flex-col gap-4">
                                     <input 
                                         type="text" 
                                         placeholder="https://..." 
                                         value={imageUrl}
                                         onChange={(e) => setImageUrl(e.target.value)}
-                                        className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
+                                        className="w-full px-5 py-4 bg-white/50 border border-white/60 rounded-xl text-xs font-bold text-slate-900 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 backdrop-blur-md"
                                     />
                                     <div className="relative">
                                         <input 
@@ -126,26 +126,26 @@ export default function AdminTestimonies() {
                                             className="hidden"
                                             accept="image/*"
                                         />
-                                        <label htmlFor="file-upload" className="flex items-center justify-center gap-2 w-full py-4 bg-slate-100 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-bold text-sm cursor-pointer hover:bg-slate-200 transition-all">
+                                        <label htmlFor="file-upload" className="flex items-center justify-center gap-2 w-full py-4 bg-white/50 border-2 border-dashed border-white/60 rounded-xl text-slate-500 shadow-sm font-bold text-xs cursor-pointer hover:bg-white/70 transition-all backdrop-blur-md">
                                             <Upload className="w-4 h-4" /> Klik untuk Upload Image
                                         </label>
                                     </div>
                                 </div>
                             </div>
                             <div className="space-y-4">
-                                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Keterangan (Optional)</label>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Keterangan (Optional)</label>
                                 <textarea 
                                     placeholder="Contoh: 'Testimoni Netflix Murah'" 
                                     value={caption}
                                     onChange={(e) => setCaption(e.target.value)}
-                                    className="w-full h-20 px-5 py-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 resize-none"
+                                    className="w-full h-20 px-5 py-4 bg-white/50 border border-white/60 rounded-xl text-xs font-bold text-slate-900 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 resize-none backdrop-blur-md"
                                 />
                                 
-                                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Pilih Produk (Slug)</label>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Pilih Produk (Slug)</label>
                                 <select 
                                     value={productSlug}
                                     onChange={(e) => setProductSlug(e.target.value)}
-                                    className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
+                                    className="w-full px-5 py-4 bg-white/50 border border-white/60 rounded-xl text-xs font-bold text-slate-900 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 backdrop-blur-md"
                                 >
                                     <option value="">Umum (Tanpa Produk)</option>
                                     {products.map(p => (
@@ -158,9 +158,9 @@ export default function AdminTestimonies() {
                         </div>
 
                         {imageUrl && (
-                            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Preview Gambar</p>
-                                <div className="w-32 h-32 rounded-xl overflow-hidden border-2 border-white shadow-md">
+                            <div className="p-4 bg-white/50 border border-white/60 shadow-sm rounded-2xl backdrop-blur-md">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Preview Gambar</p>
+                                <div className="w-32 h-32 rounded-xl overflow-hidden border-2 border-white shadow-sm">
                                     <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
                                 </div>
                             </div>
@@ -169,7 +169,7 @@ export default function AdminTestimonies() {
                         <button 
                             type="submit" 
                             disabled={isSaving}
-                            className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-xl shadow-blue-200 hover:bg-blue-500 transition-all disabled:opacity-50"
+                            className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-900/20 border border-blue-500 hover:bg-blue-500 transition-all disabled:opacity-50"
                         >
                             {isSaving ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : "Simpan Testimoni"}
                         </button>
@@ -178,12 +178,16 @@ export default function AdminTestimonies() {
             )}
 
             {loading ? (
-                <div className="py-20 flex justify-center"><Loader2 className="w-10 h-10 animate-spin text-blue-600" /></div>
+                <div className="py-20 flex justify-center">
+                    <div className="flex items-center justify-center p-12 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-sm">
+                        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+                    </div>
+                </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {testimonies.map((item) => (
-                        <div key={item.id} className="group bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl transition-all relative">
-                            <div className="aspect-square bg-slate-100 relative overflow-hidden">
+                        <div key={item.id} className="group bg-white/60 backdrop-blur-3xl rounded-[2rem] border border-white/60 shadow-sm overflow-hidden hover:bg-white/80 transition-all relative">
+                            <div className="aspect-square bg-white/50 relative overflow-hidden">
                                 <img src={item.image_url} alt="Testimony" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                 <div className="absolute inset-0 bg-black/40 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <button 
@@ -194,12 +198,12 @@ export default function AdminTestimonies() {
                                     </button>
                                 </div>
                             </div>
-                            <div className="p-4 border-t border-slate-50 bg-slate-50/50 flex justify-between items-center">
-                                <p className="text-xs font-medium text-slate-500 line-clamp-1 italic">
+                            <div className="p-4 border-t border-white/60 bg-transparent flex justify-between items-center">
+                                <p className="text-xs font-bold text-slate-600 line-clamp-1 italic">
                                     {item.caption || "No caption"}
                                 </p>
                                 {item.product_slug && (
-                                    <span className="text-[9px] font-black bg-blue-100 text-blue-600 px-2 py-0.5 rounded-md uppercase">
+                                    <span className="text-[9px] font-black bg-white/50 border border-white/60 shadow-sm text-blue-600 px-2 py-0.5 rounded-md uppercase">
                                         {item.product_slug}
                                     </span>
                                 )}
@@ -207,9 +211,9 @@ export default function AdminTestimonies() {
                         </div>
                     ))}
                     {testimonies.length === 0 && (
-                        <div className="col-span-full py-20 text-center bg-white rounded-[2rem] border border-dashed border-slate-200">
-                             <ImageIcon className="w-12 h-12 text-slate-100 mx-auto mb-4" />
-                             <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Belum ada data testimoni</p>
+                        <div className="col-span-full py-20 text-center bg-white/40 backdrop-blur-md rounded-[2rem] border border-white/60 shadow-sm">
+                             <ImageIcon className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                             <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Belum ada data testimoni</p>
                         </div>
                     )}
                 </div>

@@ -34,8 +34,8 @@ interface Package {
     price: string;
     cost_price: number;
     duration: string;
-    type: string;
     is_available: boolean;
+    terms_and_conditions?: string;
     features?: string[];
     reseller_price?: number;
 }
@@ -71,9 +71,9 @@ export default function AdminProducts() {
         category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", description: "", terms_conditions: ""
     });
     const [packageForm, setPackageForm] = useState<{
-        name: string; price: string; cost_price: string; reseller_price: string; duration: string; type: string; is_available: boolean; features: string[];
+        name: string; price: string; cost_price: string; reseller_price: string; duration: string; type: string; is_available: boolean; features: string[]; terms_and_conditions: string;
     }>({
-        name: "", price: "", cost_price: "0", reseller_price: "0", duration: "", type: "", is_available: true, features: []
+        name: "", price: "", cost_price: "0", reseller_price: "0", duration: "", type: "", is_available: true, features: [], terms_and_conditions: ""
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -222,7 +222,7 @@ export default function AdminProducts() {
     const openPackageModal = (product: Product) => {
         setEditingPackage(null);
         setSelectedProduct(product);
-        setPackageForm({ name: "", price: "", cost_price: "0", reseller_price: "0", duration: "", type: "", is_available: true, features: [] });
+        setPackageForm({ name: "", price: "", cost_price: "0", reseller_price: "0", duration: "", type: "", is_available: true, features: [], terms_and_conditions: "" });
         setIsPackageModalOpen(true);
     };
 
@@ -237,7 +237,8 @@ export default function AdminProducts() {
             duration: pkg.duration, 
             type: pkg.type, 
             is_available: pkg.is_available ?? true,
-            features: pkg.features || [] 
+            features: pkg.features || [],
+            terms_and_conditions: pkg.terms_and_conditions || ""
         });
         setIsPackageModalOpen(true);
     };
@@ -290,7 +291,7 @@ export default function AdminProducts() {
                     return p;
                 }));
                 setIsPackageModalOpen(false);
-                setPackageForm({ name: "", price: "", cost_price: "0", reseller_price: "0", duration: "", type: "", is_available: true, features: [] });
+                setPackageForm({ name: "", price: "", cost_price: "0", reseller_price: "0", duration: "", type: "", is_available: true, features: [], terms_and_conditions: "" });
             } else {
                 alert("Error: " + error?.message);
             }
@@ -316,8 +317,8 @@ export default function AdminProducts() {
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Products</h1>
-                    <p className="text-slate-500 mt-1">Manage products and their packages.</p>
+                    <h1 className="text-xs font-black text-slate-900 tracking-tight">Products</h1>
+                    <p className="text-xs text-slate-500 font-medium mt-1">Manage your store's products and packages.</p>
                 </div>
                 <button
                     onClick={() => setIsProductModalOpen(true)}
@@ -333,11 +334,11 @@ export default function AdminProducts() {
             ) : (
                 <div className="space-y-6">
                     {products.map((product) => (
-                        <div key={product.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div key={product.id} className="bg-white/60 backdrop-blur-3xl rounded-[2rem] border border-white/60 shadow-sm overflow-hidden">
                             {/* Product Header */}
-                            <div className="p-6 flex flex-col md:flex-row items-start justify-between border-b border-slate-50 bg-slate-50/50 gap-4">
+                            <div className="p-5 md:p-6 flex flex-col md:flex-row items-start justify-between border-b border-white/40 bg-white/40 gap-4">
                                 <div className="flex gap-4">
-                                    <div className="w-16 h-16 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-3xl font-black text-slate-900 overflow-hidden relative shrink-0">
+                                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-sm font-black text-slate-900 overflow-hidden relative shrink-0">
                                         {product.image_url ? (
                                             <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
                                         ) : (
@@ -355,8 +356,8 @@ export default function AdminProducts() {
                                                 {categories.find(c => c.id === product.category_id)?.name || "Unknown Category"}
                                             </span>
                                         </div>
-                                        <h3 className="text-xl font-black text-slate-900">{product.title}</h3>
-                                        <p className="text-blue-600 font-bold">{formatCurrency(product.price)}</p>
+                                        <h3 className="text-xs font-black text-slate-900">{product.title}</h3>
+                                        <p className="text-blue-600 font-bold text-xs">{formatCurrency(product.price)}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
@@ -383,8 +384,8 @@ export default function AdminProducts() {
                             </div>
 
                             {/* Packages List */}
-                            <div className="p-4 bg-white">
-                                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pl-2">Packages Available</h4>
+                            <div className="p-4 md:p-6 bg-transparent">
+                                <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 pl-2">Packages Available</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                     {[...(product.packages || [])]
                                         .sort((a, b) => {
@@ -397,9 +398,9 @@ export default function AdminProducts() {
                                             return aPrice - bPrice;
                                         })
                                         .map(pkg => (
-                                        <div key={pkg.id} className="border border-slate-100 rounded-xl p-3 flex justify-between items-center bg-slate-50/30 hover:bg-slate-50 transition-colors">
+                                        <div key={pkg.id} className="border border-white/60 rounded-xl p-3 flex justify-between items-center bg-white/40 hover:bg-white/60 transition-colors">
                                             <div>
-                                                <p className="font-bold text-sm text-slate-900">{pkg.name}</p>
+                                                <p className="font-bold text-xs text-slate-900">{pkg.name}</p>
                                                 <p className="text-xs text-blue-600 font-bold">{formatCurrency(pkg.price)} <span className="text-slate-400 font-normal">• {pkg.duration}</span></p>
                                                 <p className="text-xs text-rose-500 font-bold">Modal: {formatCurrency(pkg.cost_price)}</p>
                                                 <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wide">{pkg.type}</p>
@@ -467,10 +468,10 @@ export default function AdminProducts() {
             {/* Add Product Modal */}
             {isProductModalOpen && (
                 <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white/80 backdrop-blur-3xl rounded-[2rem] p-5 md:p-6 max-w-lg w-full shadow-2xl max-h-[85vh] overflow-y-auto border border-white/60">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-black text-slate-900">New Product</h2>
-                            <button onClick={() => setIsProductModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
+                            <h2 className="text-xs font-black text-slate-900">New Product</h2>
+                            <button onClick={() => setIsProductModalOpen(false)} className="p-2 text-slate-400 hover:bg-white/50 rounded-full transition-colors">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
@@ -512,7 +513,7 @@ export default function AdminProducts() {
                                     <div className="relative">
                                         <select
                                             required
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs appearance-none cursor-pointer"
                                             value={productForm.category_id}
                                             onChange={e => setProductForm({ ...productForm, category_id: e.target.value })}
                                         >
@@ -530,7 +531,7 @@ export default function AdminProducts() {
                                     <input 
                                         required 
                                         type="text" 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
                                         placeholder="Contoh: Netflix Premium 4K"
                                         value={productForm.title} 
                                         onChange={e => setProductForm({ ...productForm, title: e.target.value })} 
@@ -541,11 +542,11 @@ export default function AdminProducts() {
                                     <div>
                                         <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Mulai Dari</label>
                                         <div className="relative">
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">Rp</span>
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
                                             <input 
                                                 required 
                                                 type="text" 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
                                                 placeholder="0"
                                                 value={productForm.price.includes("Rp") ? productForm.price.replace("Rp ", "") : formatToIDR(productForm.price)} 
                                                 onChange={e => setProductForm({ ...productForm, price: formatToIDR(e.target.value) })} 
@@ -589,7 +590,7 @@ export default function AdminProducts() {
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Deskripsi Produk</label>
                                     <textarea 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm min-h-[120px] resize-none" 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs min-h-[120px] resize-none" 
                                         placeholder="Tuliskan deskripsi lengkap mengenai produk ini..."
                                         value={productForm.description} 
                                         onChange={e => setProductForm({ ...productForm, description: e.target.value })}
@@ -599,7 +600,7 @@ export default function AdminProducts() {
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Syarat & Ketentuan (Opsional)</label>
                                     <textarea 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm min-h-[100px] resize-none" 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs min-h-[100px] resize-none" 
                                         placeholder="Syarat, garansi, atau kebijakan lainnya..."
                                         value={productForm.terms_conditions} 
                                         onChange={e => setProductForm({ ...productForm, terms_conditions: e.target.value })}
@@ -630,10 +631,10 @@ export default function AdminProducts() {
             {/* Edit Product Modal */}
             {isEditModalOpen && editingProduct && (
                 <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white/80 backdrop-blur-3xl rounded-[2rem] border border-white/60 p-5 md:p-6 max-w-md w-full shadow-2xl max-h-[85vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h2 className="text-xl font-black text-slate-900">Edit Product</h2>
+                                <h2 className="text-sm font-black text-slate-900">Edit Product</h2>
                                 <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">{editingProduct.title}</p>
                             </div>
                             <button onClick={() => setIsEditModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
@@ -647,7 +648,7 @@ export default function AdminProducts() {
                                     <div className="relative">
                                         <select
                                             required
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs appearance-none cursor-pointer"
                                             value={editForm.category_id}
                                             onChange={e => setEditForm({ ...editForm, category_id: e.target.value })}
                                         >
@@ -664,7 +665,7 @@ export default function AdminProducts() {
                                     <input 
                                         required 
                                         type="text" 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
                                         placeholder="Contoh: Netflix Premium 4K"
                                         value={editForm.title} 
                                         onChange={e => setEditForm({ ...editForm, title: e.target.value })} 
@@ -676,11 +677,11 @@ export default function AdminProducts() {
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Mulai Dari</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">Rp</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
                                         <input 
                                             required 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
                                             placeholder="0"
                                             value={editForm.price.includes("Rp") ? editForm.price.replace("Rp ", "") : formatToIDR(editForm.price)} 
                                             onChange={e => setEditForm({ ...editForm, price: formatToIDR(e.target.value) })} 
@@ -743,7 +744,7 @@ export default function AdminProducts() {
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Deskripsi Produk</label>
                                     <textarea 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm min-h-[120px] resize-none" 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs min-h-[120px] resize-none" 
                                         placeholder="Deskripsi lengkap produk..."
                                         value={editForm.description} 
                                         onChange={e => setEditForm({ ...editForm, description: e.target.value })}
@@ -752,7 +753,7 @@ export default function AdminProducts() {
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Syarat & Ketentuan (Opsional)</label>
                                     <textarea 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm min-h-[100px] resize-none" 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs min-h-[100px] resize-none" 
                                         placeholder="Syarat, garansi, atau kebijakan lainnya..."
                                         value={editForm.terms_conditions} 
                                         onChange={e => setEditForm({ ...editForm, terms_conditions: e.target.value })}
@@ -783,10 +784,10 @@ export default function AdminProducts() {
             {/* Add Package Modal */}
             {isPackageModalOpen && selectedProduct && (
                 <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
+                    <div className="bg-white rounded-3xl p-5 max-w-sm w-full shadow-2xl max-h-[85vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h2 className="text-xl font-black text-slate-900">{editingPackage ? "Edit Package" : "Add Package"}</h2>
+                                <h2 className="text-sm font-black text-slate-900">{editingPackage ? "Edit Package" : "Add Package"}</h2>
                                 <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">For {selectedProduct.title}</p>
                             </div>
                             <button onClick={() => setIsPackageModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
@@ -799,7 +800,7 @@ export default function AdminProducts() {
                                 <input 
                                     required 
                                     type="text" 
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
                                     placeholder="Contoh: 1 Bulan Sharing"
                                     value={packageForm.name} 
                                     onChange={e => setPackageForm({ ...packageForm, name: e.target.value })} 
@@ -810,11 +811,11 @@ export default function AdminProducts() {
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Jual</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">Rp</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
                                         <input 
                                             required 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
                                             placeholder="0"
                                             value={formatToIDR(packageForm.price)} 
                                             onChange={e => setPackageForm({ ...packageForm, price: formatToIDR(e.target.value) })} 
@@ -824,11 +825,11 @@ export default function AdminProducts() {
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Modal</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">Rp</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
                                         <input 
                                             required 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
                                             placeholder="0"
                                             value={formatToIDR(packageForm.cost_price)} 
                                             onChange={e => setPackageForm({ ...packageForm, cost_price: formatToIDR(e.target.value) })} 
@@ -841,11 +842,11 @@ export default function AdminProducts() {
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Reseller</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">Rp</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
                                         <input 
                                             required 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" 
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
                                             placeholder="0"
                                             value={formatToIDR(packageForm.reseller_price)} 
                                             onChange={e => setPackageForm({ ...packageForm, reseller_price: formatToIDR(e.target.value) })} 
@@ -887,13 +888,25 @@ export default function AdminProducts() {
                                 <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">Paket Tersedia (ON/OFF)</span>
                             </div>
 
+                            {/* S&K Khusus Paket */}
+                            <div className="space-y-4">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider ml-1">Syarat & Ketentuan Khusus (Opsional)</label>
+                                <textarea 
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs resize-none" 
+                                    placeholder="Contoh: Pesanan akan diproses melalui WhatsApp..."
+                                    rows={3}
+                                    value={packageForm.terms_and_conditions}
+                                    onChange={e => setPackageForm({ ...packageForm, terms_and_conditions: e.target.value })}
+                                />
+                            </div>
+
                             {/* Features Input */}
                             <div className="space-y-4">
                                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider ml-1">Fitur & Keunggulan</label>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
-                                        className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm"
+                                        className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs"
                                         placeholder="Tambah fitur (Contoh: Garansi Full)"
                                         id="feature-input"
                                         onKeyDown={(e) => {

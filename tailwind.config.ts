@@ -73,8 +73,8 @@ const config: Config = {
                 sm: 'calc(var(--radius) - 4px)'
             },
             fontFamily: {
-                sans: ["var(--font-inter)", "sans-serif"],
-                heading: ["var(--font-poppins)", "sans-serif"],
+                sans: ["var(--font-pjs)", "sans-serif"],
+                heading: ["var(--font-pjs)", "sans-serif"],
             },
         }
     },

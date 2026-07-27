@@ -30,35 +30,39 @@ export default function AdminReviews() {
 
     return (
         <div className="space-y-8 pb-20">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-white/40">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                        <MessageSquare className="w-8 h-8 text-emerald-500" />
+                    <h1 className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-3">
+                        <MessageSquare className="w-6 h-6 text-emerald-500" />
                         Manajemen Review
                     </h1>
-                    <p className="text-slate-500 font-medium tracking-tight">Pantau dan kelola ulasan dari para pelanggan.</p>
+                    <p className="text-slate-500 font-medium tracking-tight mt-1 text-xs">Pantau dan kelola ulasan dari para pelanggan.</p>
                 </div>
             </div>
 
             {loading ? (
-                <div className="py-20 flex justify-center"><Loader2 className="w-10 h-10 animate-spin text-emerald-600" /></div>
+                <div className="py-20 flex justify-center">
+                    <div className="flex items-center justify-center p-12 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-sm">
+                        <Loader2 className="w-10 h-10 animate-spin text-emerald-600" />
+                    </div>
+                </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {reviews.map((rev) => (
-                        <div key={rev.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm relative group hover:shadow-lg transition-all">
+                        <div key={rev.id} className="bg-white/60 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/60 shadow-sm relative group hover:shadow-md hover:bg-white/80 transition-all flex flex-col">
                             <button 
                                 onClick={() => handleDelete(rev.id)}
-                                className="absolute top-4 right-4 p-2 bg-red-50 text-red-500 rounded-lg md:opacity-0 md:group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all"
+                                className="absolute top-4 right-4 p-2 bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-500 rounded-lg md:opacity-0 md:group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all shadow-sm"
                             >
                                 <Trash2 className="w-4 h-4" />
                             </button>
 
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
+                                <div className="w-10 h-10 bg-white/50 border border-white/60 shadow-sm rounded-xl flex items-center justify-center text-slate-400">
                                     <User className="w-5 h-5" />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <h3 className="font-bold text-slate-900 text-sm truncate">{rev.user_name}</h3>
+                                    <h3 className="font-bold text-slate-900 text-xs truncate">{rev.user_name}</h3>
                                     <div className="flex items-center gap-0.5">
                                         {[...Array(5)].map((_, i) => (
                                             <Star key={i} className={cn("w-2.5 h-2.5", rev.rating >= i + 1 ? "fill-amber-400 text-amber-400" : "text-slate-200")} />
@@ -67,7 +71,7 @@ export default function AdminReviews() {
                                 </div>
                             </div>
 
-                            <p className="text-slate-600 text-sm font-medium leading-relaxed bg-slate-50 p-4 rounded-xl mb-4 italic">
+                            <p className="text-slate-600 text-xs font-medium leading-relaxed bg-white/50 border border-white/60 shadow-sm p-4 rounded-xl mb-4 italic">
                                 "{rev.comment}"
                             </p>
 
@@ -75,12 +79,12 @@ export default function AdminReviews() {
                                 <div className="flex flex-col gap-1">
                                     <span>{new Date(rev.created_at).toLocaleDateString('id-ID')}</span>
                                     {rev.product_name && (
-                                        <span className="text-[8px] text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded w-fit">{rev.product_name}</span>
+                                        <span className="text-[8px] text-blue-600 bg-white/50 border border-white/60 shadow-sm px-2 py-0.5 rounded w-fit font-bold">{rev.product_name}</span>
                                     )}
                                 </div>
                                 <span className={cn(
-                                    "px-2 py-0.5 rounded-full",
-                                    rev.rating >= 4 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
+                                    "px-2 py-1 rounded-lg border border-white/60 shadow-sm",
+                                    rev.rating >= 4 ? "bg-white/50 text-emerald-600" : "bg-white/50 text-red-600"
                                 )}>
                                     {rev.rating} Stars
                                 </span>
@@ -88,9 +92,9 @@ export default function AdminReviews() {
                         </div>
                     ))}
                     {reviews.length === 0 && (
-                        <div className="col-span-full py-20 text-center bg-white rounded-[2rem] border border-dashed border-slate-200">
-                             <MessageSquare className="w-12 h-12 text-slate-100 mx-auto mb-4" />
-                             <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Belum ada review pelanggan</p>
+                        <div className="col-span-full py-20 text-center bg-white/40 backdrop-blur-md rounded-[2rem] border border-white/60 shadow-sm">
+                             <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                             <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Belum ada review pelanggan</p>
                         </div>
                     )}
                 </div>

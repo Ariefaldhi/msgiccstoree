@@ -122,10 +122,10 @@ export default function AdminPromo() {
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                        <Zap className="w-7 h-7 text-[#ff2d55]" /> Promo & Produk Spesial
+                    <h1 className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-2">
+                        <Zap className="w-6 h-6 text-[#ff2d55]" /> Promo & Produk Spesial
                     </h1>
-                    <p className="text-slate-500 mt-1">Kelola promo produk dan diskon terbatas.</p>
+                    <p className="text-slate-500 mt-1 text-xs">Kelola promo produk dan diskon terbatas.</p>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
@@ -143,18 +143,18 @@ export default function AdminPromo() {
                         const rawPrice = parseInt(item.package.price.replace(/\D/g, ""), 10) || 0;
                         const discounted = Math.round(rawPrice * (1 - item.discount_percent / 100));
                         return (
-                            <div key={item.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4">
+                            <div key={item.id} className="bg-white/60 backdrop-blur-3xl rounded-[2rem] border border-white/60 shadow-sm p-4 md:p-6 flex items-center gap-4 transition-all hover:bg-white/80 hover:shadow-md">
                                 {/* Product Image */}
-                                <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center">
+                                <div className="w-14 h-14 rounded-xl overflow-hidden bg-white/50 border border-white/60 shadow-sm shrink-0 flex items-center justify-center">
                                     {item.package.product.image_url
                                         ? <img src={item.package.product.image_url} className="w-full h-full object-cover" alt="" />
-                                        : <span className="text-xl font-black text-slate-300">{item.package.product.title.charAt(0)}</span>
+                                        : <span className="text-sm font-black text-slate-400">{item.package.product.title.charAt(0)}</span>
                                     }
                                 </div>
 
                                 {/* Info */}
                                 <div className="flex-1 min-w-0">
-                                    <p className="font-black text-slate-900 truncate text-sm md:text-base">{item.package.product.title} - {item.package.name}</p>
+                                    <p className="font-black text-slate-900 truncate text-xs">{item.package.product.title} - {item.package.name}</p>
                                     <div className="flex items-center gap-3 mt-1 flex-wrap">
                                         <span className="text-[10px] bg-red-50 text-[#ff2d55] font-black px-1.5 py-0.5 rounded-md">-{item.discount_percent}%</span>
                                         <span className="text-[10px] text-slate-400 line-through">{formatCurrency(item.package.price)}</span>
@@ -179,7 +179,7 @@ export default function AdminPromo() {
                         );
                     })}
                     {flashSales.length === 0 && (
-                        <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400">
+                        <div className="text-center py-12 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-dashed border-white/60 text-slate-500 font-medium">
                             Belum ada promo aktif. Buat sekarang!
                         </div>
                     )}
@@ -189,10 +189,10 @@ export default function AdminPromo() {
             {/* Create Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
+                    <div className="bg-white/80 backdrop-blur-3xl rounded-[2rem] border border-white/60 p-5 md:p-6 max-w-sm w-full shadow-2xl max-h-[85vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-black text-slate-900">Buat Promo Baru</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
+                            <h2 className="text-sm font-black text-slate-900">Buat Promo Baru</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:bg-white/50 rounded-full">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
@@ -240,8 +240,8 @@ export default function AdminPromo() {
             )}
 
             <style jsx>{`
-                .label-admin { @apply block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2; }
-                .input-admin { @apply w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-400 transition-all; }
+                .label-admin { @apply block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1; }
+                .input-admin { @apply w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all text-xs; }
             `}</style>
         </div>
     );

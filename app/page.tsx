@@ -6,8 +6,11 @@ import CategoryFilter from "@/components/CategoryFilter";
 import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
 import LiveSalesNotification from "@/components/LiveSalesNotification";
+import HeroCarousel from "@/components/HeroCarousel";
+import HowItWorks from "@/components/HowItWorks";
+import FAQ from "@/components/FAQ";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Flame } from "lucide-react";
 
 interface Category {
   id: string;
@@ -37,6 +40,7 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [activePromos, setActivePromos] = useState<any[]>([]);
+  const [heroBanners, setHeroBanners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
   const [isAffiliator, setIsAffiliator] = useState(false);
@@ -99,7 +103,17 @@ export default function Home() {
         setActivePromos(validSales);
       }
 
-      // Fetch User & Affiliate Status
+      // Fetch Hero Banners
+      const { data: banners, error: bannerError } = await supabase
+        .from("hero_banners")
+        .select("*, products(id, title, image_url)")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      
+      if (bannerError) console.error("❌ Banners fetch error:", bannerError.message);
+      if (banners) setHeroBanners(banners);
+
+      // Check Affiliate Status
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase.from("profiles").select("is_affiliator, role").eq("id", user.id).single();
@@ -160,33 +174,67 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Promo Section - replaces Hero, auto-hides if no active promos */}
-      <div className="pt-28">
-        <Promo onOpenProduct={(p) => { setSelectedProduct(p); setIsModalOpen(true); }} />
-      </div>
+    <div className="min-h-screen bg-transparent">
 
-      <section id="products" className="container mx-auto px-4 py-8 relative z-20">
+
+      <section id="products" className="container mx-auto px-4 pb-8 relative z-20">
+        
+        {/* Massive Hero Typography & Glass Search Input */}
+        <div className="mb-14 max-w-3xl mx-auto text-center mt-2">
+          <h1 className="text-4xl md:text-[3.5rem] leading-tight font-heading font-black text-slate-900 tracking-tighter mb-8 drop-shadow-sm">
+            Aplikasi Premium <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Favoritmu</span>
+          </h1>
+          <div className="relative group max-w-2xl mx-auto">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+            <input
+              id="search-input"
+              type="text"
+              placeholder="Cari aplikasi premium favoritmu..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="relative w-full pl-14 pr-6 py-4 md:py-5 rounded-full bg-white/30 backdrop-blur-3xl border border-white/40 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:bg-white/60 transition-all font-bold text-base md:text-lg text-slate-800 placeholder:text-slate-500 shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
+            />
+            <svg className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+
+          {/* Trending Pills */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
+            <span className="text-xs font-bold text-slate-400 mr-2 flex items-center gap-1.5">
+              <Flame className="w-4 h-4 text-orange-500" /> Trending:
+            </span>
+            {(() => {
+                const tags = Object.keys(salesCounts).length > 0 
+                  ? Array.from(new Set(Object.entries(salesCounts)
+                      .sort((a, b) => b[1] - a[1])
+                      .map(([name]) => name.split(" ")[0])))
+                      .slice(0, 3)
+                  : ["Netflix", "Canva", "Spotify"]; // Fallback if no sales yet
+                
+                return tags.map((tag) => (
+                  <button 
+                    key={tag}
+                    onClick={() => setSearchQuery(tag)}
+                    className="px-4 py-1.5 rounded-full bg-white/40 backdrop-blur-md border border-white/50 text-xs font-bold text-slate-600 hover:bg-white/70 hover:scale-105 transition-all shadow-sm"
+                  >
+                    {tag}
+                  </button>
+                ));
+            })()}
+          </div>
+
+          {/* Trust Badges Removed */}
+        </div>
+
+        {/* Promo Section */}
+        <div className="mb-12">
+          <Promo onOpenProduct={(p) => { setSelectedProduct(p); setIsModalOpen(true); }} />
+        </div>
+
         <CategoryFilter
           categories={filterCategories}
           activeCategory={activeCategory}
           onSelectCategory={setActiveCategory}
         />
-
-        {/* Search Input - Mobile/Desktop */}
-        <div className="mb-10 max-w-md mx-auto">
-          <div className="relative">
-            <input
-              id="search-input"
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white border border-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-bold text-sm text-slate-800 placeholder:text-gray-400 shadow-sm"
-            />
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          </div>
-        </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -214,6 +262,10 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      <HeroCarousel banners={heroBanners} />
+      <HowItWorks />
+      <FAQ />
 
       <ProductModal
         product={selectedProduct ? {

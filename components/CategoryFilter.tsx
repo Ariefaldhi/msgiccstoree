@@ -1,4 +1,4 @@
-import { Search, LayoutGrid } from "lucide-react";
+import { Search, LayoutGrid, Tv, Music, Palette, Shield, Gamepad2, Crown, Wrench, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Category {
@@ -11,11 +11,19 @@ interface CategoryFilterProps {
     categories: Category[]; // Now receiving full category objects
     activeCategory: string;
     onSelectCategory: (category: string) => void;
-    // Removed onSearch from here as it's better handled in parent or separate component for layout reasons, 
-    // but keeping prop signature if parent uses it. 
-    // Actually, looking at page.tsx, it passes `categories`, `activeCategory`, `onSelectCategory`.
-    // The search input is inside this component in the design.
 }
+
+const getCategoryIcon = (name: string) => {
+    const lower = name.toLowerCase();
+    if (lower.includes('stream') || lower.includes('tv') || lower.includes('film')) return <Tv className="w-3.5 h-3.5" />;
+    if (lower.includes('musik') || lower.includes('audio') || lower.includes('spotify')) return <Music className="w-3.5 h-3.5" />;
+    if (lower.includes('desain') || lower.includes('edit') || lower.includes('canva')) return <Palette className="w-3.5 h-3.5" />;
+    if (lower.includes('vpn') || lower.includes('security')) return <Shield className="w-3.5 h-3.5" />;
+    if (lower.includes('game') || lower.includes('topup')) return <Gamepad2 className="w-3.5 h-3.5" />;
+    if (lower.includes('premium') || lower.includes('pro')) return <Crown className="w-3.5 h-3.5" />;
+    if (lower.includes('tool') || lower.includes('bot') || lower.includes('ai')) return <Wrench className="w-3.5 h-3.5" />;
+    return <Package className="w-3.5 h-3.5" />;
+};
 
 export default function CategoryFilter({ categories, activeCategory, onSelectCategory }: CategoryFilterProps) {
     return (
@@ -28,32 +36,35 @@ export default function CategoryFilter({ categories, activeCategory, onSelectCat
                     <button
                         onClick={() => onSelectCategory("Semua")}
                         className={cn(
-                            "px-5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all duration-200 border flex items-center gap-2",
+                            "px-5 py-2.5 rounded-[1.25rem] text-xs font-bold whitespace-nowrap transition-all duration-300 border flex items-center gap-2 backdrop-blur-xl",
                             activeCategory === "Semua"
-                                ? "bg-blue-500 text-white border-blue-500 shadow-md shadow-blue-500/20"
-                                : "bg-white text-gray-500 border-gray-100 shadow-sm hover:translate-y-[-2px] hover:shadow-md"
+                                ? "bg-white/60 text-blue-700 border-white/60 shadow-[0_4px_20px_rgba(37,99,235,0.15)]"
+                                : "bg-white/20 text-slate-600 border-white/30 shadow-sm hover:translate-y-[-2px] hover:bg-white/40"
                         )}
                     >
                         <LayoutGrid className="w-3.5 h-3.5" />
                         Semua
                     </button>
 
-                    {/* Dynamic Categories from DB */}
-                    {categories.map((cat) => (
-                        <button
-                            key={cat.slug}
-                            onClick={() => onSelectCategory(cat.name)}
-                            className={cn(
-                                "px-5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all duration-200 border flex items-center gap-2",
-                                activeCategory === cat.name
-                                    ? "bg-blue-500 text-white border-blue-500 shadow-md shadow-blue-500/20"
-                                    : "bg-white text-gray-500 border-gray-100 shadow-sm hover:translate-y-[-2px] hover:shadow-md"
-                            )}
-                        >
-                            <span>{cat.icon || "📦"}</span>
-                            {cat.name}
-                        </button>
-                    ))}
+                    {/* Category Buttons from DB */}
+                    {categories.map((cat, idx) => {
+                        const isActive = activeCategory === cat.name;
+                        return (
+                            <button
+                                key={idx}
+                                onClick={() => onSelectCategory(cat.name)}
+                                className={cn(
+                                    "px-5 py-2.5 rounded-[1.25rem] text-xs font-bold whitespace-nowrap transition-all duration-300 border flex items-center gap-2 backdrop-blur-xl",
+                                    isActive
+                                        ? "bg-white/60 text-blue-700 border-white/60 shadow-[0_4px_20px_rgba(37,99,235,0.15)]"
+                                        : "bg-white/20 text-slate-600 border-white/30 shadow-sm hover:translate-y-[-2px] hover:bg-white/40"
+                                )}
+                            >
+                                {getCategoryIcon(cat.name)}
+                                {cat.name}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {/* Search removed from here and moved to parent for better layout control */}

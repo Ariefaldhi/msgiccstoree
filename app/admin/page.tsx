@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, TrendingUp, TrendingDown, DollarSign, ShoppingBag, PieChart, Users, Package, ArrowUpRight, ArrowDownRight, Wallet } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, DollarSign, ShoppingBag, PieChart, Users, Package, ArrowUpRight, ArrowDownRight, Wallet, Eye, EyeOff } from "lucide-react";
 import { useAdminCurrency } from "@/components/admin/AdminCurrencyProvider";
 import Link from "next/link";
 import DashboardChart, { TopProductsChart } from "@/components/admin/DashboardChart";
@@ -22,6 +22,9 @@ export default function AdminDashboard() {
     const [chartData, setChartData] = useState<any[]>([]);
     const [topProducts, setTopProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isCensored, setIsCensored] = useState(true);
+
+    const displayMoney = (val: number) => isCensored ? "Rp ••••••" : formatCurrency(val);
 
     const supabase = createClient();
 
@@ -111,22 +114,31 @@ export default function AdminDashboard() {
         <div className="space-y-8 pb-12">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end pb-4 border-b border-slate-100 gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                        <TrendingUp className="w-8 h-8 text-blue-600" />
+                    <h1 className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-3">
+                        <TrendingUp className="w-5 md:w-6 h-5 md:h-6 text-blue-600" />
                         Admin Analytics
                     </h1>
-                    <p className="text-slate-500 font-medium mt-1">Laporan Keuangan & Performa Bisnis Real-time.</p>
+                    <p className="text-slate-500 font-medium mt-1 text-[10px]">Laporan Keuangan & Performa Bisnis Real-time.</p>
                 </div>
-                <div className="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 flex items-center gap-2 text-xs font-bold text-slate-500 w-fit">
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    Sistem Operasional Normal
+                <div className="flex flex-row items-center gap-3">
+                    <button 
+                        onClick={() => setIsCensored(!isCensored)} 
+                        className="bg-slate-50 hover:bg-slate-100 p-2 rounded-xl border border-slate-200 transition-colors text-slate-500 flex items-center justify-center shadow-sm"
+                        title={isCensored ? "Tampilkan Nominal" : "Sembunyikan Nominal"}
+                    >
+                        {isCensored ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                    <div className="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 flex items-center gap-2 text-xs font-bold text-slate-500 w-fit">
+                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        Sistem Operasional Normal
+                    </div>
                 </div>
             </div>
 
             {loading ? (
                 <div className="flex flex-col items-center justify-center p-20">
                     <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
-                    <p className="text-sm font-bold text-slate-400 animate-pulse uppercase tracking-widest">Menganalisa Data Keuangan...</p>
+                    <p className="text-xs font-bold text-slate-400 animate-pulse uppercase tracking-widest">Menganalisa Data Keuangan...</p>
                 </div>
             ) : (
                 <>
@@ -138,15 +150,15 @@ export default function AdminDashboard() {
                             { label: "Modal Keluar", value: stats.cost, icon: TrendingDown, color: "rose", trend: "-2%" },
                             { label: "Potongan Komisi", value: stats.commission, icon: PieChart, color: "purple", trend: "+5%" },
                         ].map((stat, idx) => (
-                            <div key={idx} className="group bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-300 relative overflow-hidden">
+                            <div key={idx} className="group bg-white/60 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/60 shadow-sm hover:shadow-md hover:bg-white/80 transition-all duration-300 relative overflow-hidden">
                                 <div className={`absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full bg-${stat.color}-50 opacity-50 group-hover:scale-110 transition-transform`}></div>
-                                <div className={`bg-${stat.color}-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-4`}>
-                                    <stat.icon className={`w-6 h-6 text-${stat.color}-600`} />
+                                <div className={`bg-${stat.color}-50 w-10 h-10 rounded-2xl flex items-center justify-center mb-4`}>
+                                    <stat.icon className={`w-5 h-5 text-${stat.color}-600`} />
                                 </div>
-                                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
                                 <div className="flex items-end justify-between">
-                                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">{formatCurrency(stat.value)}</h3>
-                                    <div className={`flex items-center gap-0.5 text-[10px] font-black px-2 py-1 rounded-full ${stat.trend.startsWith('+') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                                    <h3 className="text-sm font-black text-slate-900 tracking-tight">{displayMoney(stat.value)}</h3>
+                                    <div className={`flex items-center gap-0.5 text-[9px] font-black px-2 py-1 rounded-full ${stat.trend.startsWith('+') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
                                         {stat.trend.startsWith('+') ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                                         {stat.trend}
                                     </div>
@@ -157,10 +169,10 @@ export default function AdminDashboard() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Main Trend Chart */}
-                        <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)]">
+                        <div className="lg:col-span-2 bg-white/60 backdrop-blur-3xl p-6 md:p-8 rounded-[2rem] border border-white/60 shadow-sm">
                             <div className="flex items-center justify-between mb-8">
                                 <div>
-                                    <h3 className="text-lg font-black text-slate-900 tracking-tight">Tren Pendapatan</h3>
+                                    <h3 className="text-sm font-black text-slate-900 tracking-tight">Tren Pendapatan</h3>
                                     <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Statistik 14 Hari Terakhir</p>
                                 </div>
                                 <div className="flex gap-4">
@@ -178,42 +190,42 @@ export default function AdminDashboard() {
                         </div>
 
                         {/* Top Products & Order Stats */}
-                        <div className="space-y-8">
-                            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)]">
-                                <h3 className="text-lg font-black text-slate-900 tracking-tight mb-6">Produk Terlaris</h3>
+                        <div className="space-y-6">
+                            <div className="bg-white/60 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/60 shadow-sm">
+                                <h3 className="text-sm font-black text-slate-900 tracking-tight mb-6">Produk Terlaris</h3>
                                 <TopProductsChart data={topProducts} />
                             </div>
 
-                            <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white overflow-hidden relative group">
+                            <div className="bg-slate-900/80 backdrop-blur-3xl p-6 rounded-[2rem] border border-slate-800 text-white overflow-hidden relative group">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500 opacity-20 blur-[80px] -mr-16 -mt-16 group-hover:opacity-30 transition-opacity"></div>
-                                <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6">Informasi Pesanan</h3>
+                                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Informasi Pesanan</h3>
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
                                                 <ShoppingBag className="w-5 h-5 text-blue-400" />
                                             </div>
-                                            <span className="text-sm font-bold text-slate-300">Total Transaksi</span>
+                                            <span className="text-xs font-bold text-slate-300">Total Transaksi</span>
                                         </div>
-                                        <span className="text-xl font-black">{stats.totalOrders}</span>
+                                        <span className="text-sm font-black">{stats.totalOrders}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
                                                 <Package className="w-5 h-5 text-orange-400" />
                                             </div>
-                                            <span className="text-sm font-bold text-slate-300">Pesanan Aktif</span>
+                                            <span className="text-xs font-bold text-slate-300">Pesanan Aktif</span>
                                         </div>
-                                        <span className="text-xl font-black text-orange-400">{stats.activeOrders}</span>
+                                        <span className="text-sm font-black text-orange-400">{stats.activeOrders}</span>
                                     </div>
                                     <Link href="/admin/withdrawals" className="flex items-center justify-between group/wd hover:bg-slate-800/50 p-2 -m-2 rounded-xl transition-all">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
                                                 <Wallet className="w-5 h-5 text-purple-400" />
                                             </div>
-                                            <span className="text-sm font-bold text-slate-300">Tarik Saldo Pending</span>
+                                            <span className="text-xs font-bold text-slate-300">Tarik Saldo Pending</span>
                                         </div>
-                                        <span className={`text-xl font-black ${stats.pendingWithdrawals > 0 ? 'text-purple-400 animate-pulse' : 'text-slate-500'}`}>
+                                        <span className={`text-sm font-black ${stats.pendingWithdrawals > 0 ? 'text-purple-400 animate-pulse' : 'text-slate-500'}`}>
                                             {stats.pendingWithdrawals}
                                         </span>
                                     </Link>
@@ -227,10 +239,10 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Daily Financial Report */}
-                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-                        <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div className="bg-white/60 backdrop-blur-3xl rounded-[2rem] border border-white/60 shadow-sm overflow-hidden">
+                        <div className="p-6 md:p-8 border-b border-white/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                             <div>
-                                <h3 className="text-lg font-black text-slate-900 tracking-tight">Laporan Harian</h3>
+                                <h3 className="text-sm font-black text-slate-900 tracking-tight">Laporan Harian</h3>
                                 <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Rincian Keuangan Per Hari</p>
                             </div>
                             <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-emerald-100">
@@ -240,22 +252,22 @@ export default function AdminDashboard() {
 
                         {/* Desktop View Table */}
                         <div className="hidden md:block overflow-x-auto">
-                            <table className="w-full text-left text-sm whitespace-nowrap">
+                            <table className="w-full text-left text-xs whitespace-nowrap">
                                 <thead>
-                                    <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                        <th className="p-6">Tanggal</th>
-                                        <th className="p-6">Pesanan Selesai</th>
-                                        <th className="p-6">Omset (Revenue)</th>
-                                        <th className="p-6 text-rose-500">Modal (Cost)</th>
-                                        <th className="p-6 text-purple-600">Komisi</th>
-                                        <th className="p-6 text-emerald-600">Laba (Profit)</th>
+                                    <tr className="bg-white/40 border-b border-white/50 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                        <th className="p-3">Tanggal</th>
+                                        <th className="p-3">Pesanan Selesai</th>
+                                        <th className="p-3">Omset (Revenue)</th>
+                                        <th className="p-3 text-rose-500">Modal (Cost)</th>
+                                        <th className="p-3 text-purple-600">Komisi</th>
+                                        <th className="p-3 text-emerald-600">Laba (Profit)</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100">
+                                <tbody className="divide-y divide-white/40">
                                     {(stats.dailyReport || []).slice(0, 14).map((day, i) => (
-                                        <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                            <td className="p-6 font-bold text-slate-900">{day.date}</td>
-                                            <td className="p-6">
+                                        <tr key={i} className="hover:bg-white/60 transition-colors">
+                                            <td className="p-3 font-bold text-slate-900">{day.date}</td>
+                                            <td className="p-3">
                                                 <div className="flex items-center gap-2">
                                                     <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs">
                                                         {day.orders}
@@ -263,12 +275,12 @@ export default function AdminDashboard() {
                                                     <span className="text-xs font-bold text-slate-500 uppercase">Trx</span>
                                                 </div>
                                             </td>
-                                            <td className="p-6 font-black text-slate-900">{formatCurrency(day.revenue)}</td>
-                                            <td className="p-6 font-bold text-rose-500">{formatCurrency(day.cost)}</td>
-                                            <td className="p-6 font-bold text-purple-600">{formatCurrency(day.commission)}</td>
-                                            <td className="p-6">
+                                            <td className="p-3 font-black text-slate-900">{displayMoney(day.revenue)}</td>
+                                            <td className="p-3 font-bold text-rose-500">{displayMoney(day.cost)}</td>
+                                            <td className="p-3 font-bold text-purple-600">{displayMoney(day.commission)}</td>
+                                            <td className="p-3">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-black text-emerald-600 text-base">{formatCurrency(day.profit)}</span>
+                                                    <span className="font-black text-emerald-600 text-sm">{displayMoney(day.profit)}</span>
                                                     <span className="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-black">
                                                         {day.revenue > 0 ? ((day.profit / day.revenue) * 100).toFixed(0) : 0}%
                                                     </span>
@@ -281,11 +293,11 @@ export default function AdminDashboard() {
                         </div>
 
                         {/* Mobile View Cards */}
-                        <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
+                        <div className="md:hidden space-y-4 p-4 bg-transparent">
                             {(stats.dailyReport || []).slice(0, 10).map((day, i) => (
-                                <div key={i} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+                                <div key={i} className="bg-white/60 backdrop-blur-xl rounded-[2rem] p-5 border border-white/60 shadow-sm">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h4 className="font-black text-slate-900 text-sm">{day.date}</h4>
+                                        <h4 className="font-black text-slate-900 text-xs">{day.date}</h4>
                                         <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase">
                                             {day.orders} TRXS
                                         </div>
@@ -293,21 +305,21 @@ export default function AdminDashboard() {
                                     <div className="grid grid-cols-2 gap-3 mb-4">
                                         <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-center">
                                             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Pemasukan</span>
-                                            <p className="font-black text-slate-900 text-xs">{formatCurrency(day.revenue)}</p>
+                                            <p className="font-black text-slate-900 text-xs">{displayMoney(day.revenue)}</p>
                                         </div>
                                         <div className="p-3 bg-rose-50 rounded-xl border border-rose-100 flex flex-col justify-center">
                                             <span className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mb-1">Modal</span>
-                                            <p className="font-black text-rose-500 text-xs">{formatCurrency(day.cost)}</p>
+                                            <p className="font-black text-rose-500 text-xs">{displayMoney(day.cost)}</p>
                                         </div>
                                         <div className="p-3 bg-purple-50 rounded-xl border border-purple-100 flex flex-col justify-center">
                                             <span className="text-[10px] text-purple-500 font-bold uppercase tracking-widest mb-1">Komisi</span>
-                                            <p className="font-black text-purple-600 text-xs">{formatCurrency(day.commission)}</p>
+                                            <p className="font-black text-purple-600 text-xs">{displayMoney(day.commission)}</p>
                                         </div>
                                         <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex flex-col justify-center">
                                             <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mb-1">Profit</span>
                                             <div className="flex items-center gap-1.5 mt-0.5">
                                                 <TrendingUp className="w-3 h-3 text-emerald-500" />
-                                                <p className="font-black text-emerald-600 text-xs">{formatCurrency(day.profit)}</p>
+                                                <p className="font-black text-emerald-600 text-xs">{displayMoney(day.profit)}</p>
                                             </div>
                                         </div>
                                     </div>

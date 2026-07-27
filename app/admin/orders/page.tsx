@@ -278,25 +278,25 @@ export default function AdminOrders() {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-                        <ShoppingBag className="w-6 h-6 text-blue-600" />
+                    <h1 className="text-xs font-black text-slate-900 flex items-center gap-2">
+                        <ShoppingBag className="w-5 md:w-6 h-5 md:h-6 text-blue-600" />
                         Kelola Pesanan
                     </h1>
-                    <p className="text-sm text-slate-500 font-medium mt-1">
+                    <p className="text-xs text-slate-500 font-medium mt-1">
                         Pantau dan update status pesanan yang masuk.
                     </p>
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">
                     <button 
                         onClick={fetchOrdersAndProducts}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-blue-200 text-slate-600 hover:text-blue-600 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all"
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white/40 backdrop-blur-md border border-white/60 hover:bg-white/60 text-slate-600 hover:text-blue-600 px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all"
                     >
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         Refresh
                     </button>
                     <button 
                         onClick={() => openModal()}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-blue-500 transition-all"
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm hover:bg-blue-500 transition-all shadow-blue-900/20"
                     >
                         <Plus className="w-4 h-4" />
                         Tambah Manual
@@ -305,64 +305,64 @@ export default function AdminOrders() {
             </div>
 
             {loading && orders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-12 bg-white rounded-3xl border border-slate-100">
+                <div className="flex flex-col items-center justify-center p-12 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-sm">
                     <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
-                    <p className="text-sm font-bold text-slate-500">Memuat data pesanan...</p>
+                    <p className="text-xs font-bold text-slate-500">Memuat data pesanan...</p>
                 </div>
             ) : orders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-12 bg-white rounded-3xl border border-slate-100 text-center">
-                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                <div className="flex flex-col items-center justify-center p-12 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-sm text-center">
+                    <div className="w-16 h-16 bg-white/50 rounded-full flex items-center justify-center mb-4 shadow-sm border border-white/60">
                         <ShoppingBag className="w-8 h-8 text-slate-300" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-1">Belum Ada Pesanan</h3>
-                    <p className="text-sm text-slate-500 max-w-sm">Pesanan dari website akan otomatis muncul di sini setelah pembeli mengklik Konfirmasi.</p>
+                    <h3 className="text-xs font-bold text-slate-900 mb-1">Belum Ada Pesanan</h3>
+                    <p className="text-xs text-slate-500 max-w-sm">Pesanan dari website akan otomatis muncul di sini setelah pembeli mengklik Konfirmasi.</p>
                 </div>
             ) : (
-                <div className="bg-white md:bg-white rounded-3xl md:border border-slate-100 shadow-sm overflow-hidden">
+                <div className="bg-white/60 backdrop-blur-3xl rounded-[2rem] border border-white/60 shadow-sm overflow-hidden">
                     <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50/50">
-                                    <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Tanggal & Order ID</th>
-                                    <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Pelanggan</th>
-                                    <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Produk / Paket</th>
-                                    <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider text-right">Harga / Profit</th>
-                                    <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Afiliasi</th>
-                                    <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                                <tr className="border-b border-white/60 bg-white/40">
+                                    <th className="px-2 py-2 text-xs font-black text-slate-500 uppercase tracking-wider">Tanggal & Order ID</th>
+                                    <th className="px-2 py-2 text-xs font-black text-slate-500 uppercase tracking-wider">Pelanggan</th>
+                                    <th className="px-2 py-2 text-xs font-black text-slate-500 uppercase tracking-wider">Produk / Paket</th>
+                                    <th className="px-2 py-2 text-xs font-black text-slate-500 uppercase tracking-wider text-right">Harga / Profit</th>
+                                    <th className="px-2 py-2 text-xs font-black text-slate-500 uppercase tracking-wider">Afiliasi</th>
+                                    <th className="px-2 py-2 text-xs font-black text-slate-500 uppercase tracking-wider">Status</th>
+                                    <th className="px-2 py-2 text-xs font-black text-slate-500 uppercase tracking-wider text-right">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-white/60">
                                 {orders.map((order) => (
-                                    <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
-                                        <td className="px-6 py-4">
+                                    <tr key={order.id} className="hover:bg-white/80 transition-colors">
+                                        <td className="px-2 py-2">
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-bold text-slate-900">{new Date(order.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                                                <span className="text-xs font-bold text-slate-900">{new Date(order.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
                                                 <span className="text-[10px] uppercase text-slate-400 font-mono mt-0.5">{order.id.split('-')[0]}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-2 py-2">
                                             <div className="flex flex-col text-[10px]">
-                                                <span className="text-sm font-bold text-slate-900">{order.customer_name}</span>
+                                                <span className="text-xs font-bold text-slate-900">{order.customer_name}</span>
                                                 <span className="font-medium text-slate-500 mt-0.5 whitespace-nowrap leading-tight">{order.wa_number}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-2 py-2">
                                             <div className="flex flex-col max-w-[200px]">
-                                                <span className="text-sm font-bold text-slate-900 truncate" title={order.product_name}>{order.product_name}</span>
+                                                <span className="text-xs font-bold text-slate-900 truncate" title={order.product_name}>{order.product_name}</span>
                                                 <span className="text-xs font-medium text-slate-500 truncate" title={order.package_name}>{order.package_name}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-2 py-2 text-right">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-sm font-black text-blue-600">{formatCurrency(order.sell_price)}</span>
+                                                <span className="text-xs font-black text-blue-600">{formatCurrency(order.sell_price)}</span>
                                                 <div className="flex items-center gap-2 mt-1">
                                                     <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-1.5 rounded" title="Total Profit: Jual - Modal">Profit: {formatCurrency(order.profit)}</span>
                                                     <span className="text-xs font-black text-green-500 bg-green-50 px-1.5 rounded" title="Diterima Owner: Profit - Jatah Afiliator">Net Owner: {formatCurrency(order.profit - (Math.floor(order.profit * (globalCommissionPercent / 100))))}</span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-2 py-2">
                                             {order.affiliator_id ? (
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Jatah Afiliator</span>
@@ -371,19 +371,19 @@ export default function AdminOrders() {
                                                             {affiliators.find(a => a.id === order.affiliator_id)?.full_name || 'Afiliator'}
                                                         </span>
                                                     </div>
-                                                    <span className="text-sm font-black text-slate-900 leading-tight">{formatCurrency(Math.floor(order.profit * (globalCommissionPercent / 100)))}</span>
+                                                    <span className="text-xs font-black text-slate-900 leading-tight">{formatCurrency(Math.floor(order.profit * (globalCommissionPercent / 100)))}</span>
                                                 </div>
                                             ) : (
                                                 <span className="text-xs text-slate-300 font-bold italic">Tanpa Ref</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-2 py-2">
                                             <div className="flex items-center gap-2">
                                                 <StatusDropdown order={order} />
                                                 {updatingId === order.id && <Loader2 className="w-3 h-3 animate-spin text-blue-500" />}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-2 py-2 text-right">
                                             <div className="flex items-center justify-end gap-2 text-slate-400">
                                                 <button onClick={() => openModal(order)} className="p-1.5 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors"><Edit className="w-4 h-4" /></button>
                                                 <button onClick={() => handleDeleteOrder(order.id)} className="p-1.5 hover:bg-red-50 hover:text-red-500 rounded-md transition-colors"><Trash2 className="w-4 h-4" /></button>
@@ -395,9 +395,9 @@ export default function AdminOrders() {
                         </table>
                     </div>
 
-                    <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
+                    <div className="md:hidden space-y-4 p-4 bg-transparent">
                         {orders.map((order) => (
-                            <div key={order.id} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden active:scale-[0.98] transition-all">
+                            <div key={order.id} className="bg-white/60 backdrop-blur-3xl rounded-[2rem] p-5 border border-white/60 shadow-sm relative overflow-hidden active:scale-[0.98] transition-all">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">ID: {order.id.split('-')[0]}</span>
@@ -410,7 +410,7 @@ export default function AdminOrders() {
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-50 rounded-2xl p-3 mb-4 space-y-2">
+                                <div className="bg-white/50 rounded-2xl p-3 mb-4 space-y-2 border border-white/60 shadow-sm">
                                     <div className="flex justify-between items-center text-xs">
                                         <span className="font-bold text-slate-500">{order.product_name}</span>
                                         <span className="font-medium text-slate-400">{order.package_name}</span>
@@ -421,9 +421,9 @@ export default function AdminOrders() {
                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Harga Jual</p>
                                             <p className="font-black text-blue-600">{formatCurrency(order.sell_price)}</p>
                                         </div>
-                                        <div className="bg-slate-100 p-2 rounded-xl text-center">
+                                        <div className="bg-white/60 p-2 rounded-xl text-center shadow-sm border border-white/60">
                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Profit (Gross)</p>
-                                            <p className="font-bold text-slate-900 text-sm">{formatCurrency(order.profit)}</p>
+                                            <p className="font-bold text-slate-900 text-xs">{formatCurrency(order.profit)}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -445,10 +445,10 @@ export default function AdminOrders() {
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white/80 backdrop-blur-3xl rounded-[2rem] p-5 md:p-6 max-w-md w-full shadow-2xl max-h-[85vh] overflow-y-auto border border-white/60">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-black text-slate-900">{editingOrder ? "Edit Pesanan" : "Tambah Pesanan Manual"}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full transition-colors">
+                            <h2 className="text-xs font-black text-slate-900">{editingOrder ? "Edit Pesanan" : "Tambah Pesanan Manual"}</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:bg-white/50 rounded-full transition-colors">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
@@ -457,18 +457,18 @@ export default function AdminOrders() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Nama Pemesan</label>
-                                    <input required type="text" className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" value={orderForm.customer_name} onChange={e => setOrderForm({...orderForm, customer_name: e.target.value})} />
+                                    <input required type="text" className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" value={orderForm.customer_name} onChange={e => setOrderForm({...orderForm, customer_name: e.target.value})} />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">No WhatsApp</label>
-                                    <input required type="text" className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" value={orderForm.wa_number} onChange={e => setOrderForm({...orderForm, wa_number: e.target.value})} />
+                                    <input required type="text" className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" value={orderForm.wa_number} onChange={e => setOrderForm({...orderForm, wa_number: e.target.value})} />
                                 </div>
                             </div>
                             
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Layanan Produk</label>
-                                    <select required className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer" value={orderForm.product_id} onChange={e => setOrderForm({...orderForm, product_id: e.target.value, package_id: ""})}>
+                                    <select required className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs appearance-none cursor-pointer" value={orderForm.product_id} onChange={e => setOrderForm({...orderForm, product_id: e.target.value, package_id: ""})}>
                                         <option value="">-- Pilih Produk --</option>
                                         {products.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
                                     </select>
@@ -477,7 +477,7 @@ export default function AdminOrders() {
                                 {orderForm.product_id && (
                                     <div className="animate-in slide-in-from-top-2 duration-300">
                                         <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Paket Item</label>
-                                        <select required className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer" value={orderForm.package_id} onChange={e => { const pkgId = e.target.value; const pkg = products.find(p => p.id === orderForm.product_id)?.packages?.find((p: any) => p.id === pkgId); setOrderForm({ ...orderForm, package_id: pkgId, sell_price: pkg ? (parseInt(pkg.price.replace(/\D/g, "")) || 0) : 0, cost_price: pkg ? (pkg.cost_price || 0) : 0 }); }}>
+                                        <select required className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs appearance-none cursor-pointer" value={orderForm.package_id} onChange={e => { const pkgId = e.target.value; const pkg = products.find(p => p.id === orderForm.product_id)?.packages?.find((p: any) => p.id === pkgId); setOrderForm({ ...orderForm, package_id: pkgId, sell_price: pkg ? (parseInt(pkg.price.replace(/\D/g, "")) || 0) : 0, cost_price: pkg ? (pkg.cost_price || 0) : 0 }); }}>
                                             <option value="">-- Pilih Paket --</option>
                                             {products.find(p => p.id === orderForm.product_id)?.packages?.map((pkg: any) => <option key={pkg.id} value={pkg.id}>{pkg.name} - {pkg.price}</option>)}
                                         </select>
@@ -507,11 +507,11 @@ export default function AdminOrders() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Waktu Transaksi</label>
-                                    <input required type="datetime-local" className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm" value={orderForm.created_at} onChange={e => setOrderForm({...orderForm, created_at: e.target.value})} />
+                                    <input required type="datetime-local" className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" value={orderForm.created_at} onChange={e => setOrderForm({...orderForm, created_at: e.target.value})} />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Status Pesanan</label>
-                                    <select required className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm appearance-none cursor-pointer" value={orderForm.status} onChange={e => setOrderForm({...orderForm, status: e.target.value})}>
+                                    <select required className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs appearance-none cursor-pointer" value={orderForm.status} onChange={e => setOrderForm({...orderForm, status: e.target.value})}>
                                         <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
                                         <option value="Sedang Diproses">Sedang Diproses</option>
                                         <option value="Pesanan Selesai">Pesanan Selesai</option>
@@ -532,12 +532,12 @@ export default function AdminOrders() {
                                         <label className="block text-[10px] font-black text-purple-400 uppercase tracking-wider mb-2 ml-1">Cari Nama/Kode Referral</label>
                                         <div className="relative group">
                                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                            <input type="text" className="w-full bg-white border border-purple-200 rounded-2xl px-4 py-3.5 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all" placeholder="Ketik nama atau kode..." value={affSearch} onFocus={() => setShowAffSuggestions(true)} onChange={e => { setAffSearch(e.target.value); setShowAffSuggestions(true); }} />
+                                            <input type="text" className="w-full bg-white border border-purple-200 rounded-2xl px-4 py-3.5 pl-11 text-xs font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all" placeholder="Ketik nama atau kode..." value={affSearch} onFocus={() => setShowAffSuggestions(true)} onChange={e => { setAffSearch(e.target.value); setShowAffSuggestions(true); }} />
                                         </div>
                                         {showAffSuggestions && affSearch && (
                                             <div className="absolute z-[10001] left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl max-h-52 overflow-y-auto">
                                                 {affiliators.filter(a => a.full_name?.toLowerCase().includes(affSearch.toLowerCase()) || a.affiliate_code?.toLowerCase().includes(affSearch.toLowerCase())).map(aff => (
-                                                    <button key={aff.id} type="button" onClick={() => { setOrderForm({ ...orderForm, affiliator_id: aff.id }); setAffSearch(aff.full_name); setShowAffSuggestions(false); }} className="w-full text-left px-5 py-4 hover:bg-purple-50 border-b border-slate-50 text-sm font-black text-slate-900">{aff.full_name}</button>
+                                                    <button key={aff.id} type="button" onClick={() => { setOrderForm({ ...orderForm, affiliator_id: aff.id }); setAffSearch(aff.full_name); setShowAffSuggestions(false); }} className="w-full text-left px-5 py-4 hover:bg-purple-50 border-b border-slate-50 text-xs font-black text-slate-900">{aff.full_name}</button>
                                                 ))}
                                             </div>
                                         )}
@@ -571,12 +571,12 @@ export default function AdminOrders() {
 
             {isPayoutModalOpen && payoutData && (
                 <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-                    <div className="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl border border-white/20 animate-in zoom-in-95 duration-300">
-                        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6">
-                            <Megaphone className="w-8 h-8 text-blue-600" />
+                    <div className="bg-white/80 backdrop-blur-3xl rounded-[2.5rem] p-5 max-w-sm w-full shadow-2xl max-h-[85vh] overflow-y-auto border border-white/60 animate-in zoom-in-95 duration-300">
+                        <div className="w-14 md:w-16 h-14 md:h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 border border-blue-100 shadow-sm">
+                            <Megaphone className="w-7 md:w-8 h-7 md:h-8 text-blue-600" />
                         </div>
-                        <h2 className="text-xl font-black text-slate-900 mb-2">Konfirmasi Komisi</h2>
-                        <div className="space-y-3 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm mb-6">
+                        <h2 className="text-xs font-black text-slate-900 mb-2">Konfirmasi Komisi</h2>
+                        <div className="space-y-3 bg-white/50 backdrop-blur-md p-5 rounded-3xl border border-white/60 shadow-sm mb-6">
                             <div className="flex justify-between items-center text-xs font-bold">
                                 <span className="text-slate-400 uppercase tracking-widest">Total Profit</span>
                                 <span className="text-slate-900">{formatCurrency(payoutData.profit)}</span>
@@ -589,11 +589,11 @@ export default function AdminOrders() {
                         <div className="grid grid-cols-2 gap-4 mb-6">
                             <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100 flex flex-col justify-center">
                                 <span className="text-[10px] font-black text-purple-600 uppercase tracking-wider">Jatah Afiliator</span>
-                                <span className="text-lg font-black text-purple-600">{formatCurrency(payoutData.commission)}</span>
+                                <span className="text-xs font-black text-purple-600">{formatCurrency(payoutData.commission)}</span>
                             </div>
                             <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 flex flex-col justify-center">
                                 <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Bersih Owner</span>
-                                <span className="text-sm font-black text-emerald-600">{formatCurrency(payoutData.ownerNet)}</span>
+                                <span className="text-xs font-black text-emerald-600">{formatCurrency(payoutData.ownerNet)}</span>
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
@@ -617,7 +617,7 @@ export default function AdminOrders() {
                                     setIsPayoutModalOpen(false);
                                     setOrders(orders.map(o => o.id === payoutData.id ? { ...o, status: payoutData.oldStatus } : o));
                                 }}
-                                className="w-full bg-white text-slate-400 hover:text-slate-600 font-bold py-3 text-sm transition-all"
+                                className="w-full bg-white/50 text-slate-500 hover:text-slate-700 font-bold py-3 text-xs transition-all rounded-2xl border border-white/60"
                             >
                                 Batalkan
                             </button>

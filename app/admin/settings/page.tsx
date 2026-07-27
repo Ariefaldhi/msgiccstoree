@@ -66,33 +66,33 @@ export default function AdminSettings() {
 
     return (
         <div className="space-y-6 max-w-2xl">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100 mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-white/40 mb-6">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 flex items-center gap-2">
-                        <Store className="w-8 h-8 text-blue-600" />
+                    <h1 className="text-xs font-black text-slate-900 flex items-center gap-2 tracking-tight">
+                        <Store className="w-6 h-6 text-blue-600" />
                         Pengaturan Toko
                     </h1>
-                    <p className="text-sm text-slate-500 font-medium mt-1">
+                    <p className="text-xs text-slate-500 font-medium mt-1">
                         Sesuaikan nama toko, logo, dan warna tema website utama.
                     </p>
                 </div>
             </div>
 
             {loading ? (
-                <div className="flex items-center justify-center p-12 bg-white rounded-3xl border border-slate-100">
+                <div className="flex items-center justify-center p-12 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-sm">
                     <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                 </div>
             ) : (
-                <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
+                <div className="bg-white/60 backdrop-blur-3xl rounded-[2rem] border border-white/60 shadow-sm p-8 transition-all hover:bg-white/80">
                     <form onSubmit={handleSave} className="space-y-6">
                         
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1 flex items-center gap-2">
                                 <Store className="w-4 h-4 text-slate-400" />
                                 Nama Toko
                             </label>
                             <input 
-                                required type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                required type="text" className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs shadow-sm" 
                                 placeholder="e.g. MsgiccStore" 
                                 value={settings.store_name} 
                                 onChange={e => setSettings({...settings, store_name: e.target.value})} 
@@ -100,31 +100,31 @@ export default function AdminSettings() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1 flex items-center gap-2">
                                 <ImageIcon className="w-4 h-4 text-slate-400" />
                                 Logo URL
                             </label>
                             <input 
-                                type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="text" className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs shadow-sm" 
                                 placeholder="https://..." 
                                 value={settings.logo_url} 
                                 onChange={e => setSettings({...settings, logo_url: e.target.value})} 
                             />
                             {settings.logo_url && (
-                                <img src={settings.logo_url} alt="Logo Preview" className="mt-4 h-16 object-contain rounded-xl border border-slate-200 p-2" />
+                                <img src={settings.logo_url} alt="Logo Preview" className="mt-4 h-16 object-contain rounded-xl border border-white/60 p-2 bg-white/50 shadow-sm" />
                             )}
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1 flex items-center gap-2">
                                 {/* Phone icon */}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.58 3.41 2 2 0 0 1 3.55 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.69a16 16 0 0 0 6.28 6.28l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                                 Nomor WhatsApp Admin
                             </label>
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">+</span>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">+</span>
                                 <input 
-                                    type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-8 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                    type="text" className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 pl-8 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs shadow-sm" 
                                     placeholder="e.g. 6285720892082" 
                                     value={settings.whatsapp_number} 
                                     onChange={e => setSettings({...settings, whatsapp_number: e.target.value.replace(/\D/g, '')})} 
@@ -134,14 +134,14 @@ export default function AdminSettings() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1 flex items-center gap-2">
                                 {/* Percent Icon */}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><line x1="19" y1="5" x2="5" y2="19"></line><circle cx="6.5" cy="6.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle></svg>
                                 Jatah Komisi Afiliator (%)
                             </label>
                             <div className="relative max-w-xs">
                                 <input 
-                                    type="number" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 outline-none" 
+                                    type="number" className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs shadow-sm" 
                                     placeholder="25" 
                                     min="0"
                                     max="100"
@@ -150,7 +150,7 @@ export default function AdminSettings() {
                                 />
                                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
                             </div>
-                            <div className="mt-3 p-4 bg-blue-50 rounded-2xl border border-blue-100 relative group">
+                            <div className="mt-3 p-4 bg-white/40 backdrop-blur-md rounded-2xl border border-white/60 shadow-sm relative group">
                                 <button 
                                     type="button"
                                     onClick={() => setSettings({...settings, affiliate_commission_percent: 25})}
@@ -162,7 +162,7 @@ export default function AdminSettings() {
                                 <div className="flex justify-between text-xs font-bold text-slate-600">
                                     <span>Jika Profit {formatCurrency(10000)}, maka:</span>
                                 </div>
-                                <div className="space-y-2 mt-3 p-3 bg-white rounded-xl border border-slate-100 shadow-sm text-[10px] md:text-xs font-bold">
+                                <div className="space-y-2 mt-3 p-3 bg-white/60 rounded-xl border border-white/60 shadow-sm text-[10px] font-bold">
                                     <div className="flex items-center justify-between">
                                         <span className="text-slate-500 uppercase tracking-widest">Jatah Afiliator</span>
                                         <span className="text-purple-600 font-black">{formatCurrency(10000 * settings.affiliate_commission_percent / 100)}</span>
@@ -177,12 +177,12 @@ export default function AdminSettings() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                                 WhatsApp Bot (Fonnte) Token
                             </label>
                             <input 
-                                type="password" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="password" className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs shadow-sm" 
                                 placeholder="Masukkan Token Fonnte Anda" 
                                 value={settings.fonnte_token} 
                                 onChange={e => setSettings({...settings, fonnte_token: e.target.value})} 
@@ -191,12 +191,12 @@ export default function AdminSettings() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                                 Fonnte Group ID (Untuk Notifikasi Pesanan Baru)
                             </label>
                             <input 
-                                type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="text" className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs shadow-sm" 
                                 placeholder="e.g. 120363000000000000@g.us" 
                                 value={settings.fonnte_group_id} 
                                 onChange={e => setSettings({...settings, fonnte_group_id: e.target.value})} 
@@ -205,7 +205,7 @@ export default function AdminSettings() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1 flex items-center gap-2">
                                 {/* Next 13 lucide icon paintclip replaced by stroke */}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                                 Warna Utama Tampilan
@@ -218,7 +218,7 @@ export default function AdminSettings() {
                                     { value: 'purple', label: 'Ungu', colorClass: 'bg-purple-600' },
                                     { value: 'orange', label: 'Orange', colorClass: 'bg-orange-600' },
                                 ].map((c) => (
-                                    <label key={c.value} className={`relative cursor-pointer flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${settings.primary_color === c.value ? 'border-slate-900 bg-slate-50' : 'border-slate-100 hover:border-slate-300'}`}>
+                                    <label key={c.value} className={`relative cursor-pointer flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${settings.primary_color === c.value ? 'border-blue-500 bg-white/70 shadow-sm' : 'border-white/60 hover:border-white/80'}`}>
                                         <input 
                                             type="radio" 
                                             name="primary_color" 
@@ -234,7 +234,7 @@ export default function AdminSettings() {
                             </div>
                         </div>
 
-                        <div className="pt-4 border-t border-slate-100">
+                        <div className="pt-4 border-t border-white/60">
                             <button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-900/20 transition-all">
                                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                                 Simpan Pengaturan

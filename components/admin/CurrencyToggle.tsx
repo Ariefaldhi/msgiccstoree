@@ -29,7 +29,7 @@ export function CurrencyToggle({ mobile = false }: { mobile?: boolean }) {
         <button
             onClick={toggleCurrency}
             className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold w-full transition-all mb-2",
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold w-full transition-all mb-2",
                 isUSD 
                     ? "text-green-600 bg-green-50 hover:bg-green-100" 
                     : "text-blue-600 bg-blue-50 hover:bg-blue-100"

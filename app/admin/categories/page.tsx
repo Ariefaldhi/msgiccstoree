@@ -96,8 +96,8 @@ export default function AdminCategories() {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Categories</h1>
-                    <p className="text-slate-500 mt-1">Manage product categories.</p>
+                    <h1 className="text-xs font-black text-slate-900 tracking-tight">Categories</h1>
+                    <p className="text-slate-500 mt-1 text-xs">Manage product categories.</p>
                 </div>
                 <button
                     onClick={() => {
@@ -117,16 +117,16 @@ export default function AdminCategories() {
                     <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:p-6">
                     {categories.map((cat) => (
-                        <div key={cat.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group relative">
+                        <div key={cat.id} className="bg-white/60 backdrop-blur-3xl p-5 md:p-4 md:p-6 rounded-[2rem] border border-white/60 shadow-sm flex items-center justify-between group relative transition-all hover:bg-white/80 hover:shadow-md">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-2xl border border-slate-100">
+                                <div className="w-12 h-12 rounded-xl bg-white/50 flex items-center justify-center text-xs border border-white/60 shadow-sm">
                                     {cat.icon || "📦"}
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-slate-900">{cat.name}</h3>
-                                    <code className="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-md">/{cat.slug}</code>
+                                    <code className="text-[10px] text-slate-500 font-bold bg-white/50 border border-white/60 px-2 py-1 rounded-md">/{cat.slug}</code>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-all">
@@ -148,7 +148,7 @@ export default function AdminCategories() {
                         </div>
                     ))}
                     {categories.length === 0 && (
-                        <div className="col-span-full text-center py-12 text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                        <div className="col-span-full text-center py-12 text-slate-500 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-dashed border-white/60 font-medium">
                             No categories found. Create one to get started.
                         </div>
                     )}
@@ -158,46 +158,46 @@ export default function AdminCategories() {
             {/* Add Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
+                    <div className="bg-white/80 backdrop-blur-3xl rounded-[2rem] border border-white/60 p-5 md:p-6 md:p-8 max-w-sm w-full shadow-2xl max-h-[85vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-black text-slate-900">{editCategory ? "Edit Category" : "New Category"}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full transition-colors">
+                            <h2 className="text-xs font-black text-slate-900">{editCategory ? "Edit Category" : "New Category"}</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:bg-white/50 rounded-full transition-colors">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Name</label>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Name</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                    className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs"
                                     placeholder="e.g. Premium Apps"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Slug</label>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Slug</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.slug}
                                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                    className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs"
                                     placeholder="e.g. premium-apps"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Icon (Emoji)</label>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Icon (Emoji)</label>
                                 <input
                                     type="text"
                                     value={formData.icon}
                                     onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                    className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs"
                                     placeholder="e.g. 💎"
                                 />
                             </div>

@@ -67,33 +67,32 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
         };
     }, []);
 
-    // Hide Navbar on Admin Dashboard - MOBILE ONLY
-    // We want to keep it on desktop as requested
-    if (typeof window !== 'undefined' && pathname.startsWith("/admin") && window.innerWidth < 768) {
+    // Hide Navbar completely on Admin Dashboard for full screen layout
+    if (pathname.startsWith("/admin")) {
         return null;
     }
 
     return (
         <>
-            <nav className={`fixed top-0 left-0 right-0 z-[999] transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-xl border-b border-gray-100 py-4' : 'bg-transparent py-6'} `}>
-                <div className="container mx-auto flex items-center gap-6 px-4 py-3">
+            <nav className={`fixed top-0 left-0 right-0 z-[999] transition-all duration-500 ${isScrolled ? 'bg-white/20 backdrop-blur-3xl border-b border-white/40 py-3 shadow-[0_4px_30px_rgba(0,0,0,0.03)]' : 'bg-transparent py-5'} `}>
+                <div className="container mx-auto flex items-center gap-3 lg:gap-6 px-4 py-2">
                     {/* Logo Section */}
-                    <Link href="/" className="flex items-center gap-3">
+                    <Link href="/" className="flex items-center gap-2 lg:gap-3 shrink-0">
                         {logoUrl ? (
-                            <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 shadow-md">
+                            <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl overflow-hidden shrink-0 shadow-md">
                                 <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
                             </div>
                         ) : (
-                            <div className="w-11 h-11 rounded-xl bg-[#18181b] flex items-center justify-center text-white relative overflow-hidden shrink-0 shadow-md">
-                                <span className="font-bold text-xl italic select-none">{storeName.charAt(0).toUpperCase()}</span>
+                            <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl bg-[#18181b] flex items-center justify-center text-white relative overflow-hidden shrink-0 shadow-md">
+                                <span className="font-bold text-lg lg:text-xl italic select-none">{storeName.charAt(0).toUpperCase()}</span>
                                 <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
                             </div>
                         )}
                         <div className="flex flex-col justify-center">
-                            <span className="text-2xl font-black tracking-tight text-[#09090b] leading-none uppercase">
+                            <span className="text-xl lg:text-2xl font-black tracking-tight text-[#09090b] leading-none uppercase">
                                 {storeName}
                             </span>
-                            <span className="text-[0.65rem] font-bold tracking-[0.2em] text-gray-400 uppercase leading-none mt-1">
+                            <span className="text-[0.55rem] lg:text-[0.65rem] font-bold tracking-[0.2em] text-gray-400 uppercase leading-none mt-1">
                                 MARKETPLACE V2.3
                             </span>
                         </div>
@@ -107,52 +106,31 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                         {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
 
-                    {/* Desktop Navigation - Separated 3D Buttons */}
-                    <div className="hidden md:flex items-center gap-4">
-                        <Link href="/" className="px-6 py-2.5 rounded-xl bg-blue-500 text-white font-bold text-sm shadow-[0_6px_0_theme(colors.blue.700)] hover:shadow-[0_3px_0_theme(colors.blue.700)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-blue-500">
-                            <HomeIcon className="w-4 h-4" /> Home
+                    {/* Desktop Navigation - Premium Glass Buttons */}
+                    <div className="hidden md:flex items-center gap-2 lg:gap-3">
+                        <Link href="/" className="px-3 py-1.5 lg:px-5 lg:py-2 rounded-xl lg:rounded-[1.25rem] bg-blue-500/10 text-blue-700 font-black text-xs lg:text-sm hover:bg-blue-500/20 active:scale-95 transition-all flex items-center gap-1.5 lg:gap-2 border border-blue-500/10 backdrop-blur-xl shrink-0">
+                            <HomeIcon className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Home
                         </Link>
-                        <Link href="/reseller" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
-                            <Store className="w-4 h-4" /> Reseller
+                        <Link href="/reseller" className="px-3 py-1.5 lg:px-5 lg:py-2 rounded-xl lg:rounded-[1.25rem] bg-white/30 text-slate-700 font-bold text-xs lg:text-sm hover:bg-white/50 active:scale-95 transition-all flex items-center gap-1.5 lg:gap-2 border border-white/40 backdrop-blur-xl shadow-sm shrink-0">
+                            <Store className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Reseller
                         </Link>
-                        <Link href="/afiliator" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
-                            <Megaphone className="w-4 h-4" /> Afiliator
+                        <Link href="/afiliator" className="px-3 py-1.5 lg:px-5 lg:py-2 rounded-xl lg:rounded-[1.25rem] bg-white/30 text-slate-700 font-bold text-xs lg:text-sm hover:bg-white/50 active:scale-95 transition-all flex items-center gap-1.5 lg:gap-2 border border-white/40 backdrop-blur-xl shadow-sm shrink-0">
+                            <Megaphone className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Afiliator
                         </Link>
-                        <Link href="/more" className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100">
-                            <MoreHorizontal className="w-4 h-4" /> Lainnya
+                        <Link href="/more" className="px-3 py-1.5 lg:px-5 lg:py-2 rounded-xl lg:rounded-[1.25rem] bg-white/60 text-slate-600 font-bold text-xs lg:text-sm hover:bg-white/90 active:scale-95 transition-all flex items-center gap-1.5 lg:gap-2 border border-white/80 backdrop-blur-md shadow-sm shrink-0">
+                            <MoreHorizontal className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Lainnya
                         </Link>
-
-                        <button 
-                            onClick={handleSearchClick}
-                            className="px-6 py-2.5 rounded-xl bg-white text-gray-500 font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 border-2 border-gray-100"
-                        >
-                            <Search className="w-4 h-4" /> Cari
-                        </button>
                     </div>
 
-                    {/* Partner Balance Display */}
-                    {profile && (profile.is_reseller || profile.is_affiliator || profile.role === 'admin') && (
-                        <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl shadow-lg border border-slate-800 ml-auto group transition-all hover:scale-105">
-                            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Saldo Anda</span>
-                                <span className="text-sm font-black text-emerald-400 leading-none">
-                                    Rp {profile.balance?.toLocaleString('id-ID') || '0'}
-                                </span>
-                            </div>
-                        </div>
-                    )}
+                    {/* Search Bar */}
+                    <div className="flex-1 max-w-[200px] lg:max-w-sm hidden md:flex items-center bg-white/30 border border-white/50 backdrop-blur-2xl rounded-xl lg:rounded-[1.5rem] px-3 py-1.5 lg:px-5 lg:py-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:bg-white/70 transition-all cursor-text group shrink" onClick={handleSearchClick}>
+                        <Search className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-blue-500 mr-2 lg:mr-3 group-hover:scale-110 transition-transform shrink-0" />
+                        <span className="text-slate-500 font-semibold text-xs lg:text-sm truncate">Cari aplikasi...</span>
+                    </div>
 
                     {/* Auth Button */}
-                    <div className={cn("flex items-center gap-4", !profile && "ml-auto")}>
+                    <div className={cn("flex items-center gap-4 ml-auto shrink-0")}>
                         <AuthButton />
-                    </div>
-
-                    {/* Hubungi Admin */}
-                    <div className="hidden md:block ml-auto">
-                        <button className="bg-[#1e293b] hover:bg-[#2c3e50] text-white px-8 py-3.5 rounded-xl text-sm font-bold shadow-[0_4px_0_#0f172a] hover:shadow-[0_2px_0_#0f172a] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all">
-                            Hubungi Admin
-                        </button>
                     </div>
                 </div>
 

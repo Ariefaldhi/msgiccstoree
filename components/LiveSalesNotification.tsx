@@ -74,7 +74,7 @@ export default function LiveSalesNotification() {
 
     return (
         <div 
-            className={`fixed bottom-4 left-4 md:bottom-6 md:left-6 z-[100] max-w-[300px] w-full transition-all duration-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}
+            className={`fixed bottom-24 left-4 md:bottom-6 md:left-6 z-[100] max-w-[280px] md:max-w-[300px] w-full transition-all duration-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}
         >
             <div className="bg-white/90 backdrop-blur-md border border-slate-100 shadow-2xl rounded-2xl p-3 flex items-start gap-3">
                 <div className="flex-shrink-0 mt-0.5">
@@ -85,7 +85,7 @@ export default function LiveSalesNotification() {
                 <div className="flex-1 min-w-0 pr-4">
                     <p className="text-xs text-slate-500 font-medium">Seseorang baru saja membeli</p>
                     <p className="text-sm font-black text-slate-900 leading-tight mt-0.5">
-                        <span className="text-blue-600">{currentOrder.customer_name}</span> top up {currentOrder.package_name} {currentOrder.product_name}
+                        <span className="text-blue-600">{currentOrder.customer_name}</span> membeli {currentOrder.package_name} {currentOrder.product_name}
                     </p>
                     <p className="text-[10px] text-slate-400 mt-1 font-bold">Beberapa saat yang lalu</p>
                 </div>

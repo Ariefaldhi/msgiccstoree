@@ -1,25 +1,18 @@
 import type { Metadata } from "next";
-import { Poppins, Inter } from "next/font/google"; // Import standard next fonts
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import AffiliateTracker from "@/components/AffiliateTracker";
+import FloatingSupport from "@/components/FloatingSupport";
 import { Suspense } from "react";
 
-// Using Poppins for headings/UI to match the modern aesthetic
-const poppins = Poppins({
+// Clean, premium modern font (Not quirky, highly professional)
+const pjs = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-poppins",
-  display: 'swap',
-});
-
-// Using Inter for body text readability
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-pjs",
   display: 'swap',
 });
 
@@ -39,17 +32,20 @@ export default async function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${poppins.variable} ${inter.variable} font-sans antialiased bg-white text-[#1e1e1e] selection:bg-blue-600/30 selection:text-blue-600`}
+        className={`${pjs.variable} font-sans antialiased bg-slate-50 text-[#1e1e1e] selection:bg-blue-600/30 selection:text-blue-600 relative overflow-x-hidden`}
       >
+        {/* Single Color Background */}
+
         <ThemeRegistry />
         <Suspense fallback={null}>
           <AffiliateTracker />
         </Suspense>
         <Navbar storeName={settings?.store_name} logoUrl={settings?.logo_url} />
-        <main className="pt-24 pb-24 md:pb-10 min-h-screen bg-white">
+        <main className="pt-24 pb-24 md:pb-10 min-h-screen">
           {children}
         </main>
         <Footer storeName={settings?.store_name} logoUrl={settings?.logo_url} />
+        <FloatingSupport />
       </body>
     </html>
   );

@@ -102,10 +102,10 @@ export default function AffiliateManagement() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+            <div className="flex items-center justify-center p-12 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-sm">
                 <div className="text-center">
                     <Loader2 className="w-10 h-10 animate-spin text-purple-600 mx-auto mb-4" />
-                    <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Memuat Data Afiliasi...</p>
+                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Memuat Data Afiliasi...</p>
                 </div>
             </div>
         );
@@ -113,47 +113,47 @@ export default function AffiliateManagement() {
 
     return (
         <div className="space-y-8 pb-12">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end pb-6 border-b border-slate-200 gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end pb-6 border-b border-white/40 gap-4 md:p-6">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+                    <h1 className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-3">
                         <Megaphone className="w-8 h-8 text-purple-600" />
                         Manajemen Afiliasi
                     </h1>
                     <p className="text-slate-500 font-medium mt-1">Kelola affiliator, pantau saldo, dan statistik referral.</p>
                 </div>
                 <div className="flex gap-2 w-full md:w-auto">
-                     <Link href="/admin/withdrawals" className="flex-1 md:flex-none justify-center bg-white border border-slate-200 px-5 py-2.5 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">
+                     <Link href="/admin/withdrawals" className="flex-1 md:flex-none justify-center bg-white/60 backdrop-blur-md border border-white/60 px-5 py-2.5 rounded-2xl text-xs font-bold text-slate-600 hover:bg-white/80 transition-all flex items-center gap-2 shadow-sm">
                         <Wallet className="w-4 h-4 text-purple-500" /> Cek Penarikan
                     </Link>
                 </div>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:p-6">
                 {[
                     { label: "Saldo Belum Ditarik", value: stats.totalBalance, icon: Wallet, color: "purple" },
                     { label: "Total Komisi Dibayar", value: stats.totalCommissionPaid, icon: DollarSign, color: "emerald" },
                     { label: "Total Referral", value: stats.totalReferrals, icon: TrendingUp, color: "blue" },
                     { label: "Affiliator Aktif", value: stats.activeAffiliates, icon: Users, color: "orange" },
                 ].map((stat, idx) => (
-                    <div key={idx} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
+                    <div key={idx} className="bg-white/60 backdrop-blur-3xl p-4 md:p-6 rounded-[2.5rem] border border-white/60 shadow-sm relative overflow-hidden group hover:bg-white/80 transition-all">
                         <div className={`absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full bg-${stat.color}-50 opacity-50`}></div>
-                        <div className={`bg-${stat.color}-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-4`}>
+                        <div className={`bg-white/50 border border-white/60 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-sm`}>
                             <stat.icon className={`w-6 h-6 text-${stat.color}-600`} />
                         </div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
+                        <h3 className="text-xs font-black text-slate-900 tracking-tight">
                             {stat.label === 'Affiliator Aktif' || stat.label === 'Total Referral' ? stat.value.toLocaleString() : formatCurrency(stat.value)}
                         </h3>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:p-8">
                 {/* Affiliators List */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="bg-white/60 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-sm overflow-hidden">
+                        <div className="p-4 md:p-6 border-b border-white/60 bg-white/40 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <h2 className="font-bold text-slate-900 flex items-center gap-3">
                                 <Users className="w-5 h-5 text-purple-400" /> Daftar Affiliator
                             </h2>
@@ -164,28 +164,28 @@ export default function AffiliateManagement() {
                                     placeholder="Cari affiliator..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                    className="w-full pl-11 pr-4 py-2.5 bg-white/50 border border-white/60 shadow-sm rounded-2xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all backdrop-blur-md"
                                 />
                             </div>
                         </div>
 
-                        <div className="bg-white md:bg-white rounded-[2.5rem] md:border-t border-slate-100 overflow-hidden">
+                        <div className="bg-transparent overflow-hidden">
                             {/* Desktop Affiliators View */}
                             <div className="hidden md:block overflow-x-auto">
-                                <table className="w-full text-left text-sm whitespace-nowrap">
+                                <table className="w-full text-left text-xs whitespace-nowrap">
                                     <thead>
-                                        <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                            <th className="p-4">Affiliator</th>
-                                            <th className="p-4">Kode</th>
-                                            <th className="p-4">Saldo</th>
-                                            <th className="p-4">Total Referral</th>
-                                            <th className="p-4 text-right">Penghasilan</th>
+                                        <tr className="bg-white/40 border-b border-white/60 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                            <th className="p-2">Affiliator</th>
+                                            <th className="p-2">Kode</th>
+                                            <th className="p-2">Saldo</th>
+                                            <th className="p-2">Total Referral</th>
+                                            <th className="p-2 text-right">Penghasilan</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100">
+                                    <tbody className="divide-y divide-white/60">
                                         {filteredAffiliates.map((aff, i) => (
-                                            <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                                <td className="p-4">
+                                            <tr key={i} className="hover:bg-white/80 transition-colors">
+                                                <td className="p-2">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-9 h-9 bg-slate-900 rounded-xl flex items-center justify-center text-white font-black text-xs">
                                                             {aff.full_name?.charAt(0) || 'U'}
@@ -196,19 +196,19 @@ export default function AffiliateManagement() {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="p-4">
-                                                    <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-lg font-mono font-bold text-xs border border-purple-100">
+                                                <td className="p-2">
+                                                    <span className="bg-white/50 text-purple-600 px-3 py-1 rounded-lg font-mono font-bold text-xs border border-white/60 shadow-sm">
                                                         {aff.affiliate_code || '-'}
                                                     </span>
                                                 </td>
-                                                <td className="p-4 font-black text-slate-900">{formatCurrency(aff.balance)}</td>
-                                                <td className="p-4">
+                                                <td className="p-2 font-black text-slate-900">{formatCurrency(aff.balance)}</td>
+                                                <td className="p-2">
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-bold text-slate-700">{aff.totalOrders}</span>
                                                         <span className="text-[10px] text-slate-400 uppercase font-bold">Trx</span>
                                                     </div>
                                                 </td>
-                                                <td className="p-4 text-right font-black text-emerald-600">
+                                                <td className="p-2 text-right font-black text-emerald-600">
                                                     {formatCurrency(aff.totalEarned)}
                                                 </td>
                                             </tr>
@@ -218,12 +218,12 @@ export default function AffiliateManagement() {
                             </div>
 
                             {/* Mobile Affiliators View */}
-                            <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
+                            <div className="md:hidden space-y-4 p-4 bg-transparent">
                                 {filteredAffiliates.map((aff, i) => (
-                                    <div key={i} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden">
+                                    <div key={i} className="bg-white/60 backdrop-blur-3xl rounded-[2rem] p-4 md:p-5 border border-white/60 shadow-sm relative overflow-hidden hover:bg-white/80 transition-all">
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-md shadow-slate-200">
+                                                <div className="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-white font-black text-xs shadow-md shadow-slate-200">
                                                     {aff.full_name?.charAt(0) || 'U'}
                                                 </div>
                                                 <div>
@@ -231,24 +231,24 @@ export default function AffiliateManagement() {
                                                     <p className="text-[10px] text-slate-500 font-medium">{aff.email}</p>
                                                 </div>
                                             </div>
-                                            <span className="bg-purple-50 text-purple-600 px-2.5 py-1 rounded-xl font-mono font-black text-[10px] border border-purple-100">
+                                            <span className="bg-white/50 text-purple-600 px-2.5 py-1 rounded-xl font-mono font-black text-[10px] border border-white/60 shadow-sm">
                                                 {aff.affiliate_code || '-'}
                                             </span>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4 mb-4">
-                                            <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100">
-                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Saldo</p>
-                                                <p className="font-black text-slate-900 text-sm">{formatCurrency(aff.balance)}</p>
+                                            <div className="bg-white/50 rounded-2xl p-3 border border-white/60 shadow-sm">
+                                                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Saldo</p>
+                                                <p className="font-black text-slate-900 text-xs">{formatCurrency(aff.balance)}</p>
                                             </div>
-                                            <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100">
-                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Ref</p>
-                                                <p className="font-black text-slate-900 text-sm">{aff.totalOrders} <span className="text-[10px] text-slate-400 font-normal ml-0.5">Trx</span></p>
+                                            <div className="bg-white/50 rounded-2xl p-3 border border-white/60 shadow-sm">
+                                                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Ref</p>
+                                                <p className="font-black text-slate-900 text-xs">{aff.totalOrders} <span className="text-[10px] text-slate-500 font-normal ml-0.5">Trx</span></p>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Penghasilan</p>
+                                        <div className="flex items-center justify-between pt-3 border-t border-white/60">
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Penghasilan</p>
                                             <p className="font-black text-emerald-600">{formatCurrency(aff.totalEarned)}</p>
                                         </div>
                                     </div>
@@ -264,21 +264,21 @@ export default function AffiliateManagement() {
 
                 {/* Recent Referral History */}
                 <div className="space-y-6">
-                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden h-fit">
-                        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                    <div className="bg-white/60 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-sm overflow-hidden h-fit">
+                        <div className="p-4 md:p-6 border-b border-white/60 bg-white/40 flex items-center justify-between">
                             <h2 className="font-bold text-slate-900 flex items-center gap-3">
                                 <History className="w-5 h-5 text-slate-400" /> Aktivitas Referral
                             </h2>
                         </div>
                         <div className="p-4 space-y-4 max-h-[600px] overflow-y-auto">
                             {commissions.slice(0, 15).map((order, i) => (
-                                <div key={i} className="group p-4 bg-slate-50 hover:bg-white rounded-[1.5rem] border border-transparent hover:border-slate-100 hover:shadow-lg transition-all">
+                                <div key={i} className="group p-4 bg-white/50 hover:bg-white/80 rounded-[1.5rem] border border-white/60 hover:shadow-sm transition-all shadow-sm">
                                     <div className="flex justify-between items-start mb-2">
                                         <div>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{new Date(order.created_at).toLocaleDateString()}</p>
-                                            <h4 className="font-bold text-slate-900 text-sm line-clamp-1">{order.product_name}</h4>
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{new Date(order.created_at).toLocaleDateString()}</p>
+                                            <h4 className="font-bold text-slate-900 text-xs line-clamp-1">{order.product_name}</h4>
                                         </div>
-                                        <div className="bg-white px-2 py-1 rounded-lg border border-slate-100 font-black text-[10px] text-purple-600">
+                                        <div className="bg-white/80 backdrop-blur-md px-2 py-1 rounded-lg border border-white/60 shadow-sm font-black text-[10px] text-purple-600">
                                             + {formatCurrency(order.commission)}
                                         </div>
                                     </div>
@@ -291,11 +291,11 @@ export default function AffiliateManagement() {
                                 </div>
                             ))}
                             {commissions.length === 0 && (
-                                <p className="p-8 text-center text-slate-400 font-medium italic text-sm">Belum ada aktivitas referral.</p>
+                                <p className="p-5 md:p-8 text-center text-slate-400 font-medium italic text-xs">Belum ada aktivitas referral.</p>
                             )}
                         </div>
-                        <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Menampilkan 15 Aktivitas Terakhir</p>
+                        <div className="p-4 bg-white/40 border-t border-white/60 text-center">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Menampilkan 15 Aktivitas Terakhir</p>
                         </div>
                     </div>
                 </div>

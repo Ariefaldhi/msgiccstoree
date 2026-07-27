@@ -61,7 +61,7 @@ export default function ImageCropper({ onCropComplete, onCancel }: ImageCropperP
                     </button>
 
                     <div className="text-center mb-6">
-                        <h3 className="text-lg font-black text-slate-900">Upload Logo</h3>
+                        <h3 className="text-xs font-black text-slate-900">Upload Logo</h3>
                         <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">Select an image to crop</p>
                     </div>
 
@@ -70,7 +70,7 @@ export default function ImageCropper({ onCropComplete, onCancel }: ImageCropperP
                         <div className="w-14 h-14 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-sm">
                             <Upload className="w-6 h-6" />
                         </div>
-                        <p className="font-bold text-slate-700 text-sm">Click to browse</p>
+                        <p className="font-bold text-slate-700 text-xs">Click to browse</p>
                         <p className="text-[10px] text-slate-400 mt-1 font-semibold uppercase tracking-wide">Max 2MB • JPG/PNG</p>
                     </div>
                 </div>
