@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Zap, Clock, Share2, Loader2 } from "lucide-react";
-import Image from "next/image";
 import html2canvas from "html2canvas";
 
 interface PromoItem {
@@ -83,13 +82,11 @@ function PromoCard({ item, onOpen }: { item: PromoItem; onOpen: () => void }) {
             </div>
 
             {/* Product Image */}
-            <div className="w-full pt-[100%] relative bg-slate-900 rounded-xl overflow-hidden mb-3">
+            <div className="w-full h-28 rounded-xl overflow-hidden bg-slate-100 mb-3 flex items-center justify-center">
                 {item.package.product.image_url ? (
-                    <Image src={item.package.product.image_url} alt={item.package.product.title} fill sizes="(max-width: 768px) 150px, 200px" className="object-cover" />
+                    <img src={item.package.product.image_url} alt={item.package.product.title} className="w-full h-full object-cover" />
                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
-                        <span className="text-4xl font-black text-slate-300">{item.package.product.title.charAt(0)}</span>
-                    </div>
+                    <span className="text-4xl font-black text-slate-300">{item.package.product.title.charAt(0)}</span>
                 )}
             </div>
 

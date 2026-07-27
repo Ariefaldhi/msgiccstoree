@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,10 +21,15 @@ export default function ProductCard({
 }: ProductCardProps) {
 
     return (
-        <div className="group relative block bg-white/30 backdrop-blur-lg rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 hover:bg-white/50 flex flex-col items-center text-center h-full border border-white/40 overflow-hidden">
+        <div className="group relative block bg-white/30 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 hover:bg-white/50 flex flex-col items-center text-center h-full border border-white/40 overflow-hidden">
 
-            {/* Static CSS Glow instead of heavy image blur */}
-            <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-blue-400/10 to-transparent pointer-events-none" />
+            {/* Blurred Background Glow */}
+            {image && (
+                <div
+                    className="absolute top-0 inset-x-0 h-40 opacity-20 blur-3xl pointer-events-none transition-opacity duration-500 group-hover:opacity-30"
+                    style={{ backgroundImage: `url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                />
+            )}
 
             {/* Floating Badge (Top Right) - Front of Icon */}
             {tag && (
@@ -46,7 +50,7 @@ export default function ProductCard({
                 <div className="w-20 h-20 md:w-32 md:h-32 rounded-[1.2rem] md:rounded-[2rem] bg-white p-1 md:p-1.5 shadow-xl shadow-slate-100/50 relative">
                     <div className="w-full h-full rounded-[1rem] md:rounded-[1.6rem] overflow-hidden bg-slate-900 flex items-center justify-center relative">
                         {image ? (
-                            <Image src={image} alt={title} fill sizes="(max-width: 768px) 150px, 200px" className="object-cover transform transition-transform duration-500 group-hover:scale-110" />
+                            <img src={image} alt={title} className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110" />
                         ) : (
                             <div className="w-full h-full bg-slate-900 flex items-center justify-center">
                                 <span className="text-2xl md:text-4xl font-black text-white">{title.charAt(0)}</span>
@@ -55,7 +59,7 @@ export default function ProductCard({
                     </div>
                 </div>
                 {/* Decorative Blur behind icon */}
-                <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full scale-125 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-blue-500/20 blur-2xl md:blur-3xl rounded-full scale-125 md:scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             </div>
 
             {/* Content Info */}
