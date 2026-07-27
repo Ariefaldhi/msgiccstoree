@@ -149,18 +149,20 @@ export default function ProductModal({
 
     const fetchSalesCounts = async () => {
         if (!product) return;
-        const { data, error } = await supabase
-            .from("orders")
-            .select("package_name, status")
-            .eq("product_name", product.title)
-            .eq("status", "Pesanan Selesai");
-        
-        if (data) {
-            const counts: Record<string, number> = {};
-            data.forEach(order => {
-                counts[order.package_name] = (counts[order.package_name] || 0) + 1;
-            });
-            setSalesCounts(counts);
+        try {
+            const res = await fetch('/api/stats');
+            const data = await res.json();
+            if (data.orders) {
+                const counts: Record<string, number> = {};
+                data.orders.forEach((order: any) => {
+                    if (order.product_name === product.title) {
+                        counts[order.package_name] = (counts[order.package_name] || 0) + 1;
+                    }
+                });
+                setSalesCounts(counts);
+            }
+        } catch (e) {
+            console.error("Failed to fetch sales counts", e);
         }
     };
 
