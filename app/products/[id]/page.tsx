@@ -14,14 +14,16 @@ import ProductModal from "@/components/ProductModal";
 
 interface Package {
     id: string;
+    product_id?: string;
     name: string;
     price: string;
     cost_price: number;
     duration: string;
     type: string;
-    is_available?: boolean;
+    is_available: boolean;
     features?: string[];
     reseller_price?: number;
+    terms_and_conditions?: string;
 }
 
 interface Product {
