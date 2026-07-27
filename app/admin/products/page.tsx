@@ -34,6 +34,7 @@ interface Package {
     price: string;
     cost_price: number;
     duration: string;
+    type: string;
     is_available: boolean;
     terms_and_conditions?: string;
     features?: string[];
