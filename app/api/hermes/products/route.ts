@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await supabase
         .from("products")
-        .select("id, title, is_active, packages(id, name, price, cost_price, is_available)");
+        .select("id, title, packages(id, name, price, cost_price, reseller_price, is_available, type, duration)");
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
