@@ -51,70 +51,55 @@ export default function Home() {
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+      const now = new Date().toISOString();
 
-      // Fetch Sales counts for sorting
-      const { data: salesStats } = await supabase.from("orders").select("product_name").eq("status", "Pesanan Selesai");
-      if (salesStats) {
+      const [
+        { data: allCompletedOrders },
+        { data: cats, error: catError },
+        { data: prods, error: prodError },
+        { data: sales },
+        { data: banners, error: bannerError },
+        { data: { user } },
+        { data: settings }
+      ] = await Promise.all([
+        supabase.from("orders").select("package_name, product_name").eq("status", "Pesanan Selesai"),
+        supabase.from("categories").select("*").order("created_at", { ascending: true }),
+        supabase.from("products").select("*, packages(*)").order("created_at", { ascending: false }),
+        supabase.from("flash_sales").select("package_id, discount_percent, max_orders, package:packages(name, product:products(title))").eq("is_active", true).gte("end_time", now),
+        supabase.from("hero_banners").select("*, products(id, title, image_url)").eq("is_active", true).order("created_at", { ascending: false }),
+        supabase.auth.getUser(),
+        supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single()
+      ]);
+
+      if (allCompletedOrders) {
         const counts: Record<string, number> = {};
-        salesStats.forEach(s => {
-          counts[s.product_name] = (counts[s.product_name] || 0) + 1;
+        allCompletedOrders.forEach(o => {
+          counts[o.product_name] = (counts[o.product_name] || 0) + 1;
         });
         setSalesCounts(counts);
       }
 
-      // Fetch Categories
-      const { data: cats, error: catError } = await supabase.from("categories").select("*").order("created_at", { ascending: true });
       if (catError) console.error("❌ Categories fetch error:", catError.message);
       if (cats) setCategories(cats);
-
-      // Fetch Products (with packages)
-      const { data: prods, error: prodError } = await supabase
-        .from("products")
-        .select("*, packages(*)")
-        .order("created_at", { ascending: false });
 
       if (prodError) console.error("❌ Products fetch error:", prodError.message);
       if (prods) setProducts(prods);
 
-      // Fetch Active Flash Sales mapping
-      const now = new Date().toISOString();
-      const { data: sales, error: saleError } = await supabase
-        .from("flash_sales")
-        .select("package_id, discount_percent, max_orders, package:packages(name, product:products(title))")
-        .eq("is_active", true)
-        .gte("end_time", now);
-      
       if (sales) {
-        // Fetch completed orders to check limits for global application
-        const { data: orders } = await supabase
-          .from("orders")
-          .select("package_name, product_name")
-          .eq("status", "Pesanan Selesai");
-
         const validSales = sales.filter(sale => {
           if (sale.max_orders === 0) return true;
-          const count = orders?.filter(o => 
+          const count = allCompletedOrders?.filter(o => 
             o.package_name === (sale.package as any).name && 
             o.product_name === (sale.package as any).product.title
           ).length || 0;
           return count < sale.max_orders;
         });
-
         setActivePromos(validSales);
       }
 
-      // Fetch Hero Banners
-      const { data: banners, error: bannerError } = await supabase
-        .from("hero_banners")
-        .select("*, products(id, title, image_url)")
-        .eq("is_active", true)
-        .order("created_at", { ascending: false });
-      
       if (bannerError) console.error("❌ Banners fetch error:", bannerError.message);
       if (banners) setHeroBanners(banners);
 
-      // Check Affiliate Status
-      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase.from("profiles").select("is_affiliator, role").eq("id", user.id).single();
         if (profile?.is_affiliator || profile?.role === 'admin') {
@@ -122,8 +107,6 @@ export default function Home() {
         }
       }
 
-      // Fetch Store Settings for Commission
-      const { data: settings } = await supabase.from("store_settings").select("affiliate_commission_percent").eq("id", 1).single();
       if (settings?.affiliate_commission_percent) {
         setCommissionPercent(settings.affiliate_commission_percent);
       }
@@ -154,7 +137,13 @@ export default function Home() {
     // Sort by sales count (popularity)
     const salesA = salesCounts[a.title] || 0;
     const salesB = salesCounts[b.title] || 0;
-    return salesB - salesA;
+    
+    if (salesB !== salesA) {
+      return salesB - salesA;
+    }
+    
+    // Deterministic fallback (prevent shuffling)
+    return b.id.localeCompare(a.id);
   });
 
   const handleProductClick = (product: Product) => {
