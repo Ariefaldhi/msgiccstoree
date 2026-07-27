@@ -62,7 +62,7 @@ export default function Home() {
         { data: { user } },
         { data: settings }
       ] = await Promise.all([
-        supabase.from("orders").select("package_name, product_name").eq("status", "Pesanan Selesai"),
+        fetch('/api/stats').then(r => r.json()).then(d => ({ data: d.orders })).catch(() => ({ data: null })),
         supabase.from("categories").select("*").order("created_at", { ascending: true }),
         supabase.from("products").select("*, packages(*)").order("created_at", { ascending: false }),
         supabase.from("flash_sales").select("package_id, discount_percent, max_orders, package:packages(name, product:products(title))").eq("is_active", true).gte("end_time", now),
