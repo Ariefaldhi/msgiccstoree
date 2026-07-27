@@ -73,7 +73,7 @@ export default function Home() {
 
       if (allCompletedOrders) {
         const counts: Record<string, number> = {};
-        allCompletedOrders.forEach(o => {
+        allCompletedOrders.forEach((o: any) => {
           counts[o.product_name] = (counts[o.product_name] || 0) + 1;
         });
         setSalesCounts(counts);
@@ -88,7 +88,7 @@ export default function Home() {
       if (sales) {
         const validSales = sales.filter(sale => {
           if (sale.max_orders === 0) return true;
-          const count = allCompletedOrders?.filter(o => 
+          const count = allCompletedOrders?.filter((o: any) => 
             o.package_name === (sale.package as any).name && 
             o.product_name === (sale.package as any).product.title
           ).length || 0;
