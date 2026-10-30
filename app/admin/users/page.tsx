@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, User, Search, Store, Megaphone, Save } from "lucide-react";
+import { Loader2, User, Search, Store, Megaphone } from "lucide-react";
 
 interface Profile {
     id: string;
@@ -82,7 +82,6 @@ export default function AdminUsers() {
             setUsers(users.map(u => u.id === id ? { ...u, affiliate_code: newCode } : u));
         } else {
             console.error("❌ Update Code Error:", error);
-            // Revert local state to the current value from the users array
             const currentUser = users.find(u => u.id === id);
             if (currentUser) {
                 setLocalCodes({ ...localCodes, [id]: currentUser.affiliate_code || "" });
@@ -99,7 +98,6 @@ export default function AdminUsers() {
             setUsers(users.map(u => u.id === id ? { ...u, balance: newBalance } : u));
         } else {
             console.error("❌ Update Balance Error:", error);
-            // Revert local state to the current value from the users array
             const currentUser = users.find(u => u.id === id);
             if (currentUser) {
                 setLocalBalances({ ...localBalances, [id]: currentUser.balance || 0 });
@@ -116,30 +114,32 @@ export default function AdminUsers() {
     );
 
     return (
-        <div>
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center shrink-0">
-                    <User className="w-6 h-6 text-blue-600" />
-                </div>
+        <div className="space-y-6 pb-12">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-slate-200">
                 <div>
-                    <h1 className="text-xs font-black text-slate-900 tracking-tight">Manajemen Pengguna</h1>
-                    <p className="text-xs font-medium text-slate-500">Persetujuan Reseller & Afiliator</p>
+                    <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
+                        <User className="w-6 h-6 text-blue-600" />
+                        Manajemen Pengguna
+                    </h1>
+                    <p className="text-slate-500 text-xs md:text-sm mt-0.5">Persetujuan status reseller, afiliator, dan saldo akun.</p>
+                </div>
+                <div className="relative w-full sm:w-64">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input 
+                        type="text" 
+                        placeholder="Cari user (email, nama, kode)..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-white border border-slate-200 rounded-lg py-2 pl-9 pr-3.5 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors font-medium text-xs placeholder:text-slate-400"
+                    />
                 </div>
             </div>
 
-            <div className="mb-6 relative w-full md:max-w-md">
-                <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                    type="text" 
-                    placeholder="Cari user (email, nama, kode)..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white/50 border border-white/60 rounded-xl py-3.5 pl-12 pr-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium text-xs shadow-sm backdrop-blur-md"
-                />
-                <div className="bg-white/60 backdrop-blur-3xl rounded-[2rem] border border-white/60 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
                 {loading ? (
-                    <div className="p-12 flex justify-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                    <div className="flex flex-col items-center justify-center p-20">
+                        <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Memuat Data Pengguna...</p>
                     </div>
                 ) : (
                     <>
@@ -147,50 +147,50 @@ export default function AdminUsers() {
                         <div className="hidden md:block overflow-x-auto">
                             <table className="w-full text-left text-xs whitespace-nowrap">
                                 <thead>
-                                    <tr className="bg-white/40 border-b border-white/60">
-                                        <th className="p-2 font-bold text-slate-500 uppercase tracking-wider text-xs">User Info</th>
-                                        <th className="p-2 font-bold text-slate-500 uppercase tracking-wider text-xs text-center">Status</th>
-                                        <th className="p-2 font-bold text-slate-500 uppercase tracking-wider text-xs">Data Afiliasi</th>
+                                    <tr className="bg-slate-50/80 border-b border-slate-100 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                                        <th className="px-4 py-3">User Info</th>
+                                        <th className="px-4 py-3 text-center">Status Keanggotaan</th>
+                                        <th className="px-4 py-3">Data Afiliasi</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-white/60">
+                                <tbody className="divide-y divide-slate-100">
                                     {filteredUsers.map((user) => (
-                                        <tr key={user.id} className="hover:bg-white/80 transition-colors">
-                                            <td className="p-2">
-                                                <div className="font-bold text-slate-900">{user.full_name || 'Tidak ada nama'}</div>
-                                                <div className="text-xs text-slate-500">{user.email}</div>
-                                                <div className="text-[10px] text-slate-400 mt-1 uppercase bg-white/60 border border-white/60 shadow-sm px-2 py-0.5 rounded-md inline-block">ROLE: {user.role}</div>
+                                        <tr key={user.id} className="hover:bg-slate-50/60 transition-colors">
+                                            <td className="px-4 py-3.5">
+                                                <div className="font-semibold text-slate-900">{user.full_name || 'Tidak ada nama'}</div>
+                                                <div className="text-[11px] text-slate-500 mt-0.5">{user.email}</div>
+                                                <div className="text-[10px] text-slate-500 mt-1 uppercase font-semibold bg-slate-100 border border-slate-200/60 px-1.5 py-0.5 rounded inline-block">ROLE: {user.role}</div>
                                             </td>
-                                            <td className="p-2">
-                                                <div className="flex flex-col gap-2 items-center">
+                                            <td className="px-4 py-3.5">
+                                                <div className="flex flex-col gap-1.5 items-center max-w-[200px] mx-auto">
                                                     <button 
                                                         onClick={() => handleToggleReseller(user.id, user.is_reseller)}
                                                         disabled={savingId === user.id}
-                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold w-full transition-all flex items-center justify-center gap-2 border ${
-                                                            user.is_reseller ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-white/50 text-slate-500 border-white/60 hover:bg-white/80'
+                                                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold w-full transition-colors flex items-center justify-center gap-1.5 border ${
+                                                            user.is_reseller ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                                                         }`}
                                                     >
-                                                        <Store className="w-3 h-3" /> Reseller: {user.is_reseller ? 'AKTIF' : 'NONAKTIF'}
+                                                        <Store className="w-3.5 h-3.5" /> Reseller: {user.is_reseller ? 'AKTIF' : 'NONAKTIF'}
                                                     </button>
                                                     <button 
                                                         onClick={() => handleToggleAffiliator(user.id, user.is_affiliator)}
                                                         disabled={savingId === user.id}
-                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold w-full transition-all flex items-center justify-center gap-2 border ${
-                                                            user.is_affiliator ? 'bg-purple-100 text-purple-700 border-purple-200' : 'bg-white/50 text-slate-500 border-white/60 hover:bg-white/80'
+                                                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold w-full transition-colors flex items-center justify-center gap-1.5 border ${
+                                                            user.is_affiliator ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                                                         }`}
                                                     >
-                                                        <Megaphone className="w-3 h-3" /> Afiliator: {user.is_affiliator ? 'AKTIF' : 'NONAKTIF'}
+                                                        <Megaphone className="w-3.5 h-3.5" /> Afiliator: {user.is_affiliator ? 'AKTIF' : 'NONAKTIF'}
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td className="p-2">
+                                            <td className="px-4 py-3.5">
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-bold text-slate-500 w-12">Kode:</span>
+                                                        <span className="text-xs font-medium text-slate-500 w-12">Kode:</span>
                                                         <input 
                                                             type="text" 
-                                                            className="bg-white/50 border border-white/60 rounded px-2 py-1 text-xs w-32"
-                                                            placeholder="Kode (opsional)"
+                                                            className="bg-white border border-slate-200 rounded px-2.5 py-1 text-xs w-32 font-mono font-medium focus:outline-none focus:ring-1 focus:ring-blue-600"
+                                                            placeholder="Kode..."
                                                             value={localCodes[user.id] || ""}
                                                             onChange={(e) => setLocalCodes({ ...localCodes, [user.id]: e.target.value })}
                                                             onBlur={(e) => {
@@ -201,12 +201,12 @@ export default function AdminUsers() {
                                                         />
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-bold text-slate-500 w-12">Saldo:</span>
+                                                        <span className="text-xs font-medium text-slate-500 w-12">Saldo:</span>
                                                         <div className="relative">
-                                                            <span className="absolute left-2 top-1 text-xs text-slate-400">Rp</span>
+                                                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">Rp</span>
                                                             <input 
                                                                 type="number" 
-                                                                className="bg-white/50 border border-white/60 rounded px-2 py-1 text-xs pl-7 w-32"
+                                                                className="bg-white border border-slate-200 rounded px-2.5 py-1 pl-7 text-xs w-32 font-medium focus:outline-none focus:ring-1 focus:ring-blue-600"
                                                                 value={localBalances[user.id] || 0}
                                                                 onChange={(e) => setLocalBalances({ ...localBalances, [user.id]: parseInt(e.target.value) || 0 })}
                                                                 onBlur={(e) => {
@@ -226,46 +226,46 @@ export default function AdminUsers() {
                         </div>
 
                         {/* Mobile View */}
-                        <div className="md:hidden space-y-4 p-4 bg-transparent">
+                        <div className="md:hidden space-y-3 p-4">
                             {filteredUsers.map((user) => (
-                                <div key={user.id} className="bg-white/60 backdrop-blur-3xl rounded-[2rem] p-5 border border-white/60 shadow-sm transition-all hover:bg-white/80">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex flex-col">
-                                            <h3 className="font-bold text-slate-900 leading-tight">{user.full_name || 'Tanpa Nama'}</h3>
-                                            <p className="text-xs text-slate-500 font-medium">{user.email}</p>
+                                <div key={user.id} className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3 relative">
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <h3 className="font-semibold text-slate-900 leading-tight">{user.full_name || 'Tanpa Nama'}</h3>
+                                            <p className="text-xs text-slate-500 mt-0.5">{user.email}</p>
                                         </div>
-                                        <span className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest bg-white/60 border border-white/60 shadow-sm text-slate-500">
+                                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase bg-slate-100 border border-slate-200/60 text-slate-600">
                                             {user.role}
                                         </span>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2 mb-4">
+                                    <div className="grid grid-cols-2 gap-2">
                                         <button 
                                             onClick={() => handleToggleReseller(user.id, user.is_reseller)}
                                             disabled={savingId === user.id}
-                                            className={`px-3 py-2 rounded-xl text-[10px] font-black w-full flex flex-col items-center justify-center gap-1 border ${
-                                                user.is_reseller ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-white/50 text-slate-500 border-white/60 hover:bg-white/80'
+                                            className={`px-3 py-2 rounded-lg text-xs font-semibold w-full flex flex-col items-center justify-center gap-1 border ${
+                                                user.is_reseller ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-50 text-slate-600 border-slate-200'
                                             }`}
                                         >
-                                            <Store className="w-3 h-3" /> RESELLER: {user.is_reseller ? 'ON' : 'OFF'}
+                                            <Store className="w-3.5 h-3.5" /> Reseller: {user.is_reseller ? 'ON' : 'OFF'}
                                         </button>
                                         <button 
                                             onClick={() => handleToggleAffiliator(user.id, user.is_affiliator)}
                                             disabled={savingId === user.id}
-                                            className={`px-3 py-2 rounded-xl text-[10px] font-black w-full flex flex-col items-center justify-center gap-1 border ${
-                                                user.is_affiliator ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-white/50 text-slate-500 border-white/60 hover:bg-white/80'
+                                            className={`px-3 py-2 rounded-lg text-xs font-semibold w-full flex flex-col items-center justify-center gap-1 border ${
+                                                user.is_affiliator ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-slate-50 text-slate-600 border-slate-200'
                                             }`}
                                         >
-                                            <Megaphone className="w-3 h-3" /> AFILIATOR: {user.is_affiliator ? 'ON' : 'OFF'}
+                                            <Megaphone className="w-3.5 h-3.5" /> Afiliator: {user.is_affiliator ? 'ON' : 'OFF'}
                                         </button>
                                     </div>
 
-                                    <div className="bg-white/50 rounded-2xl p-4 space-y-3 border border-white/60 shadow-sm">
+                                    <div className="bg-slate-50 rounded-lg p-3 space-y-2 border border-slate-100">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Kode Afiliasi</span>
+                                            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Kode Afiliasi</span>
                                             <input 
                                                 type="text" 
-                                                className="bg-white/60 border border-white/60 rounded-lg px-2 py-1 text-xs w-28 font-bold text-right outline-none focus:ring-1 focus:ring-blue-500"
+                                                className="bg-white border border-slate-200 rounded px-2.5 py-1 text-xs w-28 font-semibold text-right focus:outline-none focus:ring-1 focus:ring-blue-600"
                                                 value={localCodes[user.id] || ""}
                                                 onChange={(e) => setLocalCodes({ ...localCodes, [user.id]: e.target.value })}
                                                 onBlur={(e) => {
@@ -275,14 +275,14 @@ export default function AdminUsers() {
                                                 }}
                                             />
                                         </div>
-                                        <div className="h-px bg-white/60" />
+                                        <div className="h-px bg-slate-200" />
                                         <div className="flex items-center justify-between">
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Saldo User</span>
+                                            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Saldo User</span>
                                             <div className="relative">
-                                                <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">Rp</span>
+                                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">Rp</span>
                                                 <input 
                                                     type="number" 
-                                                    className="bg-white/60 border border-white/60 rounded-lg px-2 py-1 pl-6 text-xs w-28 font-bold text-right outline-none focus:ring-1 focus:ring-blue-500"
+                                                    className="bg-white border border-slate-200 rounded px-2 py-1 pl-7 text-xs w-28 font-semibold text-right focus:outline-none focus:ring-1 focus:ring-blue-600"
                                                     value={localBalances[user.id] || 0}
                                                     onChange={(e) => setLocalBalances({ ...localBalances, [user.id]: parseInt(e.target.value) || 0 })}
                                                     onBlur={(e) => {
@@ -295,16 +295,20 @@ export default function AdminUsers() {
                                         </div>
                                     </div>
                                     {savingId === user.id && (
-                                        <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-white/70 rounded-xl flex items-center justify-center">
                                             <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
                                         </div>
                                     )}
                                 </div>
                             ))}
                         </div>
+
+                        {filteredUsers.length === 0 && (
+                            <div className="py-16 text-center text-slate-400 text-sm">Data pengguna tidak ditemukan.</div>
+                        )}
                     </>
                 )}
-            </div>    </div>
+            </div>
         </div>
     );
 }

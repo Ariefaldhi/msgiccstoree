@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, Trash2, Loader2, Save, X } from "lucide-react";
+import { Plus, Trash2, Loader2, Save, X, Layers, Edit } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Category {
@@ -93,11 +93,14 @@ export default function AdminCategories() {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="space-y-6 pb-12">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
                 <div>
-                    <h1 className="text-xs font-black text-slate-900 tracking-tight">Categories</h1>
-                    <p className="text-slate-500 mt-1 text-xs">Manage product categories.</p>
+                    <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
+                        <Layers className="w-6 h-6 text-blue-600" />
+                        Kategori Produk
+                    </h1>
+                    <p className="text-slate-500 text-xs md:text-sm mt-0.5">Kelola kategori dan segmentasi produk katalog.</p>
                 </div>
                 <button
                     onClick={() => {
@@ -105,111 +108,112 @@ export default function AdminCategories() {
                         setFormData({ name: "", slug: "", icon: "" });
                         setIsModalOpen(true);
                     }}
-                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 transition-all"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-xs font-semibold transition-colors shadow-xs"
                 >
-                    <Plus className="w-5 h-5" />
-                    Add Category
+                    <Plus className="w-4 h-4" />
+                    Tambah Kategori
                 </button>
             </div>
 
             {loading ? (
-                <div className="flex items-center justify-center h-64">
-                    <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                <div className="flex flex-col items-center justify-center p-20 bg-white border border-slate-200/90 rounded-2xl">
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Memuat Kategori...</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {categories.map((cat) => (
-                        <div key={cat.id} className="bg-white/60 backdrop-blur-3xl p-5 md:p-4 md:p-6 rounded-[2rem] border border-white/60 shadow-sm flex items-center justify-between group relative transition-all hover:bg-white/80 hover:shadow-md">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-white/50 flex items-center justify-center text-xs border border-white/60 shadow-sm">
+                        <div key={cat.id} className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between group hover:border-slate-300 transition-colors">
+                            <div className="flex items-center gap-3.5 min-w-0">
+                                <div className="w-11 h-11 rounded-xl bg-slate-50 flex items-center justify-center text-xl border border-slate-100 shrink-0">
                                     {cat.icon || "📦"}
                                 </div>
-                                <div>
-                                    <h3 className="font-bold text-slate-900">{cat.name}</h3>
-                                    <code className="text-[10px] text-slate-500 font-bold bg-white/50 border border-white/60 px-2 py-1 rounded-md">/{cat.slug}</code>
+                                <div className="min-w-0">
+                                    <h3 className="font-semibold text-sm text-slate-900 truncate">{cat.name}</h3>
+                                    <code className="text-[11px] text-slate-500 font-mono bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60 mt-1 inline-block">/{cat.slug}</code>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-all">
+                            <div className="flex items-center gap-1 shrink-0">
                                 <button
                                     onClick={() => openEdit(cat)}
-                                    className="p-2 rounded-xl bg-blue-50 text-blue-500 hover:bg-blue-100"
+                                    className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                     title="Edit"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                                    <Edit className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(cat.id)}
-                                    className="p-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100"
-                                    title="Delete"
+                                    className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                    title="Hapus"
                                 >
-                                    <Trash2 className="w-5 h-5" />
+                                    <Trash2 className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
                     ))}
                     {categories.length === 0 && (
-                        <div className="col-span-full text-center py-12 text-slate-500 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-dashed border-white/60 font-medium">
-                            No categories found. Create one to get started.
+                        <div className="col-span-full py-16 text-center text-slate-400 text-sm bg-white border border-dashed border-slate-200 rounded-2xl">
+                            Belum ada kategori. Klik &apos;Tambah Kategori&apos; untuk membuat kategori baru.
                         </div>
                     )}
                 </div>
             )}
 
-            {/* Add Modal */}
+            {/* Add / Edit Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white/80 backdrop-blur-3xl rounded-[2rem] border border-white/60 p-5 md:p-6 md:p-8 max-w-sm w-full shadow-2xl max-h-[85vh] overflow-y-auto">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xs font-black text-slate-900">{editCategory ? "Edit Category" : "New Category"}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:bg-white/50 rounded-full transition-colors">
-                                <X className="w-6 h-6" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+                    <div className="bg-white rounded-2xl border border-slate-200 p-6 max-w-sm w-full shadow-xl max-h-[85vh] overflow-y-auto">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                            <h2 className="text-base font-bold text-slate-900">{editCategory ? "Edit Kategori" : "Kategori Baru"}</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Name</label>
+                                <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Nama Kategori</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                                    className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs"
-                                    placeholder="e.g. Premium Apps"
+                                    className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+                                    placeholder="Contoh: Premium Apps"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Slug</label>
+                                <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Slug URL</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.slug}
                                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                    className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs"
-                                    placeholder="e.g. premium-apps"
+                                    className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+                                    placeholder="Contoh: premium-apps"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Icon (Emoji)</label>
+                                <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Ikon (Emoji)</label>
                                 <input
                                     type="text"
                                     value={formData.icon}
                                     onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                                    className="w-full bg-white/50 border border-white/60 rounded-xl px-4 py-3 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs"
-                                    placeholder="e.g. 💎"
+                                    className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+                                    placeholder="Contoh: 💎"
                                 />
                             </div>
 
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2 mt-4"
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2.5 text-xs font-semibold transition-colors flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
                             >
-                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <>
-                                    <Save className="w-5 h-5" />
-                                    <span>Save Category</span>
+                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <>
+                                    <Save className="w-4 h-4" />
+                                    <span>Simpan Kategori</span>
                                 </>}
                             </button>
                         </form>

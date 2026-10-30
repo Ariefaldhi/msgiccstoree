@@ -63,7 +63,7 @@ export default function AdminProducts() {
 
     // Forms
     const [productForm, setProductForm] = useState({
-        category_id: "", title: "", price: "", tag: "", tag_color: "yellow", image_url: "", description: "", terms_conditions: ""
+        category_id: "", title: "", price: "", tag: "", tag_color: "yellow" as "yellow" | "red" | "blue" | "purple", image_url: "", description: "", terms_conditions: ""
     });
     const [editForm, setEditForm] = useState<{
         category_id: string; title: string; price: string;
@@ -313,80 +313,96 @@ export default function AdminProducts() {
         }
     };
 
+    const getTagColorClass = (color?: string) => {
+        switch (color) {
+            case "yellow": return "bg-amber-50 text-amber-700 border-amber-200";
+            case "red": return "bg-rose-50 text-rose-700 border-rose-200";
+            case "purple": return "bg-purple-50 text-purple-700 border-purple-200";
+            case "blue":
+            default: return "bg-blue-50 text-blue-700 border-blue-200";
+        }
+    };
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="space-y-6 pb-12">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
                 <div>
-                    <h1 className="text-xs font-black text-slate-900 tracking-tight">Products</h1>
-                    <p className="text-xs text-slate-500 font-medium mt-1">Manage your store's products and packages.</p>
+                    <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
+                        <PackageIcon className="w-6 h-6 text-blue-600" />
+                        Katalog Produk
+                    </h1>
+                    <p className="text-slate-500 text-xs md:text-sm mt-0.5">Kelola produk digital, varian paket, dan harga reseller.</p>
                 </div>
                 <button
                     onClick={() => setIsProductModalOpen(true)}
-                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 transition-all"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-xs font-semibold transition-colors shadow-xs"
                 >
-                    <Plus className="w-5 h-5" />
-                    Add Product
+                    <Plus className="w-4 h-4" />
+                    Tambah Produk
                 </button>
             </div>
 
             {loading ? (
-                <div className="flex justify-center h-64"><Loader2 className="w-8 h-8 text-blue-600 animate-spin" /></div>
+                <div className="flex flex-col items-center justify-center p-20 bg-white border border-slate-200/90 rounded-2xl">
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Memuat Produk...</p>
+                </div>
             ) : (
-                <div className="space-y-6">
+                <div className="space-y-5">
                     {products.map((product) => (
-                        <div key={product.id} className="bg-white/60 backdrop-blur-3xl rounded-[2rem] border border-white/60 shadow-sm overflow-hidden">
+                        <div key={product.id} className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
                             {/* Product Header */}
-                            <div className="p-5 md:p-6 flex flex-col md:flex-row items-start justify-between border-b border-white/40 bg-white/40 gap-4">
-                                <div className="flex gap-4">
-                                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-sm font-black text-slate-900 overflow-hidden relative shrink-0">
+                            <div className="p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 bg-slate-50/50 gap-4">
+                                <div className="flex items-center gap-3.5 min-w-0">
+                                    <div className="w-12 h-12 rounded-xl bg-white shadow-xs border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-900 overflow-hidden shrink-0">
                                         {product.image_url ? (
                                             <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
                                         ) : (
                                             product.title.charAt(0)
                                         )}
                                     </div>
-                                    <div>
-                                        <div className="flex flex-wrap gap-2 mb-1">
+                                    <div className="min-w-0">
+                                        <div className="flex flex-wrap items-center gap-1.5 mb-1">
                                             {product.tag && (
-                                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md text-white bg-${product.tag_color === 'yellow' ? 'yellow-500' : product.tag_color === 'red' ? 'red-500' : 'blue-500'}`}>
+                                                <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded border ${getTagColorClass(product.tag_color)}`}>
                                                     {product.tag}
                                                 </span>
                                             )}
-                                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-200 text-slate-600">
-                                                {categories.find(c => c.id === product.category_id)?.name || "Unknown Category"}
+                                            <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/60">
+                                                {categories.find(c => c.id === product.category_id)?.name || "Kategori"}
                                             </span>
                                         </div>
-                                        <h3 className="text-xs font-black text-slate-900">{product.title}</h3>
-                                        <p className="text-blue-600 font-bold text-xs">{formatCurrency(product.price)}</p>
+                                        <h3 className="text-sm font-bold text-slate-900 truncate">{product.title}</h3>
+                                        <p className="text-blue-600 font-bold text-xs mt-0.5">{formatCurrency(product.price)}</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+                                <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
                                     <button
                                         onClick={() => openPackageModal(product)}
-                                        className="flex-1 md:flex-none text-xs font-bold bg-blue-50 text-blue-600 px-4 py-2.5 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-1"
+                                        className="inline-flex items-center gap-1.5 text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg px-3 py-1.5 transition-colors border border-blue-100"
                                     >
-                                        <Plus className="w-3 h-3" /> Add Package
+                                        <Plus className="w-3.5 h-3.5" /> Tambah Paket
                                     </button>
                                     <button
                                         onClick={() => openEditModal(product)}
-                                        className="p-2.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-100 shrink-0"
-                                        title="Edit Product"
+                                        className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Edit Produk"
                                     >
-                                        <Edit className="w-5 h-5" />
+                                        <Edit className="w-4 h-4" />
                                     </button>
                                     <button
                                         onClick={() => handleDeleteProduct(product.id)}
-                                        className="p-2.5 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100 shrink-0"
+                                        className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                        title="Hapus Produk"
                                     >
-                                        <Trash2 className="w-5 h-5" />
+                                        <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Packages List */}
-                            <div className="p-4 md:p-6 bg-transparent">
-                                <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 pl-2">Packages Available</h4>
+                            <div className="p-4 md:p-5">
+                                <h4 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-3">Paket Tersedia</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                     {[...(product.packages || [])]
                                         .sort((a, b) => {
@@ -399,16 +415,16 @@ export default function AdminProducts() {
                                             return aPrice - bPrice;
                                         })
                                         .map(pkg => (
-                                        <div key={pkg.id} className="border border-white/60 rounded-xl p-3 flex justify-between items-center bg-white/40 hover:bg-white/60 transition-colors">
+                                        <div key={pkg.id} className="border border-slate-200 rounded-xl p-3 flex justify-between items-center bg-white hover:bg-slate-50/60 transition-colors">
                                             <div>
-                                                <p className="font-bold text-xs text-slate-900">{pkg.name}</p>
-                                                <p className="text-xs text-blue-600 font-bold">{formatCurrency(pkg.price)} <span className="text-slate-400 font-normal">• {pkg.duration}</span></p>
-                                                <p className="text-xs text-rose-500 font-bold">Modal: {formatCurrency(pkg.cost_price)}</p>
-                                                <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wide">{pkg.type}</p>
+                                                <p className="font-semibold text-xs text-slate-900">{pkg.name}</p>
+                                                <p className="text-xs text-blue-600 font-bold mt-0.5">{formatCurrency(pkg.price)} <span className="text-slate-400 font-normal">• {pkg.duration}</span></p>
+                                                <p className="text-[11px] text-slate-500 mt-0.5">Modal: <span className="text-rose-600 font-semibold">{formatCurrency(pkg.cost_price)}</span></p>
+                                                <p className="text-[10px] text-slate-400 mt-0.5 uppercase tracking-wide font-medium">{pkg.type}</p>
                                             </div>
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex flex-col items-center gap-1 mr-2">
-                                                    <label className="relative inline-flex items-center cursor-pointer scale-75">
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex flex-col items-center gap-0.5 mr-1">
+                                                    <label className="relative inline-flex items-center cursor-pointer">
                                                         <input type="checkbox" className="sr-only peer" checked={pkg.is_available ?? true} 
                                                             onChange={async (e) => {
                                                                 const newVal = e.target.checked;
@@ -423,32 +439,34 @@ export default function AdminProducts() {
                                                                 }
                                                             }}
                                                         />
-                                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                                        <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600"></div>
                                                     </label>
-                                                    <span className={`text-[8px] font-bold uppercase tracking-tighter ${pkg.is_available ?? true ? 'text-blue-600' : 'text-slate-400'}`}>
+                                                    <span className={`text-[9px] font-semibold uppercase ${pkg.is_available ?? true ? 'text-blue-600' : 'text-slate-400'}`}>
                                                         {pkg.is_available ?? true ? 'ON' : 'OFF'}
                                                     </span>
                                                 </div>
-                                                <div className="flex flex-col gap-1">
-                                                <button
-                                                    onClick={() => openEditPackageModal(product, pkg)}
-                                                    className="p-1.5 text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
-                                                >
-                                                    <Edit className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeletePackage(pkg.id, product.id)}
-                                                    className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
+                                                <div className="flex items-center gap-0.5">
+                                                    <button
+                                                        onClick={() => openEditPackageModal(product, pkg)}
+                                                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        title="Edit Paket"
+                                                    >
+                                                        <Edit className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeletePackage(pkg.id, product.id)}
+                                                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                        title="Hapus Paket"
+                                                    >
+                                                        <X className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
                                     {(!product.packages || product.packages.length === 0) && (
-                                        <div className="col-span-full text-center py-4 text-xs text-slate-400 italic">
-                                            No packages added yet.
+                                        <div className="col-span-full py-6 text-center text-xs text-slate-400">
+                                            Belum ada paket yang ditambahkan untuk produk ini.
                                         </div>
                                     )}
                                 </div>
@@ -457,8 +475,8 @@ export default function AdminProducts() {
                     ))}
 
                     {products.length === 0 && (
-                        <div className="text-center py-12 text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                            No products. Add your first product to start selling.
+                        <div className="py-16 text-center text-slate-400 text-sm bg-white border border-dashed border-slate-200 rounded-2xl">
+                            Belum ada produk. Klik &apos;Tambah Produk&apos; untuk mulai mengisi katalog.
                         </div>
                     )}
                 </div>
@@ -468,86 +486,81 @@ export default function AdminProducts() {
 
             {/* Add Product Modal */}
             {isProductModalOpen && (
-                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white/80 backdrop-blur-3xl rounded-[2rem] p-5 md:p-6 max-w-lg w-full shadow-2xl max-h-[85vh] overflow-y-auto border border-white/60">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xs font-black text-slate-900">New Product</h2>
-                            <button onClick={() => setIsProductModalOpen(false)} className="p-2 text-slate-400 hover:bg-white/50 rounded-full transition-colors">
-                                <X className="w-6 h-6" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+                    <div className="bg-white rounded-2xl border border-slate-200 p-6 max-w-lg w-full shadow-xl max-h-[85vh] overflow-y-auto">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-5">
+                            <h2 className="text-base font-bold text-slate-900">Tambah Produk Baru</h2>
+                            <button onClick={() => setIsProductModalOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <form onSubmit={handleCreateProduct} className="space-y-6">
-                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-4">Product Appearance</label>
-                                <div className="flex items-center gap-6">
+                        <form onSubmit={handleCreateProduct} className="space-y-4">
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-3">Logo / Gambar Produk</label>
+                                <div className="flex items-center gap-4">
                                     {imagePreview ? (
-                                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-white shadow-md group">
+                                        <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 group shrink-0">
                                             <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                                             <button
                                                 type="button"
                                                 onClick={() => { setImageFile(null); setImagePreview(null); }}
                                                 className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white"
                                             >
-                                                <X className="w-6 h-6" />
+                                                <X className="w-5 h-5" />
                                             </button>
                                         </div>
                                     ) : (
                                         <button
                                             type="button"
                                             onClick={() => setShowCropper(true)}
-                                            className="w-24 h-24 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 hover:border-blue-500 hover:text-blue-500 transition-all bg-white hover:bg-blue-50 group"
+                                            className="w-20 h-20 rounded-xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:border-blue-600 hover:text-blue-600 transition-colors bg-white shrink-0"
                                         >
-                                            <Plus className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                                            <span className="text-[8px] font-black mt-1 uppercase tracking-tighter">Upload</span>
+                                            <Plus className="w-5 h-5" />
+                                            <span className="text-[10px] font-semibold mt-1">Upload</span>
                                         </button>
                                     )}
                                     <div className="flex-1">
-                                        <h4 className="text-xs font-black text-slate-900 uppercase tracking-tight">Product Logo</h4>
-                                        <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">Gunakan gambar square (1:1) dengan resolusi tinggi untuk hasil terbaik.</p>
+                                        <h4 className="text-xs font-semibold text-slate-900">Format Gambar 1:1</h4>
+                                        <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Gunakan gambar persegi (square) resolusi tinggi untuk hasil terbaik di katalog.</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Kategori Produk</label>
-                                    <div className="relative">
-                                        <select
-                                            required
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs appearance-none cursor-pointer"
-                                            value={productForm.category_id}
-                                            onChange={e => setProductForm({ ...productForm, category_id: e.target.value })}
-                                        >
-                                            <option value="">Pilih Kategori</option>
-                                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                        </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                            <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-                                        </div>
-                                    </div>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Kategori Produk</label>
+                                    <select
+                                        required
+                                        className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors cursor-pointer"
+                                        value={productForm.category_id}
+                                        onChange={e => setProductForm({ ...productForm, category_id: e.target.value })}
+                                    >
+                                        <option value="">Pilih Kategori...</option>
+                                        {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                    </select>
                                 </div>
 
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Judul Layanan</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Judul Layanan</label>
                                     <input 
                                         required 
                                         type="text" 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
+                                        className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                         placeholder="Contoh: Netflix Premium 4K"
                                         value={productForm.title} 
                                         onChange={e => setProductForm({ ...productForm, title: e.target.value })} 
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div>
-                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Mulai Dari</label>
+                                        <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Harga Mulai Dari</label>
                                         <div className="relative">
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">Rp</span>
                                             <input 
                                                 required 
                                                 type="text" 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
+                                                className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                                 placeholder="0"
                                                 value={productForm.price.includes("Rp") ? productForm.price.replace("Rp ", "") : formatToIDR(productForm.price)} 
                                                 onChange={e => setProductForm({ ...productForm, price: formatToIDR(e.target.value) })} 
@@ -556,42 +569,37 @@ export default function AdminProducts() {
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Tag (Opsional)</label>
+                                            <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Tag (Opsional)</label>
                                             <input 
                                                 type="text" 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px]" 
+                                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                                 placeholder="PROMO"
                                                 value={productForm.tag} 
                                                 onChange={e => setProductForm({ ...productForm, tag: e.target.value })} 
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Warna Tag</label>
-                                            <div className="relative">
-                                                <select 
-                                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px] appearance-none cursor-pointer" 
-                                                    value={productForm.tag_color} 
-                                                    onChange={e => setProductForm({ ...productForm, tag_color: e.target.value as any })}
-                                                >
-                                                    <option value="yellow">Kuning</option>
-                                                    <option value="red">Merah</option>
-                                                    <option value="blue">Biru</option>
-                                                    <option value="purple">Ungu</option>
-                                                </select>
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                                    <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-                                                </div>
-                                            </div>
+                                            <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Warna Tag</label>
+                                            <select 
+                                                className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2.5 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors cursor-pointer" 
+                                                value={productForm.tag_color} 
+                                                onChange={e => setProductForm({ ...productForm, tag_color: e.target.value as any })}
+                                            >
+                                                <option value="yellow">Kuning</option>
+                                                <option value="red">Merah</option>
+                                                <option value="blue">Biru</option>
+                                                <option value="purple">Ungu</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="space-y-4 pt-2">
+                            <div className="space-y-3 pt-1">
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Deskripsi Produk</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Deskripsi Produk</label>
                                     <textarea 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs min-h-[120px] resize-none" 
+                                        className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors min-h-[90px] resize-none" 
                                         placeholder="Tuliskan deskripsi lengkap mengenai produk ini..."
                                         value={productForm.description} 
                                         onChange={e => setProductForm({ ...productForm, description: e.target.value })}
@@ -599,9 +607,9 @@ export default function AdminProducts() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Syarat & Ketentuan (Opsional)</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Syarat & Ketentuan (Opsional)</label>
                                     <textarea 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs min-h-[100px] resize-none" 
+                                        className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors min-h-[80px] resize-none" 
                                         placeholder="Syarat, garansi, atau kebijakan lainnya..."
                                         value={productForm.terms_conditions} 
                                         onChange={e => setProductForm({ ...productForm, terms_conditions: e.target.value })}
@@ -612,61 +620,55 @@ export default function AdminProducts() {
                             <button 
                                 type="submit" 
                                 disabled={isSubmitting} 
-                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-900/20 flex items-center justify-center gap-3 disabled:opacity-50 group active:scale-[0.98]"
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2.5 text-xs font-semibold transition-colors flex items-center justify-center gap-2 mt-4 disabled:opacity-50"
                             >
                                 {isSubmitting ? (
-                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                    <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (
                                     <>
                                         <span>Konfirmasi & Tambah Produk</span>
-                                        <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                                        <Plus className="w-4 h-4" />
                                     </>
                                 )}
                             </button>
                         </form>
-
                     </div>
                 </div>
             )}
 
             {/* Edit Product Modal */}
             {isEditModalOpen && editingProduct && (
-                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white/80 backdrop-blur-3xl rounded-[2rem] border border-white/60 p-5 md:p-6 max-w-md w-full shadow-2xl max-h-[85vh] overflow-y-auto">
-                        <div className="flex items-center justify-between mb-6">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+                    <div className="bg-white rounded-2xl border border-slate-200 p-6 max-w-lg w-full shadow-xl max-h-[85vh] overflow-y-auto">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-5">
                             <div>
-                                <h2 className="text-sm font-black text-slate-900">Edit Product</h2>
-                                <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">{editingProduct.title}</p>
+                                <h2 className="text-base font-bold text-slate-900">Edit Produk</h2>
+                                <p className="text-xs text-slate-500">{editingProduct.title}</p>
                             </div>
-                            <button onClick={() => setIsEditModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
-                                <X className="w-6 h-6" />
+                            <button onClick={() => setIsEditModalOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <form onSubmit={handleUpdateProduct} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
+                        <form onSubmit={handleUpdateProduct} className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Kategori Produk</label>
-                                    <div className="relative">
-                                        <select
-                                            required
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs appearance-none cursor-pointer"
-                                            value={editForm.category_id}
-                                            onChange={e => setEditForm({ ...editForm, category_id: e.target.value })}
-                                        >
-                                            <option value="">Pilih Kategori</option>
-                                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                        </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                            <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-                                        </div>
-                                    </div>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Kategori Produk</label>
+                                    <select
+                                        required
+                                        className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors cursor-pointer"
+                                        value={editForm.category_id}
+                                        onChange={e => setEditForm({ ...editForm, category_id: e.target.value })}
+                                    >
+                                        <option value="">Pilih Kategori...</option>
+                                        {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                    </select>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Judul Layanan</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Judul Layanan</label>
                                     <input 
                                         required 
                                         type="text" 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
+                                        className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                         placeholder="Contoh: Netflix Premium 4K"
                                         value={editForm.title} 
                                         onChange={e => setEditForm({ ...editForm, title: e.target.value })} 
@@ -674,15 +676,15 @@ export default function AdminProducts() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Mulai Dari</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Harga Mulai Dari</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">Rp</span>
                                         <input 
                                             required 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
+                                            className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                             placeholder="0"
                                             value={editForm.price.includes("Rp") ? editForm.price.replace("Rp ", "") : formatToIDR(editForm.price)} 
                                             onChange={e => setEditForm({ ...editForm, price: formatToIDR(e.target.value) })} 
@@ -691,70 +693,63 @@ export default function AdminProducts() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Tag (Opsional)</label>
+                                        <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Tag (Opsional)</label>
                                         <input 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px]" 
+                                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                             placeholder="PROMO"
                                             value={editForm.tag} 
                                             onChange={e => setEditForm({ ...editForm, tag: e.target.value })} 
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Warna Tag</label>
-                                        <div className="relative">
-                                            <select 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px] appearance-none cursor-pointer" 
-                                                value={editForm.tag_color} 
-                                                onChange={e => setEditForm({ ...editForm, tag_color: e.target.value as any })}
-                                            >
-                                                <option value="yellow">Kuning</option>
-                                                <option value="red">Merah</option>
-                                                <option value="blue">Biru</option>
-                                                <option value="purple">Ungu</option>
-                                            </select>
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-                                            </div>
-                                        </div>
+                                        <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Warna Tag</label>
+                                        <select 
+                                            className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2.5 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors cursor-pointer" 
+                                            value={editForm.tag_color} 
+                                            onChange={e => setEditForm({ ...editForm, tag_color: e.target.value as any })}
+                                        >
+                                            <option value="yellow">Kuning</option>
+                                            <option value="red">Merah</option>
+                                            <option value="blue">Biru</option>
+                                            <option value="purple">Ungu</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-4">URL Gambar Produk</label>
-                                <div className="flex items-center gap-4 group">
-                                    <div className="flex-1">
-                                        <input 
-                                            type="text" 
-                                            className="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
-                                            placeholder="https://example.com/image.jpg"
-                                            value={editForm.image_url} 
-                                            onChange={e => setEditForm({ ...editForm, image_url: e.target.value })} 
-                                        />
-                                    </div>
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-2">URL Gambar Produk</label>
+                                <div className="flex items-center gap-3">
+                                    <input 
+                                        type="text" 
+                                        className="flex-1 bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
+                                        placeholder="https://example.com/image.jpg"
+                                        value={editForm.image_url} 
+                                        onChange={e => setEditForm({ ...editForm, image_url: e.target.value })} 
+                                    />
                                     {editForm.image_url && (
-                                        <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-white shadow-sm shrink-0">
+                                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shrink-0">
                                             <img src={editForm.image_url} className="w-full h-full object-cover" alt="preview" />
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="space-y-4 pt-2">
+                            <div className="space-y-3 pt-1">
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Deskripsi Produk</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Deskripsi Produk</label>
                                     <textarea 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs min-h-[120px] resize-none" 
+                                        className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors min-h-[90px] resize-none" 
                                         placeholder="Deskripsi lengkap produk..."
                                         value={editForm.description} 
                                         onChange={e => setEditForm({ ...editForm, description: e.target.value })}
                                     ></textarea>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Syarat & Ketentuan (Opsional)</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Syarat & Ketentuan (Opsional)</label>
                                     <textarea 
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs min-h-[100px] resize-none" 
+                                        className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors min-h-[80px] resize-none" 
                                         placeholder="Syarat, garansi, atau kebijakan lainnya..."
                                         value={editForm.terms_conditions} 
                                         onChange={e => setEditForm({ ...editForm, terms_conditions: e.target.value })}
@@ -765,58 +760,57 @@ export default function AdminProducts() {
                             <button 
                                 type="submit" 
                                 disabled={isSubmitting} 
-                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-900/20 flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98]"
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2.5 text-xs font-semibold transition-colors flex items-center justify-center gap-2 mt-4 disabled:opacity-50"
                             >
                                 {isSubmitting ? (
-                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                    <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (
                                     <>
-                                        <Save className="w-5 h-5" />
+                                        <Save className="w-4 h-4" />
                                         <span>Simpan Perubahan Produk</span>
                                     </>
                                 )}
                             </button>
                         </form>
-
                     </div>
                 </div>
             )}
 
-            {/* Add Package Modal */}
+            {/* Add / Edit Package Modal */}
             {isPackageModalOpen && selectedProduct && (
-                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white rounded-3xl p-5 max-w-sm w-full shadow-2xl max-h-[85vh] overflow-y-auto">
-                        <div className="flex items-center justify-between mb-6">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+                    <div className="bg-white rounded-2xl border border-slate-200 p-6 max-w-sm w-full shadow-xl max-h-[85vh] overflow-y-auto">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-5">
                             <div>
-                                <h2 className="text-sm font-black text-slate-900">{editingPackage ? "Edit Package" : "Add Package"}</h2>
-                                <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">For {selectedProduct.title}</p>
+                                <h2 className="text-base font-bold text-slate-900">{editingPackage ? "Edit Paket" : "Tambah Paket"}</h2>
+                                <p className="text-xs text-slate-500">{selectedProduct.title}</p>
                             </div>
-                            <button onClick={() => setIsPackageModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full">
-                                <X className="w-6 h-6" />
+                            <button onClick={() => setIsPackageModalOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <form onSubmit={handleCreatePackage} className="space-y-6">
+                        <form onSubmit={handleCreatePackage} className="space-y-4">
                             <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Nama Paket</label>
+                                <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Nama Paket</label>
                                 <input 
                                     required 
                                     type="text" 
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
+                                    className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                     placeholder="Contoh: 1 Bulan Sharing"
                                     value={packageForm.name} 
                                     onChange={e => setPackageForm({ ...packageForm, name: e.target.value })} 
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Jual</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Harga Jual</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">Rp</span>
                                         <input 
                                             required 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
+                                            className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                             placeholder="0"
                                             value={formatToIDR(packageForm.price)} 
                                             onChange={e => setPackageForm({ ...packageForm, price: formatToIDR(e.target.value) })} 
@@ -824,13 +818,13 @@ export default function AdminProducts() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Modal</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Harga Modal</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">Rp</span>
                                         <input 
                                             required 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
+                                            className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                             placeholder="0"
                                             value={formatToIDR(packageForm.cost_price)} 
                                             onChange={e => setPackageForm({ ...packageForm, cost_price: formatToIDR(e.target.value) })} 
@@ -839,15 +833,15 @@ export default function AdminProducts() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Harga Reseller</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Harga Reseller</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">Rp</span>
                                         <input 
                                             required 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs" 
+                                            className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                             placeholder="0"
                                             value={formatToIDR(packageForm.reseller_price)} 
                                             onChange={e => setPackageForm({ ...packageForm, reseller_price: formatToIDR(e.target.value) })} 
@@ -855,12 +849,12 @@ export default function AdminProducts() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">Durasi / Tipe</label>
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Durasi / Tipe</label>
+                                    <div className="grid grid-cols-2 gap-1.5">
                                         <input 
                                             required 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px]" 
+                                            className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                             placeholder="30 Hari"
                                             value={packageForm.duration} 
                                             onChange={e => setPackageForm({ ...packageForm, duration: e.target.value })} 
@@ -868,7 +862,7 @@ export default function AdminProducts() {
                                         <input 
                                             required 
                                             type="text" 
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-[11px]" 
+                                            className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors" 
                                             placeholder="Sharing"
                                             value={packageForm.type} 
                                             onChange={e => setPackageForm({ ...packageForm, type: e.target.value })} 
@@ -877,23 +871,23 @@ export default function AdminProducts() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input 
                                         type="checkbox" 
                                         className="sr-only peer" 
                                         checked={packageForm.is_available} 
                                         onChange={e => setPackageForm({ ...packageForm, is_available: e.target.checked })} />
-                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                                 </label>
-                                <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">Paket Tersedia (ON/OFF)</span>
+                                <span className="text-xs font-semibold text-slate-700">Paket Tersedia (ON/OFF)</span>
                             </div>
 
                             {/* S&K Khusus Paket */}
-                            <div className="space-y-4">
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider ml-1">Syarat & Ketentuan Khusus (Opsional)</label>
+                            <div>
+                                <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Syarat & Ketentuan Khusus (Opsional)</label>
                                 <textarea 
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs resize-none" 
+                                    className="w-full bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors resize-none" 
                                     placeholder="Contoh: Pesanan akan diproses melalui WhatsApp..."
                                     rows={3}
                                     value={packageForm.terms_and_conditions}
@@ -902,13 +896,13 @@ export default function AdminProducts() {
                             </div>
 
                             {/* Features Input */}
-                            <div className="space-y-4">
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider ml-1">Fitur & Keunggulan</label>
+                            <div className="space-y-2">
+                                <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider">Fitur & Keunggulan</label>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
-                                        className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-xs"
-                                        placeholder="Tambah fitur (Contoh: Garansi Full)"
+                                        className="flex-1 bg-white border border-slate-200 rounded-lg px-3.5 py-2 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+                                        placeholder="Tambah fitur (Garansi Full)"
                                         id="feature-input"
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
@@ -925,32 +919,32 @@ export default function AdminProducts() {
                                         type="button"
                                         onClick={() => {
                                             const input = document.getElementById('feature-input') as HTMLInputElement;
-                                            const val = input.value.trim();
+                                            const val = input?.value.trim();
                                             if (val) {
                                                 setPackageForm(prev => ({ ...prev, features: [...prev.features, val] }));
                                                 input.value = "";
                                             }
                                         }}
-                                        className="bg-blue-50 hover:bg-blue-100 text-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center transition-colors shrink-0 border border-blue-100"
+                                        className="bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 rounded-lg flex items-center justify-center transition-colors border border-blue-100"
                                     >
-                                        <Plus className="w-6 h-6" />
+                                        <Plus className="w-4 h-4" />
                                     </button>
                                 </div>
-                                <div className="grid grid-cols-1 gap-2">
+                                <div className="space-y-1.5 max-h-36 overflow-y-auto">
                                     {packageForm.features.map((feat, idx) => (
-                                        <div key={idx} className="flex items-center justify-between bg-white border border-slate-100 rounded-xl px-4 py-3 shadow-sm group">
-                                            <span className="text-xs font-bold text-slate-700">{feat}</span>
+                                        <div key={idx} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
+                                            <span className="text-xs font-medium text-slate-700">{feat}</span>
                                             <button
                                                 type="button"
                                                 onClick={() => setPackageForm(prev => ({ ...prev, features: prev.features.filter((_, i) => i !== idx) }))}
-                                                className="text-slate-300 hover:text-red-500 transition-colors"
+                                                className="text-slate-400 hover:text-rose-600 transition-colors"
                                             >
-                                                <X className="w-5 h-5" />
+                                                <X className="w-3.5 h-3.5" />
                                             </button>
                                         </div>
                                     ))}
                                     {packageForm.features.length === 0 && (
-                                        <p className="text-[10px] text-slate-400 italic text-center py-2">Belum ada fitur ditambahkan. Tekan Enter untuk menambah.</p>
+                                        <p className="text-[11px] text-slate-400 italic text-center py-1">Belum ada fitur. Tekan Enter untuk menambah.</p>
                                     )}
                                 </div>
                             </div>
@@ -958,14 +952,14 @@ export default function AdminProducts() {
                             <button 
                                 type="submit" 
                                 disabled={isSubmitting} 
-                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-900/20 flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98]"
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2.5 text-xs font-semibold transition-colors flex items-center justify-center gap-2 mt-4 disabled:opacity-50"
                             >
                                 {isSubmitting ? (
-                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                    <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (
                                     <>
                                         <span>{editingPackage ? "Simpan Perubahan Paket" : "Tambah Paket Ke Produk"}</span>
-                                        {!editingPackage && <Plus className="w-5 h-5" />}
+                                        {!editingPackage && <Plus className="w-4 h-4" />}
                                     </>
                                 )}
                             </button>
@@ -973,7 +967,6 @@ export default function AdminProducts() {
                     </div>
                 </div>
             )}
-
 
             {showCropper && (
                 <ImageCropper
