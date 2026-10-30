@@ -74,26 +74,26 @@ export default function LiveSalesNotification() {
 
     return (
         <div 
-            className={`fixed bottom-24 left-4 md:bottom-6 md:left-6 z-[100] max-w-[280px] md:max-w-[300px] w-full transition-all duration-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}
+            className={`fixed bottom-24 left-4 md:bottom-6 md:left-6 z-[100] max-w-[280px] md:max-w-[310px] w-full transition-all duration-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'}`}
         >
-            <div className="bg-white/90 backdrop-blur-md border border-slate-100 shadow-2xl rounded-2xl p-3 flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0.5">
-                    <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
-                        <CheckCircle2 className="w-5 h-5" />
+            <div className="bg-white border border-slate-200 shadow-lg rounded-xl p-3 flex items-start gap-3 relative">
+                <div className="shrink-0 mt-0.5">
+                    <div className="size-7 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center border border-emerald-100">
+                        <CheckCircle2 className="size-4" />
                     </div>
                 </div>
                 <div className="flex-1 min-w-0 pr-4">
-                    <p className="text-xs text-slate-500 font-medium">Seseorang baru saja membeli</p>
-                    <p className="text-sm font-black text-slate-900 leading-tight mt-0.5">
-                        <span className="text-blue-600">{currentOrder.customer_name}</span> membeli {currentOrder.package_name} {currentOrder.product_name}
+                    <p className="text-[11px] text-slate-400 font-medium">Pembelian Berhasil</p>
+                    <p className="text-xs font-semibold text-slate-900 leading-snug mt-0.5">
+                        <span className="text-blue-600 font-bold">{currentOrder.customer_name}</span> membeli {currentOrder.package_name} {currentOrder.product_name}
                     </p>
-                    <p className="text-[10px] text-slate-400 mt-1 font-bold">Beberapa saat yang lalu</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Baru saja</p>
                 </div>
                 <button 
                     onClick={() => setIsVisible(false)}
-                    className="absolute top-2 right-2 text-slate-400 hover:text-slate-600 transition-colors"
+                    className="absolute top-2 right-2 text-slate-400 hover:text-slate-600 p-0.5 rounded transition-colors"
                 >
-                    <X className="w-4 h-4" />
+                    <X className="size-3.5" />
                 </button>
             </div>
         </div>

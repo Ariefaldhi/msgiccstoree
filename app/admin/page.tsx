@@ -111,54 +111,60 @@ export default function AdminDashboard() {
     }, []);
 
     return (
-        <div className="space-y-8 pb-12">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end pb-4 border-b border-slate-100 gap-4">
+        <div className="space-y-6 pb-12">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-5 border-b border-slate-200 gap-4">
                 <div>
-                    <h1 className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-3">
-                        <TrendingUp className="w-5 md:w-6 h-5 md:h-6 text-blue-600" />
+                    <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
+                        <TrendingUp className="w-6 h-6 text-blue-600" />
                         Admin Analytics
                     </h1>
-                    <p className="text-slate-500 font-medium mt-1 text-[10px]">Laporan Keuangan & Performa Bisnis Real-time.</p>
+                    <p className="text-slate-500 text-xs md:text-sm mt-0.5">Laporan keuangan & performa bisnis real-time.</p>
                 </div>
-                <div className="flex flex-row items-center gap-3">
+                <div className="flex flex-row items-center gap-2.5">
                     <button 
                         onClick={() => setIsCensored(!isCensored)} 
-                        className="bg-slate-50 hover:bg-slate-100 p-2 rounded-xl border border-slate-200 transition-colors text-slate-500 flex items-center justify-center shadow-sm"
+                        className="bg-white hover:bg-slate-50 p-2 rounded-lg border border-slate-200 transition-colors text-slate-600 flex items-center justify-center shadow-xs"
                         title={isCensored ? "Tampilkan Nominal" : "Sembunyikan Nominal"}
                     >
                         {isCensored ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
-                    <div className="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 flex items-center gap-2 text-xs font-bold text-slate-500 w-fit">
-                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <div className="bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 flex items-center gap-2 text-xs font-semibold text-emerald-700">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         Sistem Operasional Normal
                     </div>
                 </div>
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center p-20">
-                    <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
-                    <p className="text-xs font-bold text-slate-400 animate-pulse uppercase tracking-widest">Menganalisa Data Keuangan...</p>
+                <div className="flex flex-col items-center justify-center p-20 bg-white border border-slate-200/80 rounded-2xl">
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Menganalisa Data Keuangan...</p>
                 </div>
             ) : (
                 <>
                     {/* Key Metrics Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
                             { label: "Total Omset", value: stats.revenue, icon: DollarSign, color: "blue", trend: "+12%" },
                             { label: "Profit Bersih", value: stats.profit, icon: TrendingUp, color: "emerald", trend: "+8%" },
                             { label: "Modal Keluar", value: stats.cost, icon: TrendingDown, color: "rose", trend: "-2%" },
                             { label: "Potongan Komisi", value: stats.commission, icon: PieChart, color: "purple", trend: "+5%" },
                         ].map((stat, idx) => (
-                            <div key={idx} className="group bg-white/60 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/60 shadow-sm hover:shadow-md hover:bg-white/80 transition-all duration-300 relative overflow-hidden">
-                                <div className={`absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full bg-${stat.color}-50 opacity-50 group-hover:scale-110 transition-transform`}></div>
-                                <div className={`bg-${stat.color}-50 w-10 h-10 rounded-2xl flex items-center justify-center mb-4`}>
-                                    <stat.icon className={`w-5 h-5 text-${stat.color}-600`} />
+                            <div key={idx} className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:border-slate-300 transition-colors">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{stat.label}</span>
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                        stat.color === 'blue' ? 'bg-blue-50 text-blue-600' :
+                                        stat.color === 'emerald' ? 'bg-emerald-50 text-emerald-600' :
+                                        stat.color === 'rose' ? 'bg-rose-50 text-rose-600' :
+                                        'bg-purple-50 text-purple-600'
+                                    }`}>
+                                        <stat.icon className="w-4 h-4" />
+                                    </div>
                                 </div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                                <div className="flex items-end justify-between">
-                                    <h3 className="text-sm font-black text-slate-900 tracking-tight">{displayMoney(stat.value)}</h3>
-                                    <div className={`flex items-center gap-0.5 text-[9px] font-black px-2 py-1 rounded-full ${stat.trend.startsWith('+') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                                <div className="flex items-baseline justify-between gap-2">
+                                    <h3 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight">{displayMoney(stat.value)}</h3>
+                                    <div className={`flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full ${stat.trend.startsWith('+') ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
                                         {stat.trend.startsWith('+') ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                                         {stat.trend}
                                     </div>
@@ -167,22 +173,22 @@ export default function AdminDashboard() {
                         ))}
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Main Trend Chart */}
-                        <div className="lg:col-span-2 bg-white/60 backdrop-blur-3xl p-6 md:p-8 rounded-[2rem] border border-white/60 shadow-sm">
-                            <div className="flex items-center justify-between mb-8">
+                        <div className="lg:col-span-2 bg-white p-5 md:p-6 rounded-2xl border border-slate-200/90 shadow-xs">
+                            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
                                 <div>
-                                    <h3 className="text-sm font-black text-slate-900 tracking-tight">Tren Pendapatan</h3>
-                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Statistik 14 Hari Terakhir</p>
+                                    <h3 className="text-sm font-bold text-slate-900">Tren Pendapatan</h3>
+                                    <p className="text-xs text-slate-500 mt-0.5">Statistik performa 14 hari terakhir</p>
                                 </div>
                                 <div className="flex gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                                        <span className="text-[10px] font-black text-slate-500 uppercase">Omset</span>
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
+                                        <span className="text-xs font-medium text-slate-600">Omset</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                                        <span className="text-[10px] font-black text-slate-500 uppercase">Profit</span>
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                                        <span className="text-xs font-medium text-slate-600">Profit</span>
                                     </div>
                                 </div>
                             </div>
@@ -191,47 +197,46 @@ export default function AdminDashboard() {
 
                         {/* Top Products & Order Stats */}
                         <div className="space-y-6">
-                            <div className="bg-white/60 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/60 shadow-sm">
-                                <h3 className="text-sm font-black text-slate-900 tracking-tight mb-6">Produk Terlaris</h3>
+                            <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs">
+                                <h3 className="text-sm font-bold text-slate-900 mb-4 pb-3 border-b border-slate-100">Produk Terlaris</h3>
                                 <TopProductsChart data={topProducts} />
                             </div>
 
-                            <div className="bg-slate-900/80 backdrop-blur-3xl p-6 rounded-[2rem] border border-slate-800 text-white overflow-hidden relative group">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500 opacity-20 blur-[80px] -mr-16 -mt-16 group-hover:opacity-30 transition-opacity"></div>
-                                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Informasi Pesanan</h3>
-                                <div className="space-y-6">
+                            <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 text-white shadow-xs">
+                                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">Informasi Pesanan</h3>
+                                <div className="space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
-                                                <ShoppingBag className="w-5 h-5 text-blue-400" />
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center">
+                                                <ShoppingBag className="w-4 h-4 text-blue-400" />
                                             </div>
-                                            <span className="text-xs font-bold text-slate-300">Total Transaksi</span>
+                                            <span className="text-xs font-medium text-slate-300">Total Transaksi</span>
                                         </div>
-                                        <span className="text-sm font-black">{stats.totalOrders}</span>
+                                        <span className="text-sm font-bold">{stats.totalOrders}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
-                                                <Package className="w-5 h-5 text-orange-400" />
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center">
+                                                <Package className="w-4 h-4 text-orange-400" />
                                             </div>
-                                            <span className="text-xs font-bold text-slate-300">Pesanan Aktif</span>
+                                            <span className="text-xs font-medium text-slate-300">Pesanan Aktif</span>
                                         </div>
-                                        <span className="text-sm font-black text-orange-400">{stats.activeOrders}</span>
+                                        <span className="text-sm font-bold text-orange-400">{stats.activeOrders}</span>
                                     </div>
-                                    <Link href="/admin/withdrawals" className="flex items-center justify-between group/wd hover:bg-slate-800/50 p-2 -m-2 rounded-xl transition-all">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
-                                                <Wallet className="w-5 h-5 text-purple-400" />
+                                    <Link href="/admin/withdrawals" className="flex items-center justify-between group/wd hover:bg-slate-800/60 p-2 -m-2 rounded-lg transition-colors">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center">
+                                                <Wallet className="w-4 h-4 text-purple-400" />
                                             </div>
-                                            <span className="text-xs font-bold text-slate-300">Tarik Saldo Pending</span>
+                                            <span className="text-xs font-medium text-slate-300">Tarik Saldo Pending</span>
                                         </div>
-                                        <span className={`text-sm font-black ${stats.pendingWithdrawals > 0 ? 'text-purple-400 animate-pulse' : 'text-slate-500'}`}>
+                                        <span className={`text-sm font-bold ${stats.pendingWithdrawals > 0 ? 'text-purple-400' : 'text-slate-500'}`}>
                                             {stats.pendingWithdrawals}
                                         </span>
                                     </Link>
-                                    <div className="flex items-center gap-2 mt-4 pt-6 border-t border-slate-800">
-                                        <Users className="w-4 h-4 text-slate-500" />
-                                        <p className="text-[10px] font-bold text-slate-500 uppercase">Data diperbarui otomatis</p>
+                                    <div className="flex items-center gap-2 pt-3 border-t border-slate-800">
+                                        <Users className="w-3.5 h-3.5 text-slate-500" />
+                                        <p className="text-[10px] font-medium text-slate-400">Data diperbarui otomatis</p>
                                     </div>
                                 </div>
                             </div>
@@ -239,13 +244,13 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Daily Financial Report */}
-                    <div className="bg-white/60 backdrop-blur-3xl rounded-[2rem] border border-white/60 shadow-sm overflow-hidden">
-                        <div className="p-6 md:p-8 border-b border-white/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+                        <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                             <div>
-                                <h3 className="text-sm font-black text-slate-900 tracking-tight">Laporan Harian</h3>
-                                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Rincian Keuangan Per Hari</p>
+                                <h3 className="text-sm font-bold text-slate-900">Laporan Harian</h3>
+                                <p className="text-xs text-slate-500 mt-0.5">Rincian performa keuangan per hari</p>
                             </div>
-                            <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-emerald-100">
+                            <div className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold border border-emerald-100">
                                 Update Real-time
                             </div>
                         </div>
@@ -254,34 +259,34 @@ export default function AdminDashboard() {
                         <div className="hidden md:block overflow-x-auto">
                             <table className="w-full text-left text-xs whitespace-nowrap">
                                 <thead>
-                                    <tr className="bg-white/40 border-b border-white/50 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                                        <th className="p-3">Tanggal</th>
-                                        <th className="p-3">Pesanan Selesai</th>
-                                        <th className="p-3">Omset (Revenue)</th>
-                                        <th className="p-3 text-rose-500">Modal (Cost)</th>
-                                        <th className="p-3 text-purple-600">Komisi</th>
-                                        <th className="p-3 text-emerald-600">Laba (Profit)</th>
+                                    <tr className="bg-slate-50/80 border-b border-slate-100 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                                        <th className="px-4 py-3">Tanggal</th>
+                                        <th className="px-4 py-3">Pesanan</th>
+                                        <th className="px-4 py-3">Omset (Revenue)</th>
+                                        <th className="px-4 py-3 text-rose-600">Modal (Cost)</th>
+                                        <th className="px-4 py-3 text-purple-600">Komisi</th>
+                                        <th className="px-4 py-3 text-emerald-600">Laba (Profit)</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-white/40">
+                                <tbody className="divide-y divide-slate-100">
                                     {(stats.dailyReport || []).slice(0, 14).map((day, i) => (
-                                        <tr key={i} className="hover:bg-white/60 transition-colors">
-                                            <td className="p-3 font-bold text-slate-900">{day.date}</td>
-                                            <td className="p-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs">
+                                        <tr key={i} className="hover:bg-slate-50/60 transition-colors">
+                                            <td className="px-4 py-3 font-semibold text-slate-900">{day.date}</td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-bold text-xs">
                                                         {day.orders}
-                                                    </div>
-                                                    <span className="text-xs font-bold text-slate-500 uppercase">Trx</span>
+                                                    </span>
+                                                    <span className="text-[11px] text-slate-500">trx</span>
                                                 </div>
                                             </td>
-                                            <td className="p-3 font-black text-slate-900">{displayMoney(day.revenue)}</td>
-                                            <td className="p-3 font-bold text-rose-500">{displayMoney(day.cost)}</td>
-                                            <td className="p-3 font-bold text-purple-600">{displayMoney(day.commission)}</td>
-                                            <td className="p-3">
+                                            <td className="px-4 py-3 font-bold text-slate-900">{displayMoney(day.revenue)}</td>
+                                            <td className="px-4 py-3 font-medium text-rose-600">{displayMoney(day.cost)}</td>
+                                            <td className="px-4 py-3 font-medium text-purple-600">{displayMoney(day.commission)}</td>
+                                            <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-black text-emerald-600 text-sm">{displayMoney(day.profit)}</span>
-                                                    <span className="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-black">
+                                                    <span className="font-bold text-emerald-600 text-xs">{displayMoney(day.profit)}</span>
+                                                    <span className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-semibold border border-emerald-100">
                                                         {day.revenue > 0 ? ((day.profit / day.revenue) * 100).toFixed(0) : 0}%
                                                     </span>
                                                 </div>
@@ -293,34 +298,31 @@ export default function AdminDashboard() {
                         </div>
 
                         {/* Mobile View Cards */}
-                        <div className="md:hidden space-y-4 p-4 bg-transparent">
+                        <div className="md:hidden space-y-3 p-4 bg-slate-50/50">
                             {(stats.dailyReport || []).slice(0, 10).map((day, i) => (
-                                <div key={i} className="bg-white/60 backdrop-blur-xl rounded-[2rem] p-5 border border-white/60 shadow-sm">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h4 className="font-black text-slate-900 text-xs">{day.date}</h4>
-                                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase">
-                                            {day.orders} TRXS
-                                        </div>
+                                <div key={i} className="bg-white rounded-xl p-4 border border-slate-200/90 shadow-xs">
+                                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                                        <h4 className="font-bold text-slate-900 text-xs">{day.date}</h4>
+                                        <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md text-[10px] font-bold">
+                                            {day.orders} TRANSAKSI
+                                        </span>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-3 mb-4">
-                                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-center">
-                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Pemasukan</span>
-                                            <p className="font-black text-slate-900 text-xs">{displayMoney(day.revenue)}</p>
+                                    <div className="grid grid-cols-2 gap-2 text-xs">
+                                        <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                                            <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider block">Omset</span>
+                                            <p className="font-bold text-slate-900 mt-0.5">{displayMoney(day.revenue)}</p>
                                         </div>
-                                        <div className="p-3 bg-rose-50 rounded-xl border border-rose-100 flex flex-col justify-center">
-                                            <span className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mb-1">Modal</span>
-                                            <p className="font-black text-rose-500 text-xs">{displayMoney(day.cost)}</p>
+                                        <div className="p-2.5 bg-rose-50/60 rounded-lg border border-rose-100">
+                                            <span className="text-[10px] text-rose-500 font-medium uppercase tracking-wider block">Modal</span>
+                                            <p className="font-bold text-rose-600 mt-0.5">{displayMoney(day.cost)}</p>
                                         </div>
-                                        <div className="p-3 bg-purple-50 rounded-xl border border-purple-100 flex flex-col justify-center">
-                                            <span className="text-[10px] text-purple-500 font-bold uppercase tracking-widest mb-1">Komisi</span>
-                                            <p className="font-black text-purple-600 text-xs">{displayMoney(day.commission)}</p>
+                                        <div className="p-2.5 bg-purple-50/60 rounded-lg border border-purple-100">
+                                            <span className="text-[10px] text-purple-500 font-medium uppercase tracking-wider block">Komisi</span>
+                                            <p className="font-bold text-purple-600 mt-0.5">{displayMoney(day.commission)}</p>
                                         </div>
-                                        <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex flex-col justify-center">
-                                            <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mb-1">Profit</span>
-                                            <div className="flex items-center gap-1.5 mt-0.5">
-                                                <TrendingUp className="w-3 h-3 text-emerald-500" />
-                                                <p className="font-black text-emerald-600 text-xs">{displayMoney(day.profit)}</p>
-                                            </div>
+                                        <div className="p-2.5 bg-emerald-50/60 rounded-lg border border-emerald-100">
+                                            <span className="text-[10px] text-emerald-600 font-medium uppercase tracking-wider block">Profit</span>
+                                            <p className="font-bold text-emerald-700 mt-0.5">{displayMoney(day.profit)}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -328,7 +330,7 @@ export default function AdminDashboard() {
                         </div>
 
                         {(stats.dailyReport || []).length === 0 && (
-                            <div className="p-12 text-center text-slate-400 font-medium italic">Belum ada data keuangan untuk ditampilkan.</div>
+                            <div className="p-12 text-center text-slate-400 font-medium">Belum ada data keuangan untuk ditampilkan.</div>
                         )}
                     </div>
                 </>

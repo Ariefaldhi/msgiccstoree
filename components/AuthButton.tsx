@@ -48,10 +48,10 @@ export default function AuthButton() {
         return (
             <Link
                 href="/login"
-                className="hidden md:flex items-center gap-2 bg-blue-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_theme(colors.blue.700)] hover:shadow-[0_3px_0_theme(colors.blue.700)] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-blue-500"
+                className="hidden md:inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-semibold text-xs transition-colors shadow-xs"
             >
                 <User className="w-4 h-4" />
-                <span>Login</span>
+                <span>Masuk</span>
             </Link>
         );
     }
@@ -60,24 +60,23 @@ export default function AuthButton() {
         <div className="flex items-center gap-2">
             <Link
                 href="/profile"
-                className="hidden md:flex items-center gap-2 bg-slate-100 text-slate-800 px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_6px_0_#cbd5e1] hover:shadow-[0_3px_0_#cbd5e1] hover:translate-y-[3px] active:shadow-none active:translate-y-[6px] transition-all border-2 border-slate-100"
+                className="hidden md:inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl font-semibold text-xs transition-colors border border-slate-200/80"
             >
-                <User className="w-4 h-4" />
+                <User className="w-4 h-4 text-slate-500" />
                 <span>Profil</span>
             </Link>
             {profile?.role === 'admin' && (
                 <Link
                     href="/admin"
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 md:px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm shadow-[0_4px_0_theme(colors.blue.800)] md:shadow-[0_6px_0_theme(colors.blue.800)] hover:shadow-[0_2px_0_theme(colors.blue.800)] md:hover:shadow-[0_3px_0_theme(colors.blue.800)] hover:translate-y-[2px] md:hover:translate-y-[3px] active:shadow-none active:translate-y-[4px] md:active:translate-y-[6px] transition-all border-2 border-blue-600"
+                    className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-xl font-semibold text-xs transition-colors shadow-xs"
                 >
-                    <LayoutDashboard className="w-4 h-4" />
-                    <span className="hidden sm:inline">Dashboard</span>
-                    <span className="sm:hidden text-[10px]">ADMIN</span>
+                    <LayoutDashboard className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Admin</span>
                 </Link>
             )}
             <button
                 onClick={handleLogout}
-                className="p-2.5 rounded-xl bg-red-50 text-red-500 shadow-[0_4px_0_theme(colors.red.200)] hover:shadow-[0_2px_0_theme(colors.red.200)] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all border-2 border-red-50"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200/80 transition-colors"
                 title="Logout"
             >
                 <LogOut className="w-4 h-4" />

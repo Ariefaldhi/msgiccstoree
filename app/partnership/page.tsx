@@ -1,6 +1,6 @@
 "use client";
 
-import { Handshake, ArrowRight, CheckCircle2, Megaphone, Zap, Globe, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2, Zap, Globe, ShieldCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -16,104 +16,83 @@ export default function PartnershipPage() {
         fetchSettings();
     }, []);
 
-    const waText = "Halo Admin MsgiccStore, saya tertarik dengan program Partnership Elite. Saya ingin bekerja sama khususnya untuk organisasi/danusan saya.";
+    const waText = "Halo Admin MsgiccStore, saya tertarik dengan program Partnership. Saya ingin bekerja sama untuk organisasi/danusan kami.";
     const waLink = `https://wa.me/${adminPhone}?text=${encodeURIComponent(waText)}`;
 
     const features = [
         {
-            title: "Custom Pricing Control",
-            desc: "Partner bebas menentukan harga jual sendiri untuk menaikkan margin profit.",
-            icon: <Zap className="w-5 h-5 text-amber-500" />
+            title: "Fleksibilitas Margin Harga",
+            desc: "Partner bebas menentukan harga jual sendiri untuk memaksimalkan perolehan profit dana usaha.",
+            icon: <Zap className="size-5 text-blue-600" />
         },
         {
-            title: "Elite Affiliate Model",
-            desc: "Sistem bagi hasil yang lebih tinggi dibanding afiliator standar.",
-            icon: <Globe className="w-5 h-5 text-blue-500" />
+            title: "Model Bagi Hasil Tinggi",
+            desc: "Persentase komisi kemitraan khusus yang lebih menguntungkan untuk pendanaan organisasi.",
+            icon: <Globe className="size-5 text-indigo-600" />
         },
         {
-            title: "Priority Handling",
-            desc: "Setiap pesanan dari partner akan diproses dengan jalur prioritas tinggi.",
-            icon: <ShieldCheck className="w-5 h-5 text-emerald-500" />
+            title: "Jalur Prioritas Pemrosesan",
+            desc: "Setiap pesanan dari mitra akan diproses dengan prioritas cepat oleh tim support khusus.",
+            icon: <ShieldCheck className="size-5 text-emerald-600" />
         }
     ];
 
     return (
-        <div className="min-h-screen bg-white pt-32 pb-20 overflow-hidden relative">
-            {/* Background Decors */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
-
-            <main className="container mx-auto px-4 max-w-4xl relative z-10">
+        <div className="min-h-screen bg-slate-50 pt-28 pb-20">
+            <main className="container mx-auto px-4 max-w-4xl">
                 
-                <div className="text-center mb-16">
-                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-                        Power Up Your <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">Organization & Business</span>
+                <div className="text-center mb-12">
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2 block">
+                        Program Kemitraan
+                    </span>
+                    <h1 className="text-2xl md:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
+                        Kemitraan Organisasi & Komunitas
                     </h1>
-                    <p className="text-slate-500 font-medium text-lg md:text-xl max-w-2xl mx-auto">
-                        Program kerjasama khusus organisasi, komunitas, atau danusan acara. Tingkatkan pendanaan Anda dengan model bisnis digital yang sudah teruji.
+                    <p className="text-slate-500 text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
+                        Program kerja sama khusus untuk organisasi kampus, komunitas, atau kepanitiaan acara yang membutuhkan dana usaha (danus) terpercaya.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
                     {features.map((f, i) => (
-                        <div key={i} className="bg-slate-50 border border-slate-100 p-8 rounded-[2.5rem] hover:bg-white hover:shadow-2xl hover:shadow-indigo-100 transition-all duration-500 group">
-                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
+                        <div key={i} className="bg-white border border-slate-200/90 p-6 rounded-2xl shadow-xs hover:border-slate-300 transition-colors">
+                            <div className="size-10 bg-slate-50 rounded-xl flex items-center justify-center mb-4 border border-slate-100">
                                 {f.icon}
                             </div>
-                            <h3 className="font-black text-slate-900 mb-2">{f.title}</h3>
-                            <p className="text-sm text-slate-500 font-medium leading-relaxed">{f.desc}</p>
+                            <h3 className="font-bold text-slate-900 text-sm mb-1.5">{f.title}</h3>
+                            <p className="text-xs text-slate-500 leading-relaxed font-normal">{f.desc}</p>
                         </div>
                     ))}
                 </div>
 
-                <div className="bg-slate-900 rounded-[3rem] p-8 md:p-12 text-white relative overflow-hidden">
-                    <div className="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
-                    
-                    <div className="flex flex-col md:flex-row items-center gap-10">
-                        <div className="flex-1">
-                            <h2 className="text-3xl font-black mb-4">Ingin Bergabung Sebagai Partner?</h2>
-                            <p className="text-slate-400 font-medium mb-8">
-                                Partner bebas menetapkan markup harga di luar sistem website kami. Pesanan Anda tetap dikelola oleh kami, namun keuntungan sepenuhnya milik organisasi Anda.
-                            </p>
-                            <div className="space-y-3 mb-10">
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle2 className="w-5 h-5 text-indigo-400" />
-                                    <span className="font-bold text-sm">Tanpa Batas Minimum Transaksi</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle2 className="w-5 h-5 text-indigo-400" />
-                                    <span className="font-bold text-sm">Pencairan Komisi Instan</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle2 className="w-5 h-5 text-indigo-400" />
-                                    <span className="font-bold text-sm">Media Promosi Disediakan Admin</span>
-                                </div>
+                <div className="bg-slate-900 rounded-2xl p-6 md:p-10 text-white shadow-xs">
+                    <div className="max-w-2xl">
+                        <h2 className="text-xl md:text-2xl font-bold mb-3">Tertarik Bergabung Sebagai Partner?</h2>
+                        <p className="text-slate-400 text-xs md:text-sm mb-6 leading-relaxed">
+                            Organisasi Anda bebas memasarkan katalog akun premium kami dengan margin keuntungan yang Anda atur sendiri. Seluruh teknis dan garansi kami tangani sepenuhnya.
+                        </p>
+                        <div className="space-y-2 mb-8 text-xs text-slate-300">
+                            <div className="flex items-center gap-2.5">
+                                <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                                <span>Tanpa batas minimal transaksi</span>
                             </div>
-                            <a 
-                                href={waLink} 
-                                target="_blank"
-                                className="inline-flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black text-lg transition-all shadow-xl shadow-indigo-900/40 active:scale-95"
-                            >
-                                Konsultasi Kerja Sama <ArrowRight className="w-5 h-5" />
-                            </a>
-                        </div>
-                        <div className="w-full md:w-72 aspect-square bg-indigo-800/20 rounded-[2.5rem] border border-white/10 flex items-center justify-center relative group">
-                            <Handshake className="w-32 h-32 text-indigo-500 group-hover:scale-110 transition-transform duration-500 opacity-50" />
-                            <div className="absolute inset-0 flex items-center justify-center flex-col">
-                                <span className="text-5xl font-black text-white">VIP</span>
-                                <span className="text-xs font-black tracking-[0.3em] uppercase text-indigo-400 mt-2">Partnership</span>
+                            <div className="flex items-center gap-2.5">
+                                <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                                <span>Pencairan dana fleksibel ke rekening organisasi</span>
+                            </div>
+                            <div className="flex items-center gap-2.5">
+                                <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                                <span>Materi promosi dan pricelist disiapkan oleh admin</span>
                             </div>
                         </div>
+                        <a 
+                            href={waLink} 
+                            target="_blank"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs md:text-sm transition-colors shadow-xs"
+                        >
+                            Konsultasi via WhatsApp <ArrowRight className="size-4" />
+                        </a>
                     </div>
-                </div>
-
-                <div className="mt-16 text-center">
-                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-4">
-                        <span className="h-[1px] w-12 bg-slate-100"></span>
-                        Bekerjasama Dengan MsgiccStore
-                        <span className="h-[1px] w-12 bg-slate-100"></span>
-                    </p>
                 </div>
 
             </main>

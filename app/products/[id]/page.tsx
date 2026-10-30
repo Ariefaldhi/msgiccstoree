@@ -5,12 +5,13 @@ import { createClient } from "@/lib/supabase/client";
 import { 
     Loader2, Star, CheckCircle2, ShieldCheck, 
     ArrowLeft, ShoppingBag, Info, MessageSquare, 
-    Users, Clock, Zap, Share2, X
+    Users, Clock, Zap, X
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import ShareButtons from "@/components/ShareButtons";
 import ProductModal from "@/components/ProductModal";
+import TermsAndConditions from "@/components/TermsAndConditions";
 
 interface Package {
     id: string;
@@ -109,17 +110,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
-                <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+                <Loader2 className="size-8 text-blue-600 animate-spin" />
             </div>
         );
     }
 
     if (!product) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4 text-center">
-                <h1 className="text-2xl font-black text-slate-900 mb-4">Produk Tidak Ditemukan</h1>
-                <Link href="/" className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold">Kembali ke Beranda</Link>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 px-4 text-center">
+                <h1 className="text-xl font-bold text-slate-900 mb-4">Produk Tidak Ditemukan</h1>
+                <Link href="/" className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold">Kembali ke Katalog</Link>
             </div>
         );
     }
@@ -145,48 +146,46 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     const affiliateShareUrl = profile?.affiliate_code ? `${shareUrl}?ref=${profile.affiliate_code}` : "";
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-10 pb-20">
+        <div className="min-h-screen bg-slate-50 pt-8 pb-20">
             <main className="container mx-auto px-4 max-w-6xl">
                 
                 {/* Header Navigation */}
-                <div className="mb-8">
-                    <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-blue-600 font-bold transition-all group">
-                        <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-all">
-                            <ArrowLeft className="w-5 h-5" />
+                <div className="mb-6">
+                    <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 text-sm font-semibold transition-colors">
+                        <div className="p-1.5 bg-white border border-slate-200/90 rounded-lg shadow-2xs">
+                            <ArrowLeft className="size-4" />
                         </div>
-                        Kembali
+                        Kembali ke Katalog
                     </Link>
                 </div>
 
-                <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8">
+                <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 md:gap-8">
                     
-                    {/* Right Column: Packages & Share - PRIORITY ON MOBILE */}
-                    <div className="order-first lg:order-last space-y-8">
+                    {/* Right Column: Packages & Share */}
+                    <div className="order-first lg:order-last space-y-6">
                         
                         {/* Summary & Order Button */}
-                        <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-blue-100 sticky top-28 overflow-hidden relative">
-                             {/* Decorative Background for CTA */}
-                             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
-                             
-                             <h4 className="text-sm font-black text-blue-600 uppercase tracking-widest mb-4">Pesan Sekarang</h4>
-                             <p className="text-slate-500 text-sm font-medium mb-8">Pilih paket yang sesuai dengan kebutuhan Anda dan lakukan pemesanan melalui sistem konfirmasi WhatsApp kami.</p>
+                        <div className="bg-white rounded-2xl p-6 shadow-xs border border-slate-200/90 sticky top-24">
+                             <span className="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-2">Pemesanan Instan</span>
+                             <h4 className="text-base font-bold text-slate-900 mb-2">Beli Akun {product.title}</h4>
+                             <p className="text-slate-500 text-xs md:text-sm font-normal mb-6 leading-relaxed">Pilih paket yang sesuai kebutuhan Anda dan lakukan pemesanan cepat melalui WhatsApp.</p>
                              
                              <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-500/20 active:scale-95 group"
+                                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-xs active:scale-95"
                              >
-                                <ShoppingBag className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                                LIHAT PAKET & ORDER
+                                <ShoppingBag className="size-4" />
+                                Pilih Paket & Pesan Sekarang
                              </button>
 
-                             <div className="mt-8 pt-8 border-t border-slate-100 flex flex-col gap-4">
-                                 <div className="hidden md:flex items-center gap-4 text-xs font-bold text-slate-400">
-                                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center"><ShieldCheck className="w-4 h-4 text-blue-400" /></div>
-                                    Garansi Full Proteksi
+                             <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col gap-2.5">
+                                 <div className="flex items-center gap-2.5 text-xs text-slate-500 font-medium">
+                                    <ShieldCheck className="size-4 text-blue-600 shrink-0" />
+                                    Garansi ganti baru selama masa aktif
                                  </div>
-                                 <div className="flex items-center gap-4 text-xs font-bold text-slate-400">
-                                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center"><Zap className="w-4 h-4 text-amber-400" /></div>
-                                    Proses Kilat 5-15 Menit
+                                 <div className="flex items-center gap-2.5 text-xs text-slate-500 font-medium">
+                                    <Clock className="size-4 text-emerald-600 shrink-0" />
+                                    Proses aktivasi 5–15 menit
                                  </div>
                              </div>
                         </div>
@@ -195,51 +194,50 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                         <ShareButtons 
                             url={shareUrl} 
                             affiliateUrl={affiliateShareUrl} 
-                            title={`Nonton @${product.title} murah mulai dari ${product.price} hanya di MsgiccStore!`} 
+                            title={`Langganan @${product.title} murah mulai dari ${product.price} hanya di MsgiccStore!`} 
                             isAffiliator={isAffiliator}
                         />
 
                     </div>
 
                     {/* Left Column: Product Info & Banner */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-6">
                         
                         {/* Hero Section */}
-                        <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-2xl shadow-slate-200 border border-slate-100 overflow-hidden relative">
-                            {/* Decorative Background */}
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-                            
-                            <div className="flex flex-col md:flex-row items-center gap-10">
-                                <div className="w-48 h-48 md:w-64 md:h-64 rounded-[2.5rem] bg-slate-900 overflow-hidden shadow-2xl ring-8 ring-slate-50 shrink-0">
+                        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-xs border border-slate-200/90">
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                                <div className="size-36 md:size-44 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden shrink-0 flex items-center justify-center">
                                     {product.image_url ? (
                                         <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-6xl font-black text-white">
+                                        <div className="w-full h-full flex items-center justify-center text-4xl font-extrabold text-slate-800">
                                             {product.title.charAt(0)}
                                         </div>
                                     )}
                                 </div>
-                                <div className="flex-1 text-center md:text-left">
-                                    <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
-                                        <span className="px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100">Premium App</span>
+                                <div className="flex-1 text-center sm:text-left">
+                                    <div className="flex flex-wrap gap-2 mb-2 justify-center sm:justify-start">
+                                        <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold uppercase tracking-wider">
+                                            Akun Premium
+                                        </span>
                                         {product.tag && (
                                             <span className={cn(
-                                                "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                                                product.tag_color === 'red' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100'
+                                                "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border",
+                                                product.tag_color === 'red' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-200'
                                             )}>
                                                 {product.tag}
                                             </span>
                                         )}
                                     </div>
-                                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight">{product.title}</h1>
-                                    <p className="text-2xl font-black text-blue-600 mb-6">Mulai {product.price}</p>
+                                    <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">{product.title}</h1>
+                                    <p className="text-xl font-extrabold text-blue-600 mb-4">Mulai {product.price}</p>
                                     
                                     {isAffiliator && (
-                                        <div className="inline-flex items-center gap-3 px-6 py-3 bg-emerald-50 border border-emerald-100 rounded-2xl animate-in fade-in zoom-in duration-500">
-                                            <Zap className="w-5 h-5 text-emerald-500 animate-pulse" />
+                                        <div className="inline-flex items-center gap-2.5 px-3.5 py-2 bg-emerald-50 border border-emerald-100 rounded-xl">
+                                            <Zap className="size-4 text-emerald-600" />
                                             <div>
-                                                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter leading-none mb-1">Potensi Komisi Afiliasi:</p>
-                                                <p className="text-lg font-black text-emerald-700 leading-none">{commissionRange}</p>
+                                                <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider leading-none mb-0.5">Potensi Komisi Afiliasi:</p>
+                                                <p className="text-sm font-bold text-emerald-800 leading-none">{commissionRange}</p>
                                             </div>
                                         </div>
                                     )}
@@ -248,77 +246,79 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                         </div>
 
                         {/* Description & Terms */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100">
-                                <h3 className="text-lg font-black text-slate-900 mb-6 flex items-center gap-3">
-                                    <Info className="w-5 h-5 text-blue-600" /> Deskripsi Produk
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-white rounded-2xl p-6 shadow-xs border border-slate-200/90">
+                                <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                                    <Info className="size-4 text-blue-600" /> Deskripsi Layanan
                                 </h3>
-                                <div className="text-slate-600 font-medium leading-relaxed whitespace-pre-wrap text-sm">
+                                <div className="text-slate-600 font-normal leading-relaxed whitespace-pre-wrap text-xs md:text-sm">
                                     {product.description || "Nikmati layanan aplikasi premium dengan harga terbaik melalui MsgiccStore. Proses cepat, aman, dan bergaransi penuh."}
                                 </div>
                             </div>
-                            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100">
-                                <h3 className="text-lg font-black text-slate-900 mb-6 flex items-center gap-3">
-                                    <Clock className="w-5 h-5 text-amber-500" /> Syarat & Ketentuan
-                                </h3>
-                                <div className="text-slate-600 font-medium leading-relaxed whitespace-pre-wrap text-sm italic">
-                                    {product.terms_conditions || "Harap baca deskripsi paket dengan teliti. Pesanan diproses otomatis setelah konfirmasi pembayaran via WhatsApp."}
+                            <div className="bg-white rounded-2xl p-6 shadow-xs border border-slate-200/90 flex flex-col justify-between">
+                                <div>
+                                    <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                                        <Clock className="size-4 text-slate-600" /> Ketentuan Penggunaan
+                                    </h3>
+                                    <TermsAndConditions 
+                                        termsText={product.terms_conditions} 
+                                        productTitle={product.title} 
+                                        maxHeight="max-h-64" 
+                                        className="bg-transparent border-0 p-0"
+                                    />
                                 </div>
                             </div>
                         </div>
 
                         {/* Testimonials Filtered */}
-                        <div className="space-y-6">
-                            <h3 className="text-2xl font-black text-slate-900 flex items-center gap-3">
-                                <Users className="w-6 h-6 text-purple-600" /> Bukti Testimoni
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <Users className="size-5 text-purple-600" /> Bukti Transaksi & Testimoni
                             </h3>
                             {testimonies.length > 0 ? (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                                     {testimonies.map((test, i) => (
                                         <div 
                                             key={i} 
                                             onClick={() => setSelectedImage(test.image_url)}
-                                            className="aspect-square rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer bg-slate-100 group relative"
+                                            className="aspect-square rounded-xl overflow-hidden border border-slate-200/80 shadow-2xs hover:border-slate-300 transition-all cursor-pointer bg-slate-50 group relative"
                                         >
-                                            <img src={test.image_url} alt="Testimony" className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <Zap className="w-6 h-6 text-white drop-shadow-lg" />
-                                            </div>
+                                            <img src={test.image_url} alt="Testimony" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-12 text-center bg-white rounded-[2.5rem] border border-dashed border-slate-200">
-                                    <p className="text-slate-400 font-bold">Belum ada testimoni khusus untuk @{product.title.toLowerCase().replace(/\s+/g, '')}</p>
+                                <div className="p-8 text-center bg-white rounded-xl border border-dashed border-slate-200">
+                                    <p className="text-slate-400 text-xs font-medium">Belum ada testimoni khusus untuk produk ini.</p>
                                 </div>
                             )}
                         </div>
 
                         {/* Reviews */}
-                        <div className="space-y-6">
-                            <h3 className="text-2xl font-black text-slate-900 flex items-center gap-3">
-                                <MessageSquare className="w-6 h-6 text-emerald-500" /> Ulasan Pelanggan
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <MessageSquare className="size-5 text-emerald-600" /> Ulasan Pembeli
                             </h3>
                             {reviews.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {reviews.map((rev, i) => (
-                                        <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                                            <div className="flex items-center gap-3 mb-3">
+                                        <div key={i} className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-xs font-bold text-slate-800">{rev.user_name}</span>
                                                 <div className="flex items-center gap-0.5">
                                                     {[...Array(5)].map((_, j) => (
-                                                        <Star key={j} className={cn("w-3 h-3", rev.rating >= j+1 ? "fill-amber-400 text-amber-400" : "text-slate-200")} />
+                                                        <Star key={j} className={cn("size-3", rev.rating >= j+1 ? "fill-amber-400 text-amber-400" : "text-slate-200")} />
                                                     ))}
                                                 </div>
-                                                <span className="text-[10px] font-black text-slate-300 uppercase">{rev.user_name}</span>
                                             </div>
-                                            <p className="text-sm font-medium text-slate-600 italic">"{rev.comment}"</p>
+                                            <p className="text-xs text-slate-600 font-normal leading-relaxed">"{rev.comment}"</p>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-12 text-center bg-white rounded-[2.5rem] border border-dashed border-slate-200">
-                                    <p className="text-slate-400 font-bold">Belum ada ulasan untuk produk ini.</p>
-                                    <Link href="/reviews" className="text-blue-600 text-xs font-black mt-2 inline-block uppercase">Berikan Ulasan Pertama</Link>
+                                <div className="p-8 text-center bg-white rounded-xl border border-dashed border-slate-200">
+                                    <p className="text-slate-400 text-xs font-medium">Belum ada ulasan untuk produk ini.</p>
+                                    <Link href="/reviews" className="text-blue-600 text-xs font-semibold mt-1.5 inline-block">Berikan ulasan pertama</Link>
                                 </div>
                             )}
                         </div>
@@ -331,32 +331,31 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             {/* Fullscreen Image Preview */}
             {selectedImage && (
                 <div 
-                    className="fixed inset-0 z-[20000] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300"
+                    className="fixed inset-0 z-[20000] bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
                     onClick={() => setSelectedImage(null)}
                 >
-                    <div className="relative max-w-5xl w-full h-full flex items-center justify-center">
+                    <div className="relative max-w-4xl w-full h-full flex items-center justify-center">
                         <img 
                             src={selectedImage} 
                             alt="Full Preview" 
-                            className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300"
+                            className="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
                         />
                         <button 
                             onClick={() => setSelectedImage(null)}
-                            className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all backdrop-blur-md"
+                            className="absolute top-4 right-4 p-2 bg-slate-900/80 text-white rounded-lg hover:bg-slate-900 transition-colors"
                         >
-                            <X className="w-6 h-6" />
+                            <X className="size-5" />
                         </button>
                     </div>
                 </div>
             )}
 
-            {/* Reuse ProductModal for order flow */}
             <ProductModal 
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 product={{
                     ...product,
-                    category: "Apps", // Default for now
+                    category: "App",
                     packages: product.packages
                 }}
             />

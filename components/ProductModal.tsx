@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import TermsAndConditions from "@/components/TermsAndConditions";
 
 interface Package {
     id: string;
@@ -66,11 +67,9 @@ export default function ProductModal({
     const [salesCounts, setSalesCounts] = useState<Record<string, number>>({});
     const [activeRefCode, setActiveRefCode] = useState<string | null>(null);
 
-
     // Reset state when modal opens/closes
     useEffect(() => {
         if (isOpen) {
-            // Check for persistent cooldown
             const lastTime = localStorage.getItem("msgicc_order_cooldown");
             if (lastTime) {
                 const diff = Date.now() - parseInt(lastTime);
@@ -86,13 +85,12 @@ export default function ProductModal({
             setAutomationStatus("idle");
             fetchSalesCounts();
             checkUser();
-            // Fetch affiliate ref from localStorage
+
             const savedRef = localStorage.getItem("msgicc_affiliate_ref");
             if (savedRef) {
                 try {
                     const parsed = JSON.parse(savedRef);
                     let code = parsed.code || parsed.CODE || "";
-                    // Basic cleanup: if it's a URL, extract the ref part
                     if (code.includes("?ref=")) {
                         code = code.split("?ref=")[1].split("&")[0];
                     }
@@ -103,7 +101,7 @@ export default function ProductModal({
             } else {
                 setActiveRefCode(null);
             }
-            // Fetch admin WhatsApp number
+
             supabase.from("store_settings").select("whatsapp_number").eq("id", 1).single().then(({ data }) => {
                 if (data?.whatsapp_number) setAdminPhone(data.whatsapp_number);
             });
@@ -137,7 +135,6 @@ export default function ProductModal({
         if (user) {
             setCustomerName(user.user_metadata?.full_name || user.email?.split('@')[0] || "");
             setWaNumber(""); 
-            // Check if admin
             const { data: prof } = await supabase.from("profiles").select("role").eq("id", user.id).single();
             if (prof?.role === 'admin') setIsAdmin(true);
         } else {
@@ -178,7 +175,6 @@ export default function ProductModal({
 
         setIsSubmitting(true);
 
-        // Rate Limit Check (Exempt Admin)
         if (!isAdmin) {
             const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
             const { data: recentOrders } = await supabase
@@ -217,11 +213,10 @@ export default function ProductModal({
 
         const costPriceRaw = selectedPackage.cost_price || 0;
         let profitRaw = sellPriceRaw - costPriceRaw;
-        if (profitRaw < 0) profitRaw = 0; // Prevent negative profit
+        if (profitRaw < 0) profitRaw = 0;
 
         const finalPriceDisplay = `Rp ${sellPriceRaw.toLocaleString("id-ID")}`;
 
-        // Affiliate Tracking Logic
         let affiliator_id = null;
         let commission = 0;
         let affiliate_code_used = null;
@@ -245,7 +240,6 @@ export default function ProductModal({
             }
         }
 
-        // Simpan ke database
         const { error } = await supabase.from("orders").insert([{
             wa_number: waNumber,
             customer_name: customerName,
@@ -268,17 +262,13 @@ export default function ProductModal({
             return;
         }
 
-        // Set cooldown after successful DB insert
         localStorage.setItem("msgicc_order_cooldown", Date.now().toString());
         setCooldownSeconds(60);
 
-        // Get active T&C
         const currentTnc = selectedPackage?.terms_and_conditions || product.terms_conditions || "Pesanan akan diproses melalui WhatsApp. Pastikan nomor WhatsApp Anda aktif dan data yang dimasukkan sudah benar.";
 
-        // Kirim via API Fonnte
         const customerMessage = `Halo Kak ${customerName},\n\nTerima kasih telah melakukan pesanan di *MsgiccStore*!\n\n*Detail Pesanan:*\n📦 Produk: *${product.title}*\n🎁 Paket: ${selectedPackage.name}\n💰 Total: ${finalPriceDisplay}\n⏳ Durasi: ${selectedPackage.duration}\n\n*Syarat & Ketentuan:*\n_${currentTnc}_\n\n_Mohon tunggu sebentar ya kak, Admin kami sedang menyiapkan detail pesanan Anda. Admin akan segera membalas pesan ini untuk memberikan *Info Pembayaran* dan *Instruksi Selanjutnya*._\n\n📌 *Harap tidak spam pesan agar antrian Anda tetap terjaga.*\n\nTerima kasih atas kesabarannya! 🙏`;
         
-        // Construct Group Message
         let affiliatorName = "-";
         if (affiliate_code_used) {
             const { data: afflProf } = await supabase.from("profiles").select("full_name").eq("affiliate_code", affiliate_code_used).single();
@@ -300,7 +290,6 @@ export default function ProductModal({
             });
 
             if (res.ok) {
-                // Dimulasikan delay 3 detik agar user merasa "menunggu pesan"
                 setTimeout(() => {
                     setAutomationStatus("success");
                 }, 3000);
@@ -321,187 +310,143 @@ export default function ProductModal({
     return (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs"
                 onClick={onClose}
             ></div>
 
-            <div className="relative w-full max-w-lg md:max-w-3xl transform rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-hidden flex flex-col border border-white/50">
+            <div className="relative w-full max-w-lg md:max-w-2xl bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] z-10 animate-in zoom-in-95 duration-200">
                 
-                {/* Full Modal Blurred Background (Glassmorphism Base) */}
-                <div className="absolute inset-0 z-0 pointer-events-none">
-                    {product.image_url ? (
-                        <>
-                            <div
-                                className="absolute inset-0 bg-cover bg-center blur-[80px] scale-150 opacity-40 saturate-200"
-                                style={{ backgroundImage: `url(${product.image_url})` }}
-                            />
-                            {/* Frosted Glass Overlay - Made more opaque for readability */}
-                            <div className="absolute inset-0 bg-white/85 backdrop-blur-3xl"></div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-300/40 to-purple-300/40 blur-3xl opacity-60"></div>
-                            <div className="absolute inset-0 bg-white/70 backdrop-blur-2xl"></div>
-                        </>
-                    )}
-                </div>
-
-                {/* Modal Content Wrapper */}
-                <div className="relative z-10 flex flex-col h-full w-full overflow-hidden">
-                    
-                    {/* Header Section (Just Close Button & Soft Gradient) */}
-                    <div className="relative h-32 shrink-0">
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none"></div>
-                        <button
-                            onClick={onClose}
-                            className="absolute right-5 top-5 p-2 rounded-full bg-white/30 hover:bg-white/50 backdrop-blur-xl transition-all z-20 text-slate-700 shadow-sm border border-white/40"
-                        >
-                            <X className="h-5 w-5" />
-                        </button>
-                    </div>
-
-                {/* Overlapping Icon & Title */}
-                <div className="px-6 -mt-16 relative z-10 mb-4 shrink-0">
-                    <div className="flex items-end gap-5">
-                        <div className="w-28 h-28 rounded-[2rem] bg-white/40 backdrop-blur-xl border border-white/50 p-1.5 shadow-2xl">
-                            <div className="w-full h-full rounded-[1.6rem] overflow-hidden bg-slate-900/10 flex items-center justify-center">
-                                {product.image_url ? (
-                                    <img src={product.image_url} alt={product.title} className="w-full h-full object-cover rounded-[1.6rem] shadow-inner" />
-                                ) : (
-                                    <span className="text-4xl font-black text-white">{product.title.charAt(0)}</span>
-                                )}
-                            </div>
+                {/* Clean Header */}
+                <div className="p-4 sm:p-5 border-b border-slate-100 flex items-start justify-between gap-4 shrink-0 bg-white">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                        <div className="size-14 sm:size-16 rounded-xl bg-slate-50 border border-slate-100 overflow-hidden shrink-0 flex items-center justify-center">
+                            {product.image_url ? (
+                                <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                            ) : (
+                                <span className="text-xl font-bold text-slate-800">{product.title.charAt(0)}</span>
+                            )}
                         </div>
-                        <div className="flex flex-col gap-2.5 mb-2">
-                            <h2 className="text-xl font-black text-slate-900 leading-none">{product.title}</h2>
-                            <div className="flex flex-wrap gap-2">
-                                <span className="px-3 py-1 rounded-full bg-slate-100/50 backdrop-blur-sm text-[10px] font-bold text-slate-600 uppercase tracking-wider">APP</span>
+                        <div className="min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 uppercase tracking-wider">
+                                    {product.category || "App"}
+                                </span>
                                 {product.tag && (
                                     <span className={cn(
-                                        "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
-                                        product.tagColor === "yellow" && "bg-yellow-100 text-yellow-700",
-                                        product.tagColor === "red" && "bg-red-100 text-red-700",
-                                        product.tagColor === "blue" && "bg-blue-100 text-blue-700",
+                                        "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border",
+                                        product.tagColor === "yellow" && "bg-amber-50 text-amber-700 border-amber-200/60",
+                                        product.tagColor === "red" && "bg-rose-50 text-rose-700 border-rose-200/60",
+                                        product.tagColor === "blue" && "bg-blue-50 text-blue-700 border-blue-200/60",
                                     )}>
                                         {product.tag}
                                     </span>
                                 )}
                                 {activeRefCode && (
-                                    <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                                        REF CODE: {activeRefCode}
+                                    <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200/60 text-[10px] font-bold uppercase tracking-wider">
+                                        Ref: {activeRefCode}
                                     </span>
                                 )}
                             </div>
+                            <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate leading-snug">{product.title}</h2>
                             <Link 
                                 href={`/products/${product.id}`}
-                                className="text-[10px] font-black text-blue-600 hover:text-blue-700 flex items-center gap-1 group/link w-fit"
+                                className="text-xs font-semibold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 mt-0.5 group/link"
                             >
-                                LIHAT SELENGKAPNYA 
-                                <ArrowRight className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform" />
+                                Detail & Ulasan Lengkap 
+                                <ArrowRight className="size-3 group-hover/link:translate-x-0.5 transition-transform" />
                             </Link>
                         </div>
                     </div>
+                    <button
+                        onClick={onClose}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shrink-0"
+                    >
+                        <X className="size-5" />
+                    </button>
                 </div>
 
-                {/* Scrollable Content Area */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-6 pb-6">
+                {/* Content Area */}
+                <div className="flex-1 overflow-y-auto px-5 py-5 custom-scrollbar bg-slate-50/50">
 
                     {step === "payment" && (
                         <button
                             onClick={() => setStep("selection")}
-                            className="mb-4 text-slate-400 hover:text-slate-600 flex items-center gap-1 text-xs font-bold transition-colors"
+                            className="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 text-xs font-semibold transition-colors"
                         >
-                            <ChevronLeft className="h-4 w-4" />
+                            <ChevronLeft className="size-4" />
                             Kembali ke Paket
                         </button>
                     )}
 
-                    <h3 className="text-xs font-bold text-slate-600 mb-4 uppercase tracking-widest">
+                    <h3 className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">
                         {step === "selection" ? "Pilih Paket Layanan" : step === "cooldown" ? "Akses Dibatasi" : "Konfirmasi Pesanan"}
                     </h3>
 
                     {step === "cooldown" ? (
-                        <div className="flex flex-col items-center justify-center py-10 text-center animate-in zoom-in-95 fade-in duration-500">
-                            <div className="relative mb-8">
-                                <div className="absolute inset-0 bg-red-100 rounded-full animate-pulse scale-125 opacity-50"></div>
-                                <div className="relative w-28 h-28 bg-white border-4 border-red-500 rounded-full flex items-center justify-center shadow-2xl shadow-red-100 text-red-500">
-                                    <ShieldCheck className="w-14 h-14" />
-                                </div>
-                                <div className="absolute -bottom-2 -right-2 bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg animate-bounce">
-                                    SHIELD ACTIVE
-                                </div>
+                        <div className="flex flex-col items-center justify-center py-8 text-center animate-in zoom-in-95 fade-in duration-300">
+                            <div className="size-16 bg-rose-50 border border-rose-200 rounded-2xl flex items-center justify-center text-rose-600 mb-4">
+                                <ShieldCheck className="size-8" />
                             </div>
                             
-                            <h3 className="text-xl font-black text-slate-900 mb-4">Waduh, Tunggu Sebentar!</h3>
-                            <div className="bg-red-50/80 border border-red-100 rounded-2xl p-4 mb-8">
-                                <p className="text-sm text-red-700 font-bold mb-2">
-                                    Kamu masih memiliki transaksi yang baru dilakukan.
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">Mohon Tunggu Sebentar</h3>
+                            <div className="bg-white border border-rose-100 rounded-xl p-4 mb-6 max-w-sm w-full">
+                                <p className="text-xs text-rose-600 font-medium mb-1">
+                                    Anda baru saja melakukan transaksi baru-baru ini.
                                 </p>
-                                <p className="text-xs text-red-500 font-medium leading-relaxed">
-                                    Untuk keamanan dan kenyamanan, silakan order kembali dalam:
+                                <p className="text-xs text-slate-500">
+                                    Silakan order kembali dalam:
                                 </p>
-                                <div className="text-2xl font-black text-red-600 mt-2">
+                                <div className="text-2xl font-extrabold text-rose-600 mt-2 font-mono">
                                     {remainingMinutes} Menit
                                 </div>
                             </div>
 
-                            <div className="w-full space-y-3">
-                                <button
-                                    onClick={onClose}
-                                    className="w-full py-4 rounded-2xl bg-[#0f172a] hover:bg-slate-800 text-white text-sm font-bold shadow-xl transition-all active:scale-95"
-                                >
-                                    Mengerti & Tutup
-                                </button>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                    Pencegahan Spam & Duplikasi Pesanan
-                                </p>
-                            </div>
+                            <button
+                                onClick={onClose}
+                                className="w-full max-w-sm py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition-colors"
+                            >
+                                Mengerti & Tutup
+                            </button>
                         </div>
                     ) : step === "success" ? (
-                        <div className="flex flex-col items-center justify-center py-10 text-center animate-in zoom-in-95 fade-in duration-500">
-                            <div className="relative mb-8">
+                        <div className="flex flex-col items-center justify-center py-8 text-center animate-in zoom-in-95 fade-in duration-300">
+                            <div className="mb-4">
                                 {automationStatus === "sending" ? (
-                                    <>
-                                        <div className="absolute inset-0 bg-blue-100 rounded-full animate-ping opacity-20 scale-150"></div>
-                                        <div className="relative w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center border-4 border-dashed border-blue-400">
-                                            <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
-                                        </div>
-                                    </>
+                                    <div className="size-16 bg-blue-50 border border-blue-200 rounded-2xl flex items-center justify-center">
+                                        <Loader2 className="size-8 text-blue-600 animate-spin" />
+                                    </div>
                                 ) : automationStatus === "success" ? (
-                                    <>
-                                        <div className="absolute inset-0 bg-emerald-100 rounded-full animate-ping opacity-20 scale-150"></div>
-                                        <div className="relative w-24 h-24 bg-emerald-600 rounded-full flex items-center justify-center shadow-2xl shadow-emerald-200">
-                                            <CheckCircle2 className="w-12 h-12 text-white" />
-                                        </div>
-                                    </>
+                                    <div className="size-16 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-center text-emerald-600">
+                                        <CheckCircle2 className="size-8" />
+                                    </div>
                                 ) : (
-                                    <div className="relative w-24 h-24 bg-red-50 rounded-full flex items-center justify-center border-4 border-dashed border-red-400">
-                                        <MessageCircle className="w-12 h-12 text-red-500" />
+                                    <div className="size-16 bg-rose-50 border border-rose-200 rounded-2xl flex items-center justify-center text-rose-500">
+                                        <MessageCircle className="size-8" />
                                     </div>
                                 )}
                             </div>
                             
-                            <h3 className="text-xl font-black text-slate-900 mb-3">
-                                {automationStatus === "sending" ? "Menunggu Pesan Masuk..." : 
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">
+                                {automationStatus === "sending" ? "Mengirim Pesan Konfirmasi..." : 
                                  automationStatus === "success" ? "Pesanan Terkonfirmasi!" : 
                                  "Pesan Belum Masuk?"}
                             </h3>
                             
-                            <p className="text-slate-500 font-medium px-4 mb-8">
+                            <p className="text-slate-500 text-sm max-w-md mx-auto mb-6 leading-relaxed">
                                 {automationStatus === "sending" ? (
-                                    <>Sistem sedang mengirim pesan otomatis ke WhatsApp Anda. Mohon tunggu sejenak...</>
+                                    <>Sistem sedang mengirim rincian pesanan otomatis ke WhatsApp Anda. Mohon tunggu beberapa detik...</>
                                 ) : automationStatus === "success" ? (
-                                    <>Yeay! Pesanan <span className="text-emerald-600 font-bold">{selectedPackage?.name}</span> sedang diproses. Silakan cek WhatsApp Anda.</>
+                                    <>Pesanan <span className="text-slate-900 font-bold">{selectedPackage?.name}</span> sedang diproses. Silakan periksa pesan masuk di WhatsApp Anda.</>
                                 ) : (
-                                    <>Pesan otomatis mungkin terhambat. Jika dalam <span className="text-red-500 font-bold">15 detik</span> tidak ada pesan, silakan hubungi kami manual.</>
+                                    <>Jika dalam <span className="text-rose-600 font-semibold">15 detik</span> tidak ada pesan masuk, Anda dapat langsung menghubungi admin secara manual.</>
                                 )}
                             </p>
 
-                            <div className="w-full space-y-3">
+                            <div className="w-full max-w-sm space-y-3">
                                 {automationStatus === "success" ? (
                                     <button
                                         onClick={onClose}
-                                        className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold shadow-xl shadow-emerald-100 transition-all active:scale-95 animate-in slide-in-from-bottom-4 duration-500"
+                                        className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition-colors"
                                     >
                                         Selesai & Tutup
                                     </button>
@@ -512,37 +457,31 @@ export default function ProductModal({
                                                 href={`https://wa.me/${adminPhone}?text=Halo%20Admin,%20saya%20sudah%20melakukan%20pesanan%20${product.title}%20(${selectedPackage?.name})%20tetapi%20belum%20menerima%20konfirmasi%20otomatis.%20Mohon%20dibantu.`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-full py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white text-xs font-bold shadow-xl shadow-green-100 transition-all flex items-center justify-center gap-2 mb-4 hover:-translate-y-1 active:scale-95 animate-in fade-in"
+                                                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors flex items-center justify-center gap-2"
                                             >
-                                                <MessageCircle className="w-5 h-5" />
-                                                HUBUNGI MANUAL VIA WHATSAPP
+                                                <MessageCircle className="size-4" />
+                                                Hubungi WhatsApp Manual
                                             </a>
                                         )}
                                         
                                         {automationStatus === "sending" && (
-                                            <div className="py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
-                                                <Loader2 className="w-3 h-3 animate-spin" /> Tunggu {fallbackCounter}s untuk hubungi manual
+                                            <div className="py-2 text-xs font-medium text-slate-400 flex items-center justify-center gap-2">
+                                                <Loader2 className="size-3.5 animate-spin" /> Menunggu {fallbackCounter}s untuk chat manual
                                             </div>
                                         )}
                                     </>
                                 )}
-
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pt-4">
-                                    {automationStatus === "success" ? "Terima kasih telah berlangganan!" : "MsgiccStore • Anti Badai & Terpercaya"}
-                                </p>
                             </div>
                         </div>
                     ) : step === "selection" ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {[...(product.packages || [])]
                                 .sort((a, b) => {
-                                    // 1. Availability first
                                     const aAvail = a.is_available !== false;
                                     const bAvail = b.is_available !== false;
                                     if (aAvail && !bAvail) return -1;
                                     if (!aAvail && bAvail) return 1;
                                     
-                                    // 2. Price (Lowest first)
                                     const aPrice = isResellerContext && a.reseller_price ? a.reseller_price : parseInt(a.price.replace(/\D/g, "")) || 0;
                                     const bPrice = isResellerContext && b.reseller_price ? b.reseller_price : parseInt(b.price.replace(/\D/g, "")) || 0;
                                     return aPrice - bPrice;
@@ -551,110 +490,77 @@ export default function ProductModal({
                                 <div
                                     key={idx}
                                     className={cn(
-                                        "group border rounded-[2rem] p-5 md:p-4 bg-white/50 backdrop-blur-md shadow-sm transition-all relative overflow-hidden flex flex-col",
+                                        "bg-white border rounded-xl p-4 shadow-2xs transition-all flex flex-col justify-between",
                                         (pkg.is_available === false) 
-                                            ? "opacity-60 grayscale-[0.5] border-slate-200 cursor-not-allowed" 
-                                            : "hover:shadow-lg hover:border-blue-200 border-white/60"
+                                            ? "opacity-60 grayscale border-slate-200 cursor-not-allowed" 
+                                            : "border-slate-200/90 hover:border-blue-500 hover:shadow-xs"
                                     )}
                                 >
-                                    <div className="flex flex-col gap-4 flex-1">
-
-                                        {/* Header */}
-                                        <div className="flex justify-between items-start">
-                                            <h4 className="font-bold text-base md:text-sm text-slate-900 w-2/3">{product.title} {pkg.name}</h4>
-                                            {/* Order Button in Reference Style */}
+                                    <div>
+                                        <div className="flex justify-between items-start gap-2 mb-2">
+                                            <h4 className="font-bold text-sm text-slate-900 leading-snug">{pkg.name}</h4>
                                             <button
                                                 onClick={() => pkg.is_available !== false && handleSelectPackage(pkg)}
                                                 disabled={pkg.is_available === false}
                                                 className={cn(
-                                                    "px-5 py-2 rounded-xl text-xs font-bold shadow-lg active:scale-95 transition-all text-white",
+                                                    "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shrink-0",
                                                     pkg.is_available === false 
-                                                        ? "bg-slate-400 cursor-not-allowed shadow-none" 
-                                                        : "bg-[#0f172a] hover:bg-[#1e293b]"
+                                                        ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+                                                        : "bg-slate-900 hover:bg-slate-800 text-white"
                                                 )}
                                             >
-                                                {pkg.is_available === false ? "STOK HABIS" : "ORDER"}
+                                                {pkg.is_available === false ? "Habis" : "Pilih"}
                                             </button>
                                         </div>
 
-                                        {/* Price & Sales Count */}
-                                        <div className="flex justify-between items-end">
-                                            <div className="text-xl font-black text-blue-600 flex items-center gap-3 flex-wrap">
+                                        <div className="flex items-baseline gap-2 mb-3">
+                                            <div className="text-base font-extrabold text-blue-600">
                                                 {(() => {
                                                     const fs = !isResellerContext && activePromos?.find(f => f.package_id === pkg.id);
                                                     const rawPrice = parseInt(pkg.price.replace(/\D/g, "")) || 0;
                                                     
                                                     if (isResellerContext && pkg.reseller_price) {
                                                         return (
-                                                            <>
+                                                            <div className="flex items-center gap-2">
                                                                 <span>Rp {pkg.reseller_price.toLocaleString("id-ID")}</span>
-                                                                <span className="text-xs font-bold text-slate-500 line-through">{pkg.price}</span>
-                                                            </>
+                                                                <span className="text-xs font-medium text-slate-400 line-through">{pkg.price}</span>
+                                                            </div>
                                                         );
                                                     }
                                                     
                                                     if (fs) {
                                                         const discounted = Math.round(rawPrice * (1 - fs.discount_percent / 100));
                                                         return (
-                                                            <>
+                                                            <div className="flex items-center gap-2">
                                                                 <span>Rp {discounted.toLocaleString("id-ID")}</span>
-                                                                <span className="text-xs font-bold text-slate-500 line-through">{pkg.price}</span>
-                                                                <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-md">-{fs.discount_percent}%</span>
-                                                            </>
+                                                                <span className="text-xs font-medium text-slate-400 line-through">{pkg.price}</span>
+                                                                <span className="text-[10px] bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded font-bold">-{fs.discount_percent}%</span>
+                                                            </div>
                                                         );
                                                     }
                                                     return <span>{pkg.price}</span>;
                                                 })()}
                                             </div>
-                                            <div className="flex flex-col items-end gap-1">
-                                                <div className="text-[10px] font-bold text-slate-500 bg-white/60 px-3 py-1 rounded-full border border-white/50 flex items-center gap-1.5">
-                                                    <ShieldCheck className="w-3 h-3 text-blue-500" />
-                                                    Terjual {salesCounts[pkg.name] || 0}
-                                                </div>
-                                                {isAffiliator && (
-                                                    <div className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 animate-in fade-in zoom-in duration-300">
-                                                        {(profitRaw => {
-                                                            const comm = Math.floor(profitRaw * (commissionPercent / 100));
-                                                            return comm > 0 ? `+ Komisi Rp ${comm.toLocaleString("id-ID")}` : "0 Komisi";
-                                                        })((() => {
-                                                            const fs = !isResellerContext && activePromos?.find(f => f.package_id === pkg.id);
-                                                            const rawPrice = parseInt(pkg.price.replace(/\D/g, "")) || 0;
-                                                            let sellPrice = rawPrice;
-                                                            if (isResellerContext && pkg.reseller_price) sellPrice = pkg.reseller_price;
-                                                            else if (fs) sellPrice = Math.round(rawPrice * (1 - fs.discount_percent / 100));
-                                                            return Math.max(0, sellPrice - (pkg.cost_price || 0));
-                                                        })())}
-                                                    </div>
-                                                )}
-                                            </div>
                                         </div>
 
-                                        {/* Features List (Reference Style) */}
-                                        <div className="space-y-1.5 pt-2 border-t border-dashed border-slate-200 mt-auto">
+                                        {/* Features */}
+                                        <div className="space-y-1.5 pt-2.5 border-t border-slate-100 text-xs text-slate-600">
                                             {pkg.features && pkg.features.length > 0 ? (
                                                 pkg.features.map((feature, i) => (
-                                                    <div key={i} className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                                                        <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-                                                        <span>{feature}</span>
+                                                    <div key={i} className="flex items-center gap-2 font-medium">
+                                                        <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
+                                                        <span className="truncate">{feature}</span>
                                                     </div>
                                                 ))
                                             ) : (
                                                 <>
-                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                                                        <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
+                                                    <div className="flex items-center gap-2 font-medium">
+                                                        <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
                                                         <span>Garansi {pkg.duration}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                                                        <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-                                                        <span>Type: {pkg.type}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                                                        <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-                                                        <span>Support All Device</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                                                        <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-                                                        <span>Proses Cepat & Aman</span>
+                                                    <div className="flex items-center gap-2 font-medium">
+                                                        <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
+                                                        <span>Tipe: {pkg.type}</span>
                                                     </div>
                                                 </>
                                             )}
@@ -663,177 +569,149 @@ export default function ProductModal({
                                 </div>
                             ))}
                             {(!product.packages || product.packages.length === 0) && (
-                                <div className="text-center py-10 border-2 border-dashed border-slate-100 rounded-3xl">
-                                    <p className="text-gray-400 text-sm font-bold">Belum ada paket tersedia.</p>
+                                <div className="col-span-full text-center py-12 border border-dashed border-slate-200 rounded-xl bg-white">
+                                    <p className="text-slate-400 text-sm font-medium">Belum ada paket tersedia saat ini.</p>
                                 </div>
                             )}
                         </div>
                     ) : (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-6">
+                        <div className="space-y-4 animate-in fade-in duration-200">
 
                             {/* Selected Package Summary */}
-                            <div className="border border-white/60 rounded-[2rem] p-6 bg-white/50 backdrop-blur-md shadow-sm">
-                                <h4 className="font-bold text-base text-slate-900 mb-1">{selectedPackage?.name}</h4>
-                                <div className="text-2xl font-black text-blue-600 mb-4 flex items-center gap-3 flex-wrap">
-                                    {(() => {
-                                        const fs = !isResellerContext && selectedPackage && activePromos?.find(f => f.package_id === selectedPackage.id);
-                                        const rawPrice = parseInt(selectedPackage?.price?.replace(/\D/g, "") || "0");
-                                        
-                                        if (isResellerContext && selectedPackage?.reseller_price) {
-                                            return (
-                                                <>
-                                                    <span className="text-purple-600">Rp {selectedPackage.reseller_price.toLocaleString("id-ID")}</span>
-                                                    <span className="text-sm font-bold text-slate-400 line-through">{selectedPackage.price}</span>
-                                                </>
-                                            );
-                                        }
+                            <div className="border border-slate-200/90 rounded-xl p-4 bg-white shadow-2xs">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Paket yang dipilih</span>
+                                <div className="flex items-baseline justify-between gap-4">
+                                    <h4 className="font-bold text-base text-slate-900">{selectedPackage?.name}</h4>
+                                    <div className="text-lg font-extrabold text-blue-600">
+                                        {(() => {
+                                            const fs = !isResellerContext && selectedPackage && activePromos?.find(f => f.package_id === selectedPackage.id);
+                                            const rawPrice = parseInt(selectedPackage?.price?.replace(/\D/g, "") || "0");
+                                            
+                                            if (isResellerContext && selectedPackage?.reseller_price) {
+                                                return <span>Rp {selectedPackage.reseller_price.toLocaleString("id-ID")}</span>;
+                                            }
 
-                                        if (fs) {
-                                            const discounted = Math.round(rawPrice * (1 - fs.discount_percent / 100));
-                                            return (
-                                                <>
-                                                    <span>Rp {discounted.toLocaleString("id-ID")}</span>
-                                                    <span className="text-sm font-bold text-slate-400 line-through">{selectedPackage?.price}</span>
-                                                </>
-                                            )
-                                        }
-                                        return <span className={cn(isResellerContext && "text-purple-600")}>{selectedPackage?.price}</span>;
-                                    })()}
-                                </div>
-
-                                <div className="space-y-2">
-                                    {selectedPackage?.features && selectedPackage.features.length > 0 ? (
-                                        selectedPackage.features.map((feature, i) => (
-                                            <div key={i} className="flex items-center gap-2 text-sm text-slate-600">
-                                                <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                                                <span>{feature}</span>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <>
-                                            <div className="flex items-center gap-2 text-sm text-slate-600">
-                                                <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                                                <span>Garansi {selectedPackage?.duration}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-sm text-slate-600">
-                                                <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                                                <span>Type: {selectedPackage?.type}</span>
-                                            </div>
-                                        </>
-                                    )}
+                                            if (fs) {
+                                                const discounted = Math.round(rawPrice * (1 - fs.discount_percent / 100));
+                                                return <span>Rp {discounted.toLocaleString("id-ID")}</span>;
+                                            }
+                                            return <span>{selectedPackage?.price}</span>;
+                                        })()}
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Customer Form */}
-                            <div className="space-y-4 px-1">
+                            <div className="space-y-3">
                                 {user ? (
-                                    <div className="space-y-4">
-                                        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
-                                                <span className="text-white font-black text-lg uppercase">{customerName.charAt(0)}</span>
+                                    <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Akun Terdaftar</p>
+                                                <p className="text-sm font-bold text-slate-900">{customerName}</p>
+                                                <p className="text-xs text-slate-500">{user.email}</p>
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-0.5">Sudah Login</p>
-                                                <p className="text-sm font-black text-slate-900 truncate">{customerName}</p>
-                                                <p className="text-[11px] font-bold text-slate-500 truncate">{user.email}</p>
-                                            </div>
-                                            <div className="p-2 bg-white rounded-lg shadow-sm">
-                                                <ShieldCheck className="w-5 h-5 text-blue-600" />
+                                            <div className="size-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                                <ShieldCheck className="size-4" />
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nomor WhatsApp Aktif</label>
+                                            <label className="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp Aktif</label>
                                             <input 
                                                 type="text" 
                                                 required 
                                                 placeholder="Contoh: 08123456789" 
                                                 value={waNumber}
                                                 onChange={(e) => setWaNumber(e.target.value.replace(/\D/g, ''))}
-                                                className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all"
                                             />
                                         </div>
                                     </div>
                                 ) : (
-                                    <>
-                                        <div className="flex items-center justify-between px-1">
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Detail Pemesan</label>
-                                            <Link href="/register" className="text-[10px] font-black text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-tighter transition-all">
-                                                Daftar agar otomatis
+                                    <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Detail Pemesan</label>
+                                            <Link href="/register" className="text-xs font-semibold text-blue-600 hover:text-blue-700">
+                                                Daftar akun
                                             </Link>
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            <input 
-                                                type="text" 
-                                                required 
-                                                placeholder="Nama Pelanggan" 
-                                                value={customerName}
-                                                onChange={(e) => setCustomerName(e.target.value)}
-                                                className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                            />
-                                            <input 
-                                                type="text" 
-                                                required 
-                                                placeholder="Nomor WhatsApp" 
-                                                value={waNumber}
-                                                onChange={(e) => setWaNumber(e.target.value.replace(/\D/g, ''))}
-                                                className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                            />
+                                            <div>
+                                                <label className="block text-[11px] font-semibold text-slate-500 mb-1">Nama Lengkap</label>
+                                                <input 
+                                                    type="text" 
+                                                    required 
+                                                    placeholder="Nama Anda" 
+                                                    value={customerName}
+                                                    onChange={(e) => setCustomerName(e.target.value)}
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[11px] font-semibold text-slate-500 mb-1">Nomor WhatsApp</label>
+                                                <input 
+                                                    type="text" 
+                                                    required 
+                                                    placeholder="08123456789" 
+                                                    value={waNumber}
+                                                    onChange={(e) => setWaNumber(e.target.value.replace(/\D/g, ''))}
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all"
+                                                />
+                                            </div>
                                         </div>
-                                    </>
+                                    </div>
                                 )}
                             </div>
 
+                            {/* Terms & Conditions Section */}
+                            <div className="space-y-2.5">
+                                <TermsAndConditions 
+                                    termsText={selectedPackage?.terms_and_conditions || product.terms_conditions} 
+                                    productTitle={selectedPackage?.name ? `${product.title} - ${selectedPackage.name}` : product.title}
+                                    maxHeight="max-h-40"
+                                />
 
-                            {/* Terms Checkbox */}
-                            <label className="flex items-start gap-4 cursor-pointer group p-4 rounded-2xl border border-slate-100 hover:border-blue-200 transition-all bg-white shadow-sm">
-                                <div className="relative flex items-center mt-0.5">
+                                <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition-colors shadow-xs">
                                     <input
                                         type="checkbox"
-                                        className="peer sr-only"
+                                        className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer shrink-0"
                                         checked={agreed}
                                         onChange={(e) => setAgreed(e.target.checked)}
                                     />
-                                    <div className="w-6 h-6 border-2 border-slate-300 rounded-lg peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-all flex items-center justify-center">
-                                        <CheckCircle2 className="w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
-                                    </div>
-                                </div>
-                                <div className="flex-1">
-                                    <span className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Setuju dengan Syarat & Ketentuan</span>
-                                    <div className="mt-2 text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed max-h-32 overflow-y-auto custom-scrollbar italic font-medium whitespace-pre-wrap">
-                                        {selectedPackage?.terms_and_conditions || product.terms_conditions || "Pesanan akan diproses melalui WhatsApp. Pastikan nomor WhatsApp Anda aktif dan data yang dimasukkan sudah benar."}
-                                    </div>
-                                </div>
-                            </label>
+                                    <span className="text-xs font-semibold text-slate-800 select-none">
+                                        Saya telah membaca dan menyetujui Syarat & Ketentuan di atas
+                                    </span>
+                                </label>
+                            </div>
 
                             {/* Order Button */}
                             <button
                                 onClick={handleOrder}
                                 disabled={!agreed || !customerName || !waNumber || isSubmitting || cooldownSeconds > 0}
                                 className={cn(
-                                    "w-full py-4 rounded-2xl text-sm font-bold shadow-xl transition-all flex items-center justify-center gap-3",
+                                    "w-full py-3.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2",
                                     (agreed && customerName && waNumber && !isSubmitting && cooldownSeconds === 0)
-                                        ? "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-300 hover:-translate-y-1 active:scale-95 cursor-pointer"
-                                        : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+                                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm cursor-pointer"
+                                        : "bg-slate-200 text-slate-400 cursor-not-allowed"
                                 )}
                             >
                                 {isSubmitting ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    <Loader2 className="size-4 animate-spin" />
                                 ) : cooldownSeconds > 0 ? (
                                     <>
-                                        <span>TUNGGU ({cooldownSeconds}s)</span>
-                                        <Loader2 className="w-4 h-4 animate-spin opacity-50" />
+                                        <span>Tunggu ({cooldownSeconds}s)</span>
+                                        <Loader2 className="size-4 animate-spin opacity-50" />
                                     </>
                                 ) : (
                                     <>
-                                        <span>KONFIRMASI VIA WHATSAPP</span>
-                                        <ArrowRight className="w-5 h-5" />
+                                        <span>Konfirmasi via WhatsApp</span>
+                                        <ArrowRight className="size-4" />
                                     </>
                                 )}
                             </button>
                         </div>
                     )}
                 </div>
-                </div> {/* End Modal Content Wrapper */}
             </div>
         </div>
     );

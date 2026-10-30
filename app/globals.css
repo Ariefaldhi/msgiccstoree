@@ -24,8 +24,8 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 10 90% 55%;
-    --radius: 1rem;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -67,9 +67,6 @@
   }
 
   body {
-    @apply bg-[#f4f7f9] text-[#1e1e1e];
-    background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
-      linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
-    background-size: 4rem 4rem;
+    @apply bg-slate-50 text-slate-900 antialiased;
   }
 }

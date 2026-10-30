@@ -74,26 +74,25 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
 
     return (
         <>
-            <nav className={`fixed top-0 left-0 right-0 z-[999] transition-all duration-500 ${isScrolled ? 'bg-white/20 backdrop-blur-3xl border-b border-white/40 py-3 shadow-[0_4px_30px_rgba(0,0,0,0.03)]' : 'bg-transparent py-5'} `}>
-                <div className="container mx-auto flex items-center gap-3 lg:gap-6 px-4 py-2">
+            <nav className={`fixed top-0 left-0 right-0 z-[999] transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-md border-b border-slate-200/80 py-2.5 shadow-xs' : 'bg-slate-50/80 backdrop-blur-sm border-b border-slate-200/40 py-3.5'}`}>
+                <div className="container mx-auto flex items-center gap-3 lg:gap-6 px-4">
                     {/* Logo Section */}
-                    <Link href="/" className="flex items-center gap-2 lg:gap-3 shrink-0">
+                    <Link href="/" className="flex items-center gap-2.5 shrink-0">
                         {logoUrl ? (
-                            <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl overflow-hidden shrink-0 shadow-md">
+                            <div className="size-9 lg:size-10 rounded-xl overflow-hidden shrink-0 border border-slate-200/80 shadow-xs">
                                 <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
                             </div>
                         ) : (
-                            <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl bg-[#18181b] flex items-center justify-center text-white relative overflow-hidden shrink-0 shadow-md">
-                                <span className="font-bold text-lg lg:text-xl italic select-none">{storeName.charAt(0).toUpperCase()}</span>
-                                <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
+                            <div className="size-9 lg:size-10 rounded-xl bg-slate-900 flex items-center justify-center text-white shrink-0 shadow-xs">
+                                <span className="font-bold text-base lg:text-lg select-none">{storeName.charAt(0).toUpperCase()}</span>
                             </div>
                         )}
                         <div className="flex flex-col justify-center">
-                            <span className="text-xl lg:text-2xl font-black tracking-tight text-[#09090b] leading-none uppercase">
+                            <span className="text-base lg:text-lg font-bold tracking-tight text-slate-900 leading-none">
                                 {storeName}
                             </span>
-                            <span className="text-[0.55rem] lg:text-[0.65rem] font-bold tracking-[0.2em] text-gray-400 uppercase leading-none mt-1">
-                                MARKETPLACE V2.3
+                            <span className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase leading-none mt-1">
+                                Marketplace
                             </span>
                         </div>
                     </Link>
@@ -106,110 +105,143 @@ export default function Navbar({ storeName = "MSGICC STORE", logoUrl }: { storeN
                         {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
 
-                    {/* Desktop Navigation - Premium Glass Buttons */}
-                    <div className="hidden md:flex items-center gap-2 lg:gap-3">
-                        <Link href="/" className="px-3 py-1.5 lg:px-5 lg:py-2 rounded-xl lg:rounded-[1.25rem] bg-blue-500/10 text-blue-700 font-black text-xs lg:text-sm hover:bg-blue-500/20 active:scale-95 transition-all flex items-center gap-1.5 lg:gap-2 border border-blue-500/10 backdrop-blur-xl shrink-0">
-                            <HomeIcon className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Home
-                        </Link>
-                        <Link href="/reseller" className="px-3 py-1.5 lg:px-5 lg:py-2 rounded-xl lg:rounded-[1.25rem] bg-white/30 text-slate-700 font-bold text-xs lg:text-sm hover:bg-white/50 active:scale-95 transition-all flex items-center gap-1.5 lg:gap-2 border border-white/40 backdrop-blur-xl shadow-sm shrink-0">
-                            <Store className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Reseller
-                        </Link>
-                        <Link href="/afiliator" className="px-3 py-1.5 lg:px-5 lg:py-2 rounded-xl lg:rounded-[1.25rem] bg-white/30 text-slate-700 font-bold text-xs lg:text-sm hover:bg-white/50 active:scale-95 transition-all flex items-center gap-1.5 lg:gap-2 border border-white/40 backdrop-blur-xl shadow-sm shrink-0">
-                            <Megaphone className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Afiliator
-                        </Link>
-                        <Link href="/more" className="px-3 py-1.5 lg:px-5 lg:py-2 rounded-xl lg:rounded-[1.25rem] bg-white/60 text-slate-600 font-bold text-xs lg:text-sm hover:bg-white/90 active:scale-95 transition-all flex items-center gap-1.5 lg:gap-2 border border-white/80 backdrop-blur-md shadow-sm shrink-0">
-                            <MoreHorizontal className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Lainnya
-                        </Link>
-                    </div>
-
-                    {/* Search Bar */}
-                    <div className="flex-1 max-w-[200px] lg:max-w-sm hidden md:flex items-center bg-white/30 border border-white/50 backdrop-blur-2xl rounded-xl lg:rounded-[1.5rem] px-3 py-1.5 lg:px-5 lg:py-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:bg-white/70 transition-all cursor-text group shrink" onClick={handleSearchClick}>
-                        <Search className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-blue-500 mr-2 lg:mr-3 group-hover:scale-110 transition-transform shrink-0" />
-                        <span className="text-slate-500 font-semibold text-xs lg:text-sm truncate">Cari aplikasi...</span>
-                    </div>
-
-                    {/* Auth Button */}
-                    <div className={cn("flex items-center gap-4 ml-auto shrink-0")}>
-                        <AuthButton />
-                    </div>
-                </div>
-
-                {/* Mobile Menu Overlay - Still available if needed */}
-                {isMenuOpen && (
-                    <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-xl p-4 space-y-3 animate-in slide-in-from-top-4 duration-200">
+                    {/* Desktop Navigation */}
+                    <div className="hidden md:flex items-center gap-1 lg:gap-1.5 ml-2">
                         <Link 
                             href="/" 
                             className={cn(
-                                "flex items-center gap-3 p-4 rounded-2xl font-bold text-sm transition-all",
-                                pathname === "/" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50"
+                                "px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition-colors flex items-center gap-2",
+                                pathname === "/" 
+                                    ? "bg-slate-900 text-white shadow-2xs" 
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                             )}
                         >
-                            <HomeIcon className="w-5 h-5" /> Home
+                            <HomeIcon className="size-4" /> Home
                         </Link>
                         <Link 
                             href="/reseller" 
                             className={cn(
-                                "flex items-center gap-3 p-4 rounded-2xl font-bold text-sm transition-all",
-                                pathname === "/reseller" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50"
+                                "px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition-colors flex items-center gap-2",
+                                pathname === "/reseller" 
+                                    ? "bg-slate-900 text-white shadow-2xs" 
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                             )}
                         >
-                            <Store className="w-5 h-5" /> Reseller
+                            <Store className="size-4" /> Reseller
                         </Link>
                         <Link 
                             href="/afiliator" 
                             className={cn(
-                                "flex items-center gap-3 p-4 rounded-2xl font-bold text-sm transition-all",
-                                pathname === "/afiliator" ? "bg-blue-50 text-blue-600" : "text-gray-500 hover:bg-gray-50"
+                                "px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition-colors flex items-center gap-2",
+                                pathname === "/afiliator" 
+                                    ? "bg-slate-900 text-white shadow-2xs" 
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                             )}
                         >
-                            <Megaphone className="w-5 h-5" /> Afiliator
+                            <Megaphone className="size-4" /> Afiliator
+                        </Link>
+                        <Link 
+                            href="/more" 
+                            className={cn(
+                                "px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition-colors flex items-center gap-2",
+                                pathname === "/more" 
+                                    ? "bg-slate-900 text-white shadow-2xs" 
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                            )}
+                        >
+                            <MoreHorizontal className="size-4" /> Lainnya
+                        </Link>
+                    </div>
+
+                    {/* Search Bar Trigger */}
+                    <div 
+                        className="flex-1 max-w-[200px] lg:max-w-xs hidden md:flex items-center bg-white border border-slate-200/90 rounded-xl px-3.5 py-1.5 text-xs text-slate-400 hover:border-slate-300 hover:text-slate-600 shadow-2xs transition-all cursor-text" 
+                        onClick={handleSearchClick}
+                    >
+                        <Search className="size-3.5 text-slate-400 mr-2 shrink-0" />
+                        <span className="truncate font-medium">Cari aplikasi...</span>
+                    </div>
+
+                    {/* Auth Button */}
+                    <div className={cn("flex items-center gap-3 ml-auto shrink-0")}>
+                        <AuthButton />
+                    </div>
+                </div>
+
+                {/* Mobile Menu Overlay */}
+                {isMenuOpen && (
+                    <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 shadow-lg p-4 space-y-2 animate-in slide-in-from-top-2 duration-150">
+                        <Link 
+                            href="/" 
+                            className={cn(
+                                "flex items-center gap-3 p-3 rounded-xl font-semibold text-sm transition-colors",
+                                pathname === "/" ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:bg-slate-50"
+                            )}
+                        >
+                            <HomeIcon className="size-4" /> Home
+                        </Link>
+                        <Link 
+                            href="/reseller" 
+                            className={cn(
+                                "flex items-center gap-3 p-3 rounded-xl font-semibold text-sm transition-colors",
+                                pathname === "/reseller" ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:bg-slate-50"
+                            )}
+                        >
+                            <Store className="size-4" /> Reseller
+                        </Link>
+                        <Link 
+                            href="/afiliator" 
+                            className={cn(
+                                "flex items-center gap-3 p-3 rounded-xl font-semibold text-sm transition-colors",
+                                pathname === "/afiliator" ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:bg-slate-50"
+                            )}
+                        >
+                            <Megaphone className="size-4" /> Afiliator
                         </Link>
                     </div>
                 )}
             </nav>
 
-            {/* Mobile Bottom Navigation Bar - Fixed at the very bottom of the viewport */}
-            <div className="md:hidden fixed bottom-4 left-4 right-4 bg-white/90 backdrop-blur-xl border border-gray-100 px-6 py-3 flex items-center justify-between z-[1000] shadow-[0_8px_30px_rgba(0,0,0,0.12)] rounded-3xl pb-[calc(12px+env(safe-area-inset-bottom,0px))]">
+            {/* Mobile Bottom Navigation Bar */}
+            <div className="md:hidden fixed bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md border border-slate-200/90 px-4 py-2 flex items-center justify-around z-[1000] shadow-lg shadow-slate-900/5 rounded-2xl pb-[calc(8px+env(safe-area-inset-bottom,0px))]">
                 <Link href="/" className={cn(
-                    "flex flex-col items-center gap-1 transition-all active:scale-90",
-                    pathname === "/" ? "text-blue-600" : "text-gray-400"
+                    "flex flex-col items-center gap-1 transition-colors px-2 py-1",
+                    pathname === "/" ? "text-blue-600 font-bold" : "text-slate-400 hover:text-slate-600"
                 )}>
-                    <HomeIcon className={cn("w-6 h-6", pathname === "/" ? "fill-blue-600/10" : "")} />
-                    <span className="text-[10px] font-bold uppercase tracking-tight">Home</span>
+                    <HomeIcon className="size-5" />
+                    <span className="text-[10px] uppercase tracking-wider font-semibold">Home</span>
                 </Link>
 
                 <Link href="/reseller" className={cn(
-                    "flex flex-col items-center gap-1 transition-all active:scale-90",
-                    pathname === "/reseller" ? "text-blue-600" : "text-gray-400"
+                    "flex flex-col items-center gap-1 transition-colors px-2 py-1",
+                    pathname === "/reseller" ? "text-blue-600 font-bold" : "text-slate-400 hover:text-slate-600"
                 )}>
-                    <Store className={cn("w-6 h-6", pathname === "/reseller" ? "fill-blue-600/10" : "")} />
-                    <span className="text-[10px] font-bold uppercase tracking-tight">Reseller</span>
+                    <Store className="size-5" />
+                    <span className="text-[10px] uppercase tracking-wider font-semibold">Reseller</span>
                 </Link>
 
-                <div className="flex flex-col items-center -mt-10">
-                    <button 
-                        onClick={handleSearchClick}
-                        className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/40 border-4 border-white active:scale-95 transition-all"
-                    >
-                        <Search className="w-6 h-6" />
-                    </button>
-                    <span className="text-[10px] font-bold uppercase tracking-tight text-gray-400 mt-1">Cari</span>
-                </div>
+                <button 
+                    onClick={handleSearchClick}
+                    className="size-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-sm -mt-5 active:scale-95 transition-all"
+                    aria-label="Cari Produk"
+                >
+                    <Search className="size-5" />
+                </button>
 
                 <Link href="/afiliator" className={cn(
-                    "flex flex-col items-center gap-1 transition-all active:scale-90",
-                    pathname === "/afiliator" ? "text-blue-600" : "text-gray-400"
+                    "flex flex-col items-center gap-1 transition-colors px-2 py-1",
+                    pathname === "/afiliator" ? "text-blue-600 font-bold" : "text-slate-400 hover:text-slate-600"
                 )}>
-                    <Megaphone className={cn("w-6 h-6", pathname === "/afiliator" ? "fill-blue-600/10" : "")} />
-                    <span className="text-[10px] font-bold uppercase tracking-tight">Afiliator</span>
+                    <Megaphone className="size-5" />
+                    <span className="text-[10px] uppercase tracking-wider font-semibold">Afiliasi</span>
                 </Link>
 
                 <Link href="/more" className={cn(
-                    "flex flex-col items-center gap-1 transition-all active:scale-90",
-                    pathname === "/more" ? "text-blue-600" : "text-gray-400"
+                    "flex flex-col items-center gap-1 transition-colors px-2 py-1",
+                    pathname === "/more" ? "text-blue-600 font-bold" : "text-slate-400 hover:text-slate-600"
                 )}>
-                    <MoreHorizontal className={cn("w-6 h-6", pathname === "/more" ? "fill-blue-600/10" : "")} />
-                    <span className="text-[10px] font-bold uppercase tracking-tight">Lainnya</span>
+                    <MoreHorizontal className="size-5" />
+                    <span className="text-[10px] uppercase tracking-wider font-semibold">Lainnya</span>
                 </Link>
             </div>
         </>

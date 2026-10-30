@@ -53,10 +53,10 @@ function useCountdown(endTime: string) {
 function CountdownUnit({ value, label }: { value: number; label: string }) {
     return (
         <div className="flex flex-col items-center">
-            <div className="bg-blue-500 text-white font-black text-xs w-6 h-6 rounded-md flex items-center justify-center shadow-lg">
+            <div className="bg-slate-100 border border-slate-200 text-slate-900 font-mono font-bold text-xs size-6 rounded flex items-center justify-center">
                 {String(value).padStart(2, "0")}
             </div>
-            <span className="text-[7px] font-bold text-slate-400 uppercase tracking-wider mt-1">{label}</span>
+            <span className="text-[8px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">{label}</span>
         </div>
     );
 }
@@ -74,52 +74,54 @@ function PromoCard({ item, onOpen }: { item: PromoItem; onOpen: () => void }) {
     return (
         <div
             onClick={onOpen}
-            className="group relative bg-white/30 backdrop-blur-2xl border border-white/40 rounded-[1.25rem] p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 hover:bg-white/50 transition-all duration-300 cursor-pointer overflow-hidden"
+            className="group relative bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-xs hover:border-rose-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer overflow-hidden flex flex-col justify-between"
         >
             {/* Discount Badge */}
-            <div className="absolute top-3 right-3 bg-blue-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow">
+            <div className="absolute top-3 right-3 bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold px-2 py-0.5 rounded-full z-10">
                 -{item.discount_percent}%
             </div>
 
-            {/* Product Image */}
-            <div className="w-full h-28 rounded-xl overflow-hidden bg-slate-100 mb-3 flex items-center justify-center">
-                {item.package.product.image_url ? (
-                    <img src={item.package.product.image_url} alt={item.package.product.title} className="w-full h-full object-cover" />
-                ) : (
-                    <span className="text-4xl font-black text-slate-300">{item.package.product.title.charAt(0)}</span>
+            <div>
+                {/* Product Image */}
+                <div className="w-full h-28 rounded-lg overflow-hidden bg-slate-50 border border-slate-100 mb-3 flex items-center justify-center">
+                    {item.package.product.image_url ? (
+                        <img src={item.package.product.image_url} alt={item.package.product.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                    ) : (
+                        <span className="text-3xl font-extrabold text-slate-300">{item.package.product.title.charAt(0)}</span>
+                    )}
+                </div>
+
+                {/* Title */}
+                <h3 className="font-bold text-sm text-slate-900 truncate group-hover:text-rose-600 transition-colors mb-0.5">{item.package.product.title}</h3>
+                <p className="text-xs text-slate-500 font-medium mb-2 truncate">{item.package.name}</p>
+
+                {/* Price */}
+                <div className="mb-3">
+                    <p className="text-[10px] text-slate-400 line-through font-medium">{item.package.price}</p>
+                    <p className="text-base font-extrabold text-rose-600">{discountedFormatted}</p>
+                </div>
+
+                {/* Scarcity Indicator */}
+                {item.displayStock !== undefined && (
+                    <div className="mb-3">
+                        <div className="flex justify-between items-center text-[10px] font-semibold text-slate-500 mb-1">
+                            <span>Sisa kuota:</span>
+                            <span className="text-rose-600 font-bold">{item.displayStock} pcs</span>
+                        </div>
+                        <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                            <div className="bg-rose-500 h-full rounded-full" style={{ width: `${Math.max(5, (item.displayStock / 10) * 100)}%` }}></div>
+                        </div>
+                    </div>
                 )}
             </div>
 
-            {/* Title */}
-            <h3 className="font-black text-sm text-slate-900 truncate mb-1">{item.package.product.title}</h3>
-            <p className="text-xs text-slate-500 font-bold mb-1 truncate">{item.package.name}</p>
-
-            {/* Price */}
-            <div className="mb-3">
-                <p className="text-[10px] text-slate-400 line-through">{item.package.price}</p>
-                <p className="text-base font-black text-[#ff2d55]">{discountedFormatted}</p>
-            </div>
-
-            {/* Scarcity Indicator */}
-            {item.displayStock !== undefined && (
-                <div className="mb-3">
-                    <div className="flex justify-between items-center text-[10px] font-black text-slate-500 mb-1">
-                        <span>Sisa kuota promo:</span>
-                        <span className="text-[#ff2d55]">{item.displayStock}</span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                        <div className="bg-[#ff2d55] h-full rounded-full" style={{ width: `${Math.max(5, (item.displayStock / 10) * 100)}%` }}></div>
-                    </div>
-                </div>
-            )}
-
             {/* Countdown */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 justify-center">
                 <CountdownUnit value={h} label="Jam" />
-                <span className="text-slate-400 font-black text-xs pb-3">:</span>
-                <CountdownUnit value={m} label="Menit" />
-                <span className="text-slate-400 font-black text-xs pb-3">:</span>
-                <CountdownUnit value={s} label="Detik" />
+                <span className="text-slate-400 font-bold text-xs pb-2">:</span>
+                <CountdownUnit value={m} label="Mnt" />
+                <span className="text-slate-400 font-bold text-xs pb-2">:</span>
+                <CountdownUnit value={s} label="Dtk" />
             </div>
         </div>
     );
@@ -214,36 +216,36 @@ export default function Promo({ onOpenProduct }: PromoProps) {
     };
 
     return (
-        <section className="py-4 md:py-6 bg-white/40 backdrop-blur-3xl border border-white/60 rounded-3xl md:rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] relative overflow-hidden">
-            <div className="px-4 sm:px-8 relative z-10">
+        <section className="p-4 sm:p-6 bg-white rounded-2xl border border-rose-100 shadow-xs relative overflow-hidden">
+            <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4 md:mb-6">
-                    <div className="flex items-center gap-2 md:gap-3">
-                        <div className="w-8 h-8 md:w-12 md:h-12 bg-red-600 rounded-lg md:rounded-2xl flex items-center justify-center shadow-lg shadow-red-200 animate-pulse shrink-0">
-                            <Zap className="w-4 h-4 md:w-6 md:h-6 text-white" />
+                    <div className="flex items-center gap-3">
+                        <div className="size-9 md:size-10 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl flex items-center justify-center shrink-0">
+                            <Zap className="size-5" />
                         </div>
                         <div>
-                            <h2 className="text-base md:text-2xl font-black text-slate-900 tracking-tight leading-none">Promo Spesial</h2>
-                            <p className="hidden md:block text-slate-500 text-xs font-medium mt-0.5">Jangan lewatkan penawaran terbatas ini.</p>
+                            <h2 className="text-base md:text-lg font-bold text-slate-900 tracking-tight leading-none">Promo Spesial</h2>
+                            <p className="hidden md:block text-slate-500 text-xs font-normal mt-1">Jangan lewatkan penawaran terbatas dengan harga terbaik.</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 md:gap-3">
-                        <div className="hidden sm:flex items-center gap-1.5 text-slate-400 text-xs font-bold">
-                            <Clock className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-3">
+                        <div className="hidden sm:flex items-center gap-1.5 text-slate-500 text-xs font-medium">
+                            <Clock className="size-3.5 text-slate-400" />
                             Berakhir Segera
                         </div>
                         <button 
                             onClick={handleShareAll}
                             disabled={isSharing}
-                            className="bg-blue-50 hover:bg-blue-100 text-blue-600 px-2 py-1 md:px-3 md:py-1.5 rounded-md md:rounded-lg text-[10px] md:text-xs font-bold transition-colors flex items-center gap-1 md:gap-2 border border-blue-100 whitespace-nowrap"
+                            className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 border border-slate-200/60 whitespace-nowrap"
                         >
-                            {isSharing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Share2 className="w-3.5 h-3.5" />}
+                            {isSharing ? <Loader2 className="size-3.5 animate-spin" /> : <Share2 className="size-3.5" />}
                             Share Semua
                         </button>
                     </div>
                 </div>
 
                 {/* Products Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 relative z-10">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 md:gap-4 relative z-10">
                     {items.map((item) => (
                         <PromoCard
                             key={item.id}

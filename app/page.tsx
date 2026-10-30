@@ -10,7 +10,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import HowItWorks from "@/components/HowItWorks";
 import FAQ from "@/components/FAQ";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, Flame } from "lucide-react";
+import { Loader2, Flame, Search, X } from "lucide-react";
 
 interface Category {
   id: string;
@@ -168,28 +168,42 @@ export default function Home() {
 
       <section id="products" className="container mx-auto px-4 pb-8 relative z-20">
         
-        {/* Massive Hero Typography & Glass Search Input */}
-        <div className="mb-14 max-w-3xl mx-auto text-center mt-2">
-          <h1 className="text-4xl md:text-[3.5rem] leading-tight font-heading font-black text-slate-900 tracking-tighter mb-8 drop-shadow-sm">
-            Aplikasi Premium <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Favoritmu</span>
+        {/* Hero & Search */}
+        <div className="mb-12 max-w-3xl mx-auto text-center pt-6 md:pt-10">
+          <h1 className="text-3xl md:text-[2.75rem] font-extrabold text-slate-900 tracking-tight leading-[1.15] mb-3">
+            Akun Premium Resmi,<br className="hidden sm:block" />{" "}
+            <span className="text-blue-600">Harga Terbaik</span>
           </h1>
-          <div className="relative group max-w-2xl mx-auto">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
-            <input
-              id="search-input"
-              type="text"
-              placeholder="Cari aplikasi premium favoritmu..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="relative w-full pl-14 pr-6 py-4 md:py-5 rounded-full bg-white/30 backdrop-blur-3xl border border-white/40 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:bg-white/60 transition-all font-bold text-base md:text-lg text-slate-800 placeholder:text-slate-500 shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
-            />
-            <svg className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <p className="text-slate-500 text-sm md:text-base max-w-md mx-auto mb-8 leading-relaxed">
+            Netflix, Spotify, Canva, dan ratusan layanan lainnya — proses instan, garansi penuh, tanpa ribet.
+          </p>
+
+          <div className="relative max-w-2xl mx-auto">
+            <div className="relative flex items-center bg-white rounded-2xl border border-slate-200/90 shadow-sm focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-600/10 transition-all">
+              <Search className="w-5 h-5 text-slate-400 ml-4 shrink-0" />
+              <input
+                id="search-input"
+                type="text"
+                placeholder="Cari Netflix, Spotify, Canva, YouTube Premium..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-3 py-3.5 md:py-4 bg-transparent text-slate-900 placeholder:text-slate-400 text-sm md:text-base font-medium focus:outline-none"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="mr-3 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Trending Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
-            <span className="text-xs font-bold text-slate-400 mr-2 flex items-center gap-1.5">
-              <Flame className="w-4 h-4 text-orange-500" /> Trending:
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+            <span className="text-xs font-semibold text-slate-400 mr-1 flex items-center gap-1.5">
+              <Flame className="w-3.5 h-3.5 text-orange-500" /> Trending:
             </span>
             {(() => {
                 const tags = Object.keys(salesCounts).length > 0 
@@ -197,21 +211,19 @@ export default function Home() {
                       .sort((a, b) => b[1] - a[1])
                       .map(([name]) => name.split(" ")[0])))
                       .slice(0, 3)
-                  : ["Netflix", "Canva", "Spotify"]; // Fallback if no sales yet
+                  : ["Netflix", "Canva", "Spotify"];
                 
                 return tags.map((tag) => (
                   <button 
                     key={tag}
                     onClick={() => setSearchQuery(tag)}
-                    className="px-4 py-1.5 rounded-full bg-white/40 backdrop-blur-md border border-white/50 text-xs font-bold text-slate-600 hover:bg-white/70 hover:scale-105 transition-all shadow-sm"
+                    className="px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-medium text-slate-600 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50 transition-colors shadow-xs"
                   >
                     {tag}
                   </button>
                 ));
             })()}
           </div>
-
-          {/* Trust Badges Removed */}
         </div>
 
         {/* Promo Section */}

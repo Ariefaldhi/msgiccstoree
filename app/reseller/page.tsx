@@ -9,11 +9,7 @@ import {
     Store, 
     ArrowRight, 
     CheckCircle2, 
-    ShieldCheck, 
-    Zap, 
-    TrendingUp, 
-    Smartphone,
-    Rocket
+    ShieldCheck
 } from "lucide-react";
 import Link from "next/link";
 
@@ -82,7 +78,7 @@ export default function ResellerPage() {
   if (loading) {
       return (
       <div className="min-h-screen bg-slate-50 pt-32 pb-20 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-slate-400 animate-spin" />
+          <Loader2 className="size-8 text-blue-600 animate-spin" />
       </div>
       );
   }
@@ -97,59 +93,62 @@ export default function ResellerPage() {
     const waLink = `https://wa.me/${adminPhone}?text=${encodeURIComponent(waText)}`;
 
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col pt-32 pb-20 overflow-hidden relative">
-        <main className="flex-1 container mx-auto px-4 flex flex-col items-center justify-center relative z-10">
+      <div className="min-h-screen bg-slate-50 flex flex-col pt-32 pb-20">
+        <main className="flex-1 container mx-auto px-4 flex flex-col items-center justify-center">
           
-          <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             
             {/* Left: Content */}
             <div className="text-left">
-                <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2 block">
+                    Kemitraan Reseller
+                </span>
+                <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">
                     Program Kemitraan Khusus
                 </h1>
-                <p className="text-slate-600 font-medium text-sm md:text-base mb-10 max-w-sm leading-relaxed">
+                <p className="text-slate-600 text-sm md:text-base mb-8 max-w-sm leading-relaxed font-normal">
                     Dapatkan akses eksklusif ke harga dasar layanan untuk mempermudah penjualan ulang Anda.
                 </p>
 
-                <div className="space-y-4 mb-10">
+                <div className="space-y-3 mb-8">
                     {[
                         "Akses Harga Supplier Secara Langsung",
-                        "Prioritas Layanan Bantuan Admin",
-                        "Tanpa Syarat Minimal Transaksi"
+                        "Prioritas Layanan Bantuan Admin WhatsApp",
+                        "Tanpa Syarat Minimal Transaksi Bulanan"
                     ].map((item, i) => (
                         <div key={i} className="flex items-center gap-3">
-                            <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0" />
-                            <span className="font-bold text-slate-700 text-sm">{item}</span>
+                            <CheckCircle2 className="size-4 text-blue-600 shrink-0" />
+                            <span className="font-semibold text-slate-700 text-sm">{item}</span>
                         </div>
                     ))}
                 </div>
             </div>
 
             {/* Right: Registration Card */}
-            <div className="bg-white/60 backdrop-blur-2xl rounded-[2.5rem] p-8 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 relative flex flex-col items-center text-center">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-xs border border-slate-200/90 flex flex-col items-center text-center">
                 
-                <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-slate-200">
-                    <Store className="w-8 h-8 text-white" />
+                <div className="size-14 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl flex items-center justify-center mb-4">
+                    <Store className="size-7" />
                 </div>
 
-                <h2 className="text-xl font-black text-slate-900 mb-1">Akses Kemitraan</h2>
-                <p className="text-slate-500 font-medium text-xs mb-8">Pembayaran satu kali, akses selamanya.</p>
+                <h2 className="text-xl font-bold text-slate-900 mb-1">Akses Kemitraan</h2>
+                <p className="text-slate-500 text-xs mb-6">Biaya pendaftaran sekali untuk akses selamanya.</p>
 
-                <div className="mb-10 flex flex-col items-center">
-                    <span className="text-xs font-bold text-slate-400 line-through mb-1">Rp 25.000</span>
-                    <div className="flex items-start gap-1">
-                        <span className="text-sm font-bold text-slate-900 mt-1.5">Rp</span>
-                        <span className="text-5xl font-black text-slate-900 tracking-tighter">15.000</span>
+                <div className="mb-8 flex flex-col items-center">
+                    <span className="text-xs font-semibold text-slate-400 line-through mb-1">Rp 25.000</span>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-sm font-bold text-slate-900">Rp</span>
+                        <span className="text-4xl font-extrabold text-slate-900 tracking-tight">15.000</span>
                     </div>
                 </div>
 
                 {user ? (
-                    <a href={waLink} target="_blank" className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95">
-                        Hubungi Admin Sekarang <ArrowRight className="w-4 h-4" />
+                    <a href={waLink} target="_blank" className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-xs">
+                        Hubungi Admin Sekarang <ArrowRight className="size-4" />
                     </a>
                 ) : (
-                    <Link href="/login" className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20 active:scale-95">
-                        Masuk untuk Melanjutkan <ArrowRight className="w-4 h-4" />
+                    <Link href="/login" className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-xs">
+                        Masuk untuk Melanjutkan <ArrowRight className="size-4" />
                     </Link>
                 )}
 
@@ -175,19 +174,19 @@ export default function ResellerPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col pt-32 pb-20">
       <main className="flex-1 container mx-auto px-4 max-w-6xl">
         
-        <div className="flex items-center justify-between mb-12 bg-white p-6 md:p-8 rounded-[2rem] border border-slate-100 shadow-sm">
+        <div className="flex items-center justify-between mb-8 bg-white p-5 md:p-6 rounded-2xl border border-slate-200/90 shadow-xs">
            <div>
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight">Katalog Khusus Mitra</h1>
-              <p className="text-slate-500 mt-1 font-medium text-sm">Harga modal otomatis aktif untuk akun Anda.</p>
+              <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">Katalog Khusus Mitra Reseller</h1>
+              <p className="text-slate-500 mt-0.5 text-xs md:text-sm font-normal">Harga modal reseller otomatis aktif untuk akun Anda.</p>
            </div>
            <div className="flex flex-col items-end">
-              <div className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg font-bold text-xs flex items-center gap-1.5 border border-blue-100">
-                 <ShieldCheck className="w-4 h-4" /> AKTIF
+              <div className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg font-bold text-xs flex items-center gap-1.5 border border-emerald-200">
+                 <ShieldCheck className="size-3.5" /> Mitra Aktif
               </div>
            </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 md:gap-4">
           {[...products].sort((a, b) => {
             const sa = salesCounts[a.title] || 0;
             const sb = salesCounts[b.title] || 0;

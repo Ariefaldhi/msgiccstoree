@@ -16,54 +16,55 @@ export default function Footer({ storeName = "MSGICC STORE", logoUrl }: FooterPr
             setHasRef(!!localStorage.getItem("msgicc_affiliate_ref"));
         };
         checkRef();
-        // Listen for storage changes in case it's added in another tab
         window.addEventListener('storage', checkRef);
         return () => window.removeEventListener('storage', checkRef);
     }, []);
+
     return (
-        <footer className="border-t border-border/40 bg-background/50 backdrop-blur-sm mt-20">
+        <footer className="border-t border-slate-200/80 bg-white mt-20">
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div className="col-span-1 md:col-span-2">
-                        <Link href="/" className="flex items-center gap-2 mb-4">
+                        <Link href="/" className="flex items-center gap-2.5 mb-3">
                             {logoUrl ? (
-                                <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-gray-200/20">
+                                <div className="size-9 rounded-xl overflow-hidden shrink-0 border border-slate-200/80 shadow-2xs">
                                     <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
                                 </div>
                             ) : (
-                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#18181b] text-white font-bold shadow-lg shadow-gray-200/20 italic text-xl">
+                                <div className="size-9 rounded-xl bg-slate-900 text-white font-bold flex items-center justify-center text-lg shadow-2xs">
                                     {storeName.charAt(0).toUpperCase()}
                                 </div>
                             )}
-                            <span className="text-xl font-bold uppercase tracking-tight">
-                                {storeName.split(' ')[0]}<span className="text-blue-500">{storeName.split(' ').slice(1).join(' ')}</span>
+                            <span className="text-lg font-bold tracking-tight text-slate-900">
+                                {storeName}
                             </span>
                         </Link>
-                        <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
-                            Platform top-up game dan aplikasi premium termurah, tercepat, dan terpercaya di Indonesia.
+                        <p className="text-slate-500 text-xs md:text-sm leading-relaxed max-w-sm">
+                            Platform penyedia akun aplikasi dan hiburan premium terpercaya dengan garansi resmi dan proses transaksi instan.
                         </p>
                     </div>
 
                     <div>
-                        <h4 className="font-bold mb-4 text-foreground text-sm uppercase tracking-widest">Menu</h4>
-                        <ul className="space-y-2 text-sm text-muted-foreground font-medium">
-                            <li><Link href="/" className="hover:text-blue-500 transition-colors">Home</Link></li>
-                            <li><Link href="/reseller" className="hover:text-blue-500 transition-colors">Reseller</Link></li>
-                            <li><Link href="/afiliator" className="hover:text-blue-500 transition-colors">Afiliator</Link></li>
+                        <h4 className="font-bold mb-3 text-slate-900 text-xs uppercase tracking-wider">Navigasi</h4>
+                        <ul className="space-y-2 text-xs md:text-sm text-slate-500 font-medium">
+                            <li><Link href="/" className="hover:text-blue-600 transition-colors">Home</Link></li>
+                            <li><Link href="/reseller" className="hover:text-blue-600 transition-colors">Program Reseller</Link></li>
+                            <li><Link href="/afiliator" className="hover:text-blue-600 transition-colors">Program Afiliasi</Link></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="font-bold mb-4 text-foreground text-sm uppercase tracking-widest">Bantuan</h4>
-                        <ul className="space-y-2 text-sm text-muted-foreground font-medium">
-                            <li><Link href="/privacy" className="hover:text-blue-500 transition-colors">Kebijakan Privasi</Link></li>
-                            <li><Link href="/terms" className="hover:text-blue-500 transition-colors">Syarat & Ketentuan</Link></li>
-                            <li><Link href="/contact" className="hover:text-blue-500 transition-colors">Hubungi Kami</Link></li>
+                        <h4 className="font-bold mb-3 text-slate-900 text-xs uppercase tracking-wider">Bantuan & Legal</h4>
+                        <ul className="space-y-2 text-xs md:text-sm text-slate-500 font-medium">
+                            <li><Link href="/privacy" className="hover:text-blue-600 transition-colors">Kebijakan Privasi</Link></li>
+                            <li><Link href="/terms" className="hover:text-blue-600 transition-colors">Syarat & Ketentuan</Link></li>
+                            <li><Link href="/contact" className="hover:text-blue-600 transition-colors">Hubungi Layanan</Link></li>
                         </ul>
                     </div>
                 </div>
-                <div className="mt-12 pt-8 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground font-medium">
-                    <div>&copy; 2026 {storeName}. All rights reserved.</div>
+
+                <div className="mt-10 pt-6 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400 font-medium">
+                    <div>&copy; 2026 {storeName}. Hak cipta dilindungi undang-undang.</div>
                     
                     {hasRef && (
                         <button 
@@ -76,9 +77,9 @@ export default function Footer({ storeName = "MSGICC STORE", logoUrl }: FooterPr
                                     window.location.href = url.toString();
                                 }
                             }}
-                            className="py-1 px-3 rounded-lg border border-red-100 text-red-500 hover:bg-red-50 transition-all font-bold text-[10px] uppercase tracking-wider"
+                            className="py-1 px-2.5 rounded-md border border-rose-200 text-rose-600 hover:bg-rose-50 transition-colors font-semibold text-[10px] uppercase tracking-wider"
                         >
-                            Hapus Ref
+                            Reset Referral
                         </button>
                     )}
                 </div>

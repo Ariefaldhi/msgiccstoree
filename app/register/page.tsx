@@ -40,63 +40,63 @@ export default function RegisterPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-            <div className="w-full max-w-md bg-white border border-slate-100 p-8 rounded-[2rem] shadow-xl">
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-50 mb-4 shadow-sm border border-indigo-100">
-                        <User className="w-6 h-6 text-indigo-600" />
+            <div className="w-full max-w-md bg-white border border-slate-200/90 p-6 sm:p-8 rounded-2xl shadow-sm">
+                <div className="text-center mb-6">
+                    <div className="inline-flex items-center justify-center size-12 rounded-xl bg-blue-50 mb-3 border border-blue-100 text-blue-600">
+                        <User className="size-5" />
                     </div>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">Create Account</h1>
-                    <p className="text-slate-500 text-sm mt-2 font-medium">Join us to manage your store</p>
+                    <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Daftar Akun Baru</h1>
+                    <p className="text-slate-500 text-xs sm:text-sm mt-1 font-normal">Buat akun untuk mempermudah transaksi</p>
                 </div>
 
                 <form onSubmit={handleRegister} className="space-y-4">
-                    <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
-                        <div className="relative group">
-                            <User className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                    <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">Nama Lengkap</label>
+                        <div className="relative">
+                            <User className="absolute left-3.5 top-3 size-4 text-slate-400" />
                             <input
                                 type="text"
                                 required
                                 value={fullName}
                                 onChange={(e) => setFullName(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-400 font-medium"
-                                placeholder="John Doe"
+                                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl py-2.5 pl-10 pr-3.5 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 text-sm font-medium transition-all placeholder:text-slate-400"
+                                placeholder="Nama Anda"
                             />
                         </div>
                     </div>
 
-                    <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Email</label>
-                        <div className="relative group">
-                            <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                    <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">Email</label>
+                        <div className="relative">
+                            <Mail className="absolute left-3.5 top-3 size-4 text-slate-400" />
                             <input
                                 type="email"
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-400 font-medium"
-                                placeholder="admin@example.com"
+                                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl py-2.5 pl-10 pr-3.5 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 text-sm font-medium transition-all placeholder:text-slate-400"
+                                placeholder="nama@email.com"
                             />
                         </div>
                     </div>
 
-                    <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
-                        <div className="relative group">
-                            <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                    <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">Password</label>
+                        <div className="relative">
+                            <Lock className="absolute left-3.5 top-3 size-4 text-slate-400" />
                             <input
                                 type="password"
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-400 font-medium"
+                                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl py-2.5 pl-10 pr-3.5 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 text-sm font-medium transition-all placeholder:text-slate-400"
                                 placeholder="••••••••"
                             />
                         </div>
                     </div>
 
                     {error && (
-                        <div className="bg-red-50 border border-red-100 text-red-600 text-sm p-3 rounded-lg text-center font-bold">
+                        <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs p-3 rounded-xl font-medium">
                             {error}
                         </div>
                     )}
@@ -104,19 +104,19 @@ export default function RegisterPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-200 hover:shadow-indigo-300 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 text-sm mt-2"
                     >
-                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>
-                            <span>Sign Up</span>
-                            <ArrowRight className="w-4 h-4" />
+                        {loading ? <Loader2 className="size-4 animate-spin" /> : <>
+                            <span>Daftar Akun</span>
+                            <ArrowRight className="size-4" />
                         </>}
                     </button>
                 </form>
 
-                <p className="text-center mt-6 text-slate-400 text-sm font-medium">
-                    Already have an account?{" "}
-                    <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-bold transition-colors">
-                        Sign in
+                <p className="text-center mt-6 text-slate-500 text-xs font-medium">
+                    Sudah memiliki akun?{" "}
+                    <Link href="/login" className="text-blue-600 hover:text-blue-700 font-bold">
+                        Masuk sekarang
                     </Link>
                 </p>
             </div>
