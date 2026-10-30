@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Bricolage_Grotesque } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -9,11 +9,11 @@ import AffiliateTracker from "@/components/AffiliateTracker";
 import FloatingSupport from "@/components/FloatingSupport";
 import { Suspense } from "react";
 
-// Clean, premium modern font (Not quirky, highly professional)
-const pjs = Plus_Jakarta_Sans({
+const font = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-pjs",
+  variable: "--font-sans",
   display: 'swap',
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${pjs.variable} font-sans antialiased bg-slate-50 text-[#1e1e1e] selection:bg-blue-600/30 selection:text-blue-600 relative overflow-x-hidden`}
+        className={`${font.variable} font-sans antialiased bg-slate-50 text-[#1e1e1e] selection:bg-blue-600/30 selection:text-blue-600 relative overflow-x-hidden`}
       >
         {/* Single Color Background */}
 
